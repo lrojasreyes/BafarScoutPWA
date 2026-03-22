@@ -12,57 +12,47 @@
 body,html{height:100%;background:#070c1a;color:#e8ecf4;font-family:sans-serif;overflow:hidden}
 #app{position:fixed;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;background:#070c1a}
 header{background:#0e1628;padding:50px 20px 14px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-.lb{width:32px;height:32px;background:#e8a020;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;color:#000}
-.lt{font-weight:700;font-size:18px;margin-left:10px}
-.lt span{color:#e8a020}
 .content{flex:1;overflow:hidden;position:relative}
-.page{position:absolute;top:0;left:0;right:0;bottom:0;overflow-y:auto;display:none;-webkit-overflow-scrolling:touch}
+.page{position:absolute;top:0;left:0;right:0;bottom:0;overflow-y:auto;display:none;-webkit-overflow-scrolling:touch;padding:16px}
 .page.on{display:block}
-nav{background:#0e1628;border-top:1px solid rgba(255,255,255,.07);display:flex;flex-shrink:0;padding-bottom:env(safe-area-inset-bottom,0px)}
-.ni{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 0 6px;cursor:pointer}
+nav{background:#0e1628;border-top:1px solid rgba(255,255,255,.07);display:flex;flex-shrink:0;padding-bottom:20px}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 0 4px;cursor:pointer}
 .ni .ic{font-size:22px}
-.ni .lb2{font-size:10px;font-weight:600;text-transform:uppercase;color:#6a7590;margin-top:3px}
-.ni.on .lb2{color:#e8a020}
-.fab-w{flex:1;display:flex;align-items:center;justify-content:center}
-.fab{width:52px;height:52px;background:#e8a020;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer;border:none;color:#000;margin-bottom:8px}
-.pad{padding:16px}
-.card{background:#0e1628;border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:16px;margin-bottom:12px}
+.ni .lb{font-size:10px;font-weight:600;text-transform:uppercase;color:#6a7590;margin-top:3px}
+.ni.on .lb{color:#e8a020}
+.fabw{flex:1;display:flex;align-items:center;justify-content:center}
+.fab{width:52px;height:52px;background:#e8a020;border-radius:16px;font-size:28px;border:none;color:#000;cursor:pointer;margin-bottom:8px}
 .hero{background:linear-gradient(135deg,#162a4a,#0e1e36);border:1px solid rgba(58,143,255,.2);border-radius:16px;padding:20px;margin-bottom:12px}
-.hnum{font-size:48px;font-weight:800;line-height:1}
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
 .stat{background:#0e1628;border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:14px}
-.slbl{font-size:10px;text-transform:uppercase;color:#6a7590;margin-bottom:6px}
-.sval{font-size:26px;font-weight:800}
-.badge{font-size:10px;font-weight:700;text-transform:uppercase;padding:4px 8px;border-radius:6px}
-.bp{background:rgba(232,160,32,.15);color:#e8a020}
-.bv{background:rgba(34,209,138,.15);color:#22d18a}
-.bd{background:rgba(240,80,96,.15);color:#f05060}
+.card{background:#0e1628;border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:16px;margin-bottom:12px}
 .sec{background:#0e1628;border:1px solid rgba(255,255,255,.07);border-radius:16px;overflow:hidden;margin-bottom:12px}
 .sh{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:10px}
-.st{font-size:15px;font-weight:700;color:#e8a020}
 .sb{padding:16px;display:flex;flex-direction:column;gap:12px}
-.lbl{font-size:11px;font-weight:700;text-transform:uppercase;color:#6a7590;margin-bottom:5px;letter-spacing:.5px;display:block}
-input,textarea{background:#162035;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:12px;font-size:16px;color:#e8ecf4;font-family:sans-serif;width:100%;outline:none;-webkit-appearance:none;appearance:none;display:block}
+.lbl{font-size:11px;font-weight:700;text-transform:uppercase;color:#6a7590;margin-bottom:5px;display:block}
+input,textarea{background:#162035;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:12px;font-size:16px;color:#e8ecf4;font-family:sans-serif;width:100%;outline:none;-webkit-appearance:none;display:block}
 input:focus,textarea:focus{border-color:#e8a020}
 input::placeholder,textarea::placeholder{color:#6a7590}
 textarea{resize:none;min-height:80px}
 .r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.gbox{background:#162035;border:1px solid rgba(58,143,255,.2);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.gbox{background:#162035;border:1px solid rgba(58,143,255,.2);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer}
 .gbox.ok{background:#0e2a1e;border-color:rgba(34,209,138,.3)}
-.gico{width:42px;height:42px;border-radius:10px;background:rgba(58,143,255,.12);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-.tipos{display:flex;gap:8px;flex-wrap:wrap}
+.tipos{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
 .tipo{padding:7px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.07);background:#162035;font-size:12px;font-weight:600;cursor:pointer;color:#6a7590}
 .tipo.ok{background:rgba(232,160,32,.12);border-color:#e8a020;color:#e8a020}
 .seld{background:#162035;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:12px;font-size:16px;color:#6a7590;cursor:pointer;width:100%;display:block}
-.btn{background:#e8a020;color:#000;font-size:16px;font-weight:800;text-transform:uppercase;border:none;border-radius:14px;padding:16px;cursor:pointer;width:100%;display:block;letter-spacing:.05em;-webkit-appearance:none}
+.btn{background:#e8a020;color:#000;font-size:16px;font-weight:800;text-transform:uppercase;border:none;border-radius:14px;padding:16px;cursor:pointer;width:100%;display:block;margin-bottom:8px}
 .btn:disabled{background:#8a6010}
-.btn2{background:transparent;color:#6a7590;font-size:14px;border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:13px;cursor:pointer;width:100%;display:block;-webkit-appearance:none}
-.srch{background:#0e1628;border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:10px 14px;font-size:16px;color:#e8ecf4;width:100%;outline:none;-webkit-appearance:none;display:block}
+.btn2{background:transparent;color:#6a7590;font-size:14px;border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:13px;cursor:pointer;width:100%;display:block}
+.srch{background:#0e1628;border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:10px 14px;font-size:16px;color:#e8ecf4;width:100%;outline:none;-webkit-appearance:none;display:block;margin-bottom:10px}
 .srch::placeholder{color:#6a7590}
-.fbar{display:flex;gap:8px;overflow-x:auto;padding:10px 16px;scrollbar-width:none}
-.fbar::-webkit-scrollbar{display:none}
-.fc{padding:6px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.07);background:#0e1628;font-size:12px;font-weight:600;cursor:pointer;color:#6a7590;white-space:nowrap;-webkit-tap-highlight-color:transparent}
+.fbar{display:flex;gap:8px;overflow-x:auto;margin-bottom:10px;scrollbar-width:none}
+.fc{padding:6px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.07);background:#0e1628;font-size:12px;font-weight:600;cursor:pointer;color:#6a7590;white-space:nowrap}
 .fc.ok{background:rgba(232,160,32,.12);border-color:rgba(232,160,32,.35);color:#e8a020}
+.badge{font-size:10px;font-weight:700;text-transform:uppercase;padding:4px 8px;border-radius:6px;cursor:pointer}
+.bp{background:rgba(232,160,32,.15);color:#e8a020}
+.bv{background:rgba(34,209,138,.15);color:#22d18a}
+.bd{background:rgba(240,80,96,.15);color:#f05060}
 .spin{width:28px;height:28px;border:3px solid rgba(255,255,255,.07);border-top-color:#e8a020;border-radius:50%;animation:sp .8s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:#162035;border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:10px 18px;font-size:13px;opacity:0;transition:all .3s;z-index:9999;pointer-events:none;white-space:nowrap}
@@ -70,319 +60,548 @@ textarea{resize:none;min-height:80px}
 .mbg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;display:none;align-items:flex-end;justify-content:center}
 .mbg.on{display:flex}
 .modal{background:#0e1628;border-radius:20px 20px 0 0;width:100%;max-height:70vh;display:flex;flex-direction:column}
-.mh{padding:16px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.mh{padding:16px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;justify-content:space-between;flex-shrink:0}
 .ml{overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch}
 .mi{padding:15px 16px;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;font-size:15px}
 .surf{background:rgba(232,160,32,.08);border:1px solid rgba(232,160,32,.15);border-radius:10px;padding:10px;font-size:12px;color:#e8a020}
-.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;gap:12px;text-align:center}
 .pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .pth{aspect-ratio:1;border-radius:10px;overflow:hidden}
 .pth img{width:100%;height:100%;object-fit:cover}
 .padd{aspect-ratio:1;border-radius:10px;border:1.5px dashed rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font-size:24px;background:#162035;cursor:pointer}
 .ci{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer}
 .ci:last-child{border-bottom:none}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;gap:12px;text-align:center}
 </style>
 </head>
 <body>
 <div id="app">
   <header>
-    <div style="display:flex;align-items:center">
-      <div class="lb">B</div>
-      <div class="lt">BAFAR <span>SCOUT</span></div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:32px;height:32px;background:#e8a020;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#000">B</div>
+      <div style="font-weight:700;font-size:18px">BAFAR <span style="color:#e8a020">SCOUT</span></div>
     </div>
     <div style="font-size:12px;color:#6a7590;padding:6px 10px;background:#162035;border-radius:8px" id="hc">0 prospectos</div>
   </header>
   <div class="content">
+
     <div class="page on" id="p-dash">
-      <div class="pad">
-        <div class="hero">
-          <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#3a8fff;margin-bottom:8px">Prospectos activos</div>
-          <div class="hnum" id="d-t">0</div>
-          <div style="font-size:13px;color:#6a7590;margin-top:4px">en evaluacion</div>
-          <div style="display:flex;gap:6px;margin-top:12px;flex-wrap:wrap" id="d-ci"></div>
-        </div>
-        <div class="stats">
-          <div class="stat"><div class="slbl">Viables</div><div class="sval" style="color:#22d18a" id="d-v">0</div></div>
-          <div class="stat"><div class="slbl">Pob. prom.</div><div class="sval" style="color:#e8a020" id="d-p">-</div></div>
-          <div class="stat"><div class="slbl">Descartados</div><div class="sval" style="color:#f05060" id="d-d">0</div></div>
-          <div class="stat"><div class="slbl">Rest. prom.</div><div class="sval" style="color:#3a8fff" id="d-r">-</div></div>
-        </div>
-        <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#6a7590;margin-bottom:10px">Recientes</div>
-        <div id="d-l"></div>
+      <div class="hero">
+        <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#3a8fff;margin-bottom:8px">Prospectos activos</div>
+        <div style="font-size:48px;font-weight:800;line-height:1" id="d-t">0</div>
+        <div style="font-size:13px;color:#6a7590;margin-top:4px">en evaluacion</div>
+        <div style="display:flex;gap:6px;margin-top:12px;flex-wrap:wrap" id="d-ci"></div>
       </div>
+      <div class="stats">
+        <div class="stat"><div style="font-size:10px;text-transform:uppercase;color:#6a7590;margin-bottom:6px">Viables</div><div style="font-size:26px;font-weight:800;color:#22d18a" id="d-v">0</div></div>
+        <div class="stat"><div style="font-size:10px;text-transform:uppercase;color:#6a7590;margin-bottom:6px">Pob. prom.</div><div style="font-size:26px;font-weight:800;color:#e8a020" id="d-p">-</div></div>
+        <div class="stat"><div style="font-size:10px;text-transform:uppercase;color:#6a7590;margin-bottom:6px">Descartados</div><div style="font-size:26px;font-weight:800;color:#f05060" id="d-d">0</div></div>
+        <div class="stat"><div style="font-size:10px;text-transform:uppercase;color:#6a7590;margin-bottom:6px">Rest. prom.</div><div style="font-size:26px;font-weight:800;color:#3a8fff" id="d-r">-</div></div>
+      </div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#6a7590;margin-bottom:10px">Recientes</div>
+      <div id="d-l"></div>
     </div>
+
     <div class="page" id="p-list">
-      <div style="padding:12px 16px 0"><input class="srch" type="text" placeholder="Buscar..." id="q" oninput="rl()"></div>
+      <input class="srch" type="text" placeholder="Buscar..." id="q">
       <div class="fbar">
-        <div class="fc ok" onclick="sf('todos',this)">Todos</div>
-        <div class="fc" onclick="sf('prospecto',this)">Prospectos</div>
-        <div class="fc" onclick="sf('viable',this)">Viables</div>
-        <div class="fc" onclick="sf('descartado',this)">Descartados</div>
+        <div class="fc ok" data-filter="todos">Todos</div>
+        <div class="fc" data-filter="prospecto">Prospectos</div>
+        <div class="fc" data-filter="viable">Viables</div>
+        <div class="fc" data-filter="descartado">Descartados</div>
       </div>
-      <div style="padding:10px 16px" id="l-l"></div>
+      <div id="l-l"></div>
     </div>
+
     <div class="page" id="p-new">
-      <div style="padding:16px;display:flex;flex-direction:column;gap:12px">
-        <div class="sec">
-          <div class="sh"><span style="font-size:20px">📡</span><span class="st">Ubicacion GPS</span></div>
-          <div class="sb">
-            <div class="gbox" id="gb" onclick="doGPS()">
-              <div class="gico" id="gi">📡</div>
-              <div><div style="font-weight:600;font-size:14px" id="gt">Capturar ubicacion</div><div style="font-size:12px;color:#6a7590;margin-top:2px" id="gc">Toca para obtener coordenadas</div></div>
-            </div>
+      <div class="sec">
+        <div class="sh"><span style="font-size:20px">📡</span><span style="font-size:15px;font-weight:700;color:#e8a020">Ubicacion GPS</span></div>
+        <div class="sb">
+          <div class="gbox" id="gb">
+            <div style="width:42px;height:42px;border-radius:10px;background:rgba(58,143,255,.12);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0" id="gi">📡</div>
+            <div><div style="font-weight:600;font-size:14px" id="gt">Capturar ubicacion</div><div style="font-size:12px;color:#6a7590;margin-top:2px" id="gc">Toca para obtener coordenadas</div></div>
           </div>
         </div>
-        <div class="sec">
-          <div class="sh"><span style="font-size:20px">🏢</span><span class="st">Informacion del sitio</span></div>
-          <div class="sb">
-            <div><label class="lbl">Nombre *</label><input type="text" placeholder="Ej: Local Blvd. Culiacan Norte" id="fn"></div>
-            <div><label class="lbl">Direccion</label><input type="text" placeholder="Se autocompleta con GPS" id="fd" oninput="dm=1"></div>
-            <div><label class="lbl">Tipo *</label><div class="tipos" style="margin-top:6px">
-              <div class="tipo ok" onclick="st(this,'Local comercial')">Local comercial</div>
-              <div class="tipo" onclick="st(this,'Terreno')">Terreno</div>
-              <div class="tipo" onclick="st(this,'Nave industrial')">Nave industrial</div>
-              <div class="tipo" onclick="st(this,'Bodega')">Bodega</div>
-              <div class="tipo" onclick="st(this,'Edificio')">Edificio</div>
-            </div></div>
-            <div class="r2">
-              <div><label class="lbl">Ciudad</label><input type="text" placeholder="Culiacan..." id="fci"></div>
-              <div><label class="lbl">Estado</label><div class="seld" id="fe-d" onclick="openM()">Seleccionar...</div><input type="hidden" id="fe"></div>
-            </div>
-            <div><label class="lbl">Notas</label><textarea placeholder="Observaciones..." id="fno"></textarea></div>
-          </div>
-        </div>
-        <div class="sec">
-          <div class="sh"><span style="font-size:20px">📐</span><span class="st">Medidas</span></div>
-          <div class="sb">
-            <div class="r2">
-              <div><label class="lbl">M2 terreno</label><input type="number" placeholder="0" id="fm2t" oninput="cs()"></div>
-              <div><label class="lbl">M2 construccion</label><input type="number" placeholder="0" id="fm2c"></div>
-            </div>
-            <div class="r2">
-              <div><label class="lbl">Frente (m)</label><input type="number" placeholder="0" id="ffr" oninput="cs()"></div>
-              <div><label class="lbl">Fondo (m)</label><input type="number" placeholder="0" id="ffo" oninput="cs()"></div>
-            </div>
-            <div class="surf" id="fsu" style="display:none"></div>
-          </div>
-        </div>
-        <div class="sec">
-          <div class="sh"><span style="font-size:20px">👤</span><span class="st">Propietario</span></div>
-          <div class="sb">
-            <div><label class="lbl">Nombre</label><input type="text" placeholder="Nombre completo" id="fdu"></div>
-            <div class="r2">
-              <div><label class="lbl">Telefono</label><input type="tel" placeholder="(667) 000-0000" id="fte"></div>
-              <div><label class="lbl">Precio</label><input type="text" placeholder="0 MXN" id="fpr"></div>
-            </div>
-          </div>
-        </div>
-        <div class="sec" id="dsec" style="display:none">
-          <div class="sh"><span style="font-size:20px">📊</span><span class="st">DENUE / INEGI</span></div>
-          <div id="dc"><div style="padding:20px;display:flex;align-items:center;gap:12px"><div class="spin"></div><span style="color:#6a7590;font-size:13px">Consultando...</span></div></div>
-        </div>
-        <div class="sec">
-          <div class="sh"><span style="font-size:20px">📷</span><span class="st">Fotos</span></div>
-          <div class="sb">
-            <div class="pgrid" id="pg"><div class="padd" onclick="document.getElementById('fi').click()">➕</div></div>
-            <input type="file" id="fi" accept="image/*" multiple onchange="ap(event)" style="display:none">
-          </div>
-        </div>
-        <button class="btn" id="bsv" onclick="saveP()">GUARDAR PROSPECTO</button>
-        <button class="btn2" onclick="go('dash')">Cancelar</button>
-        <div style="height:30px"></div>
       </div>
+      <div class="sec">
+        <div class="sh"><span style="font-size:20px">🏢</span><span style="font-size:15px;font-weight:700;color:#e8a020">Informacion del sitio</span></div>
+        <div class="sb">
+          <div><label class="lbl">Nombre *</label><input type="text" placeholder="Ej: Local Blvd. Culiacan Norte" id="fn"></div>
+          <div><label class="lbl">Direccion</label><input type="text" placeholder="Se autocompleta con GPS" id="fd"></div>
+          <div><label class="lbl">Tipo *</label>
+            <div class="tipos">
+              <div class="tipo ok" data-tipo="Local comercial">Local comercial</div>
+              <div class="tipo" data-tipo="Terreno">Terreno</div>
+              <div class="tipo" data-tipo="Nave industrial">Nave industrial</div>
+              <div class="tipo" data-tipo="Bodega">Bodega</div>
+              <div class="tipo" data-tipo="Edificio">Edificio</div>
+            </div>
+          </div>
+          <div class="r2">
+            <div><label class="lbl">Ciudad</label><input type="text" placeholder="Culiacan..." id="fci"></div>
+            <div><label class="lbl">Estado</label><div class="seld" id="fe-d">Seleccionar...</div><input type="hidden" id="fe"></div>
+          </div>
+          <div><label class="lbl">Notas</label><textarea placeholder="Observaciones..." id="fno"></textarea></div>
+        </div>
+      </div>
+      <div class="sec">
+        <div class="sh"><span style="font-size:20px">📐</span><span style="font-size:15px;font-weight:700;color:#e8a020">Medidas</span></div>
+        <div class="sb">
+          <div class="r2">
+            <div><label class="lbl">M2 terreno</label><input type="number" placeholder="0" id="fm2t"></div>
+            <div><label class="lbl">M2 construccion</label><input type="number" placeholder="0" id="fm2c"></div>
+          </div>
+          <div class="r2">
+            <div><label class="lbl">Frente m</label><input type="number" placeholder="0" id="ffr"></div>
+            <div><label class="lbl">Fondo m</label><input type="number" placeholder="0" id="ffo"></div>
+          </div>
+          <div class="surf" id="fsu" style="display:none"></div>
+        </div>
+      </div>
+      <div class="sec">
+        <div class="sh"><span style="font-size:20px">👤</span><span style="font-size:15px;font-weight:700;color:#e8a020">Propietario</span></div>
+        <div class="sb">
+          <div><label class="lbl">Nombre</label><input type="text" placeholder="Nombre completo" id="fdu"></div>
+          <div class="r2">
+            <div><label class="lbl">Telefono</label><input type="tel" placeholder="(667) 000-0000" id="fte"></div>
+            <div><label class="lbl">Precio</label><input type="text" placeholder="0 MXN" id="fpr"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sec" id="dsec" style="display:none">
+        <div class="sh"><span style="font-size:20px">📊</span><span style="font-size:15px;font-weight:700;color:#e8a020">DENUE / INEGI</span></div>
+        <div id="dc"></div>
+      </div>
+      <div class="sec">
+        <div class="sh"><span style="font-size:20px">📷</span><span style="font-size:15px;font-weight:700;color:#e8a020">Fotos</span></div>
+        <div class="sb">
+          <div class="pgrid" id="pg"><div class="padd" id="padd">+</div></div>
+          <input type="file" id="fi" accept="image/*" multiple style="display:none">
+        </div>
+      </div>
+      <button class="btn" id="bsv">GUARDAR PROSPECTO</button>
+      <button class="btn2" id="bcan">Cancelar</button>
+      <div style="height:30px"></div>
     </div>
+
     <div class="page" id="p-cfg">
-      <div style="padding:16px">
-        <div style="margin-bottom:16px"><div style="font-size:22px;font-weight:800">Configuracion</div><div style="font-size:13px;color:#6a7590">BAFAR Scout v2.0</div></div>
-        <div style="background:linear-gradient(135deg,#162035,#0e1628);border:1px solid rgba(232,160,32,.2);border-radius:14px;padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:12px">
-          <div style="font-size:32px">📱</div>
-          <div><div style="font-weight:700">Instalar en iPhone</div><div style="font-size:12px;color:#6a7590;margin-top:2px">Safari → compartir → Agregar a inicio</div></div>
-        </div>
-        <div class="sec">
-          <div style="padding:12px 16px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#6a7590;border-bottom:1px solid rgba(255,255,255,.07)">Token DENUE</div>
-          <div style="padding:14px 16px">
-            <div style="font-size:12px;font-family:monospace;color:#e8a020;background:#162035;padding:8px;border-radius:8px;word-break:break-all;margin-bottom:10px" id="td">70b82e03...</div>
-            <label class="lbl">Actualizar token</label>
-            <input type="text" placeholder="Pega tu token" id="ti" style="margin-top:6px">
-            <button class="btn" style="margin-top:8px;padding:12px;font-size:14px" onclick="saveTk()">Guardar token</button>
-          </div>
-        </div>
-        <div class="sec" style="margin-top:12px">
-          <div class="ci" onclick="expC()"><div style="display:flex;align-items:center;gap:12px"><div style="width:36px;height:36px;border-radius:10px;background:rgba(34,209,138,.12);display:flex;align-items:center;justify-content:center;font-size:18px">📤</div><div><div style="font-size:14px;font-weight:500">Exportar Excel</div><div style="font-size:12px;color:#6a7590" id="ec">0 prospectos</div></div></div><span style="color:#6a7590">›</span></div>
-          <div class="ci" onclick="delA()"><div style="display:flex;align-items:center;gap:12px"><div style="width:36px;height:36px;border-radius:10px;background:rgba(240,80,96,.12);display:flex;align-items:center;justify-content:center;font-size:18px">🗑️</div><div><div style="font-size:14px;font-weight:500;color:#f05060">Eliminar todos</div><div style="font-size:12px;color:#6a7590">No se puede deshacer</div></div></div><span style="color:#6a7590">›</span></div>
-        </div>
-        <div style="height:20px"></div>
+      <div style="margin-bottom:16px"><div style="font-size:22px;font-weight:800">Configuracion</div><div style="font-size:13px;color:#6a7590">BAFAR Scout v2.0</div></div>
+      <div style="background:linear-gradient(135deg,#162035,#0e1628);border:1px solid rgba(232,160,32,.2);border-radius:14px;padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:12px">
+        <div style="font-size:32px">📱</div>
+        <div><div style="font-weight:700">Instalar en iPhone</div><div style="font-size:12px;color:#6a7590;margin-top:2px">Safari - compartir - Agregar a inicio</div></div>
       </div>
+      <div class="sec">
+        <div style="padding:12px 16px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#6a7590;border-bottom:1px solid rgba(255,255,255,.07)">Token DENUE</div>
+        <div style="padding:14px 16px">
+          <div style="font-size:12px;font-family:monospace;color:#e8a020;background:#162035;padding:8px;border-radius:8px;word-break:break-all;margin-bottom:10px" id="td">70b82e03...</div>
+          <label class="lbl">Actualizar token</label>
+          <input type="text" placeholder="Pega tu token" id="ti" style="margin-top:6px">
+          <button class="btn" id="bsavtok" style="margin-top:8px;padding:12px;font-size:14px">Guardar token</button>
+        </div>
+      </div>
+      <div class="sec" style="margin-top:12px">
+        <div class="ci" id="bexp">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:36px;height:36px;border-radius:10px;background:rgba(34,209,138,.12);display:flex;align-items:center;justify-content:center">📤</div>
+            <div><div style="font-size:14px;font-weight:500">Exportar Excel</div><div style="font-size:12px;color:#6a7590" id="ec">0 prospectos</div></div>
+          </div>
+          <span style="color:#6a7590">›</span>
+        </div>
+        <div class="ci" id="bdel">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:36px;height:36px;border-radius:10px;background:rgba(240,80,96,.12);display:flex;align-items:center;justify-content:center">🗑️</div>
+            <div><div style="font-size:14px;font-weight:500;color:#f05060">Eliminar todos</div><div style="font-size:12px;color:#6a7590">No se puede deshacer</div></div>
+          </div>
+          <span style="color:#6a7590">›</span>
+        </div>
+      </div>
+      <div style="height:20px"></div>
     </div>
+
   </div>
   <nav>
-    <div class="ni on" id="n-dash" onclick="go('dash')"><div class="ic">📊</div><div class="lb2">Dashboard</div></div>
-    <div class="ni" id="n-list" onclick="go('list')"><div class="ic">📋</div><div class="lb2">Prospectos</div></div>
-    <div class="fab-w"><button class="fab" onclick="go('new')">＋</button></div>
-    <div class="ni" style="opacity:.3"><div class="ic">📍</div><div class="lb2">Detalle</div></div>
-    <div class="ni" id="n-cfg" onclick="go('cfg')"><div class="ic">⚙️</div><div class="lb2">Config</div></div>
+    <div class="ni on" data-page="dash"><div class="ic">📊</div><div class="lb">Dashboard</div></div>
+    <div class="ni" data-page="list"><div class="ic">📋</div><div class="lb">Prospectos</div></div>
+    <div class="fabw"><button class="fab" id="bfab">+</button></div>
+    <div class="ni" style="opacity:.3"><div class="ic">📍</div><div class="lb">Detalle</div></div>
+    <div class="ni" data-page="cfg"><div class="ic">⚙️</div><div class="lb">Config</div></div>
   </nav>
 </div>
-<div class="mbg" id="mb"><div class="modal"><div class="mh"><span style="font-weight:700">Seleccionar Estado</span><span style="cursor:pointer;color:#e8a020" onclick="closeM()">Cerrar</span></div><div class="ml" id="ml"></div></div></div>
+<div class="mbg" id="mb">
+  <div class="modal">
+    <div class="mh"><span style="font-weight:700">Seleccionar Estado</span><button id="bcloseM" style="background:none;border:none;color:#e8a020;font-size:16px;cursor:pointer">Cerrar</button></div>
+    <div class="ml" id="ml"></div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 <script>
-const TOK='70b82e03-5905-4374-87af-4e7a5e1671c0';
-const EST=['Aguascalientes','Baja California','Baja California Sur','Campeche','Chiapas','Chihuahua','Ciudad de Mexico','Coahuila','Colima','Durango','Estado de Mexico','Guanajuato','Guerrero','Hidalgo','Jalisco','Michoacan','Morelos','Nayarit','Nuevo Leon','Oaxaca','Puebla','Queretaro','Quintana Roo','San Luis Potosi','Sinaloa','Sonora','Tabasco','Tamaulipas','Tlaxcala','Veracruz','Yucatan','Zacatecas'];
-let PS=JSON.parse(localStorage.getItem('bsv3')||'[]'),GD=null,TI='Local comercial',AF='todos',PH=[],dm=0,DR=null;
-function sv(){try{localStorage.setItem('bsv3',JSON.stringify(PS.map(p=>({...p,fotos:[]}))));}catch(e){}}
+var TOK="70b82e03-5905-4374-87af-4e7a5e1671c0";
+var EST=["Aguascalientes","Baja California","Baja California Sur","Campeche","Chiapas","Chihuahua","Ciudad de Mexico","Coahuila","Colima","Durango","Estado de Mexico","Guanajuato","Guerrero","Hidalgo","Jalisco","Michoacan","Morelos","Nayarit","Nuevo Leon","Oaxaca","Puebla","Queretaro","Quintana Roo","San Luis Potosi","Sinaloa","Sonora","Tabasco","Tamaulipas","Tlaxcala","Veracruz","Yucatan","Zacatecas"];
+var PS=JSON.parse(localStorage.getItem("bsv4")||"[]");
+var GD=null,TI="Local comercial",AF="todos",PH=[],DM=false,DR=null,editId=null;
+
+function sv(){try{localStorage.setItem("bsv4",JSON.stringify(PS.map(function(p){return Object.assign({},p,{fotos:[]});})));}catch(e){}}
+
 function go(p){
-  document.querySelectorAll('.page').forEach(x=>x.classList.remove('on'));
-  document.querySelectorAll('.ni').forEach(x=>x.classList.remove('on'));
-  document.getElementById('p-'+p).classList.add('on');
-  const n=document.getElementById('n-'+p);if(n)n.classList.add('on');
-  if(p==='list')rl();
-  if(p==='new')rf();
-  if(p==='dash')ud();
-  if(p==='cfg'){const e=document.getElementById('ec');if(e)e.textContent=PS.length+' prospectos';}
+  document.querySelectorAll(".page").forEach(function(x){x.classList.remove("on");});
+  document.querySelectorAll(".ni").forEach(function(x){x.classList.remove("on");});
+  document.getElementById("p-"+p).classList.add("on");
+  var n=document.querySelector(".ni[data-page="+p+"]");
+  if(n)n.classList.add("on");
+  if(p==="list")rl();
+  if(p==="new")rf();
+  if(p==="dash")ud();
+  if(p==="cfg"){var e=document.getElementById("ec");if(e)e.textContent=PS.length+" prospectos";}
 }
+
 function ud(){
-  document.getElementById('d-t').textContent=PS.length;
-  document.getElementById('hc').textContent=PS.length+' prospectos';
-  document.getElementById('d-v').textContent=PS.filter(p=>p.status==='viable').length;
-  document.getElementById('d-d').textContent=PS.filter(p=>p.status==='descartado').length;
-  const wp=PS.filter(p=>p.inegi&&p.inegi.pob);
-  document.getElementById('d-p').textContent=wp.length?(wp.reduce((a,p)=>a+p.inegi.pob,0)/wp.length/1000).toFixed(1)+'K':'-';
-  const wr=PS.filter(p=>p.denue&&p.denue.rest);
-  document.getElementById('d-r').textContent=wr.length?Math.round(wr.reduce((a,p)=>a+p.denue.rest,0)/wr.length):'-';
-  const ci=[...new Set(PS.map(p=>p.ciudad).filter(Boolean))].slice(0,5);
-  document.getElementById('d-ci').innerHTML=ci.map((c,i)=>`<span style="background:${i===0?'rgba(232,160,32,.12)':'rgba(255,255,255,.06)'};border:1px solid ${i===0?'rgba(232,160,32,.3)':'rgba(255,255,255,.07)'};border-radius:20px;padding:4px 10px;font-size:11px;color:${i===0?'#e8a020':'#6a7590'}">${c}</span>`).join('');
-  document.getElementById('d-l').innerHTML=PS.slice(0,3).map(ch).join('')||'<div class="empty"><div style="font-size:48px;opacity:.3">🗺️</div><div style="font-size:18px;font-weight:700;color:#6a7590">Sin prospectos</div><div style="font-size:13px;color:#6a7590">Toca + para comenzar</div></div>';
+  document.getElementById("d-t").textContent=PS.length;
+  document.getElementById("hc").textContent=PS.length+" prospectos";
+  document.getElementById("d-v").textContent=PS.filter(function(p){return p.status==="viable";}).length;
+  document.getElementById("d-d").textContent=PS.filter(function(p){return p.status==="descartado";}).length;
+  var wp=PS.filter(function(p){return p.inegi&&p.inegi.pob;});
+  document.getElementById("d-p").textContent=wp.length?((wp.reduce(function(a,p){return a+p.inegi.pob;},0)/wp.length)/1000).toFixed(1)+"K":"-";
+  var wr=PS.filter(function(p){return p.denue&&p.denue.rest;});
+  document.getElementById("d-r").textContent=wr.length?Math.round(wr.reduce(function(a,p){return a+p.denue.rest;},0)/wr.length):"-";
+  var ci=[...new Set(PS.map(function(p){return p.ciudad;}).filter(Boolean))].slice(0,5);
+  document.getElementById("d-ci").innerHTML=ci.map(function(c,i){return "<span style='background:"+(i===0?"rgba(232,160,32,.12)":"rgba(255,255,255,.06)")+";border:1px solid "+(i===0?"rgba(232,160,32,.3)":"rgba(255,255,255,.07)")+";border-radius:20px;padding:4px 10px;font-size:11px;color:"+(i===0?"#e8a020":"#6a7590")+"'>"+c+"</span>";}).join("");
+  document.getElementById("d-l").innerHTML=PS.slice(0,3).map(ch).join("")||"<div class='empty'><div style='font-size:48px;opacity:.3'>🗺️</div><div style='font-size:18px;font-weight:700;color:#6a7590'>Sin prospectos</div><div style='font-size:13px;color:#6a7590'>Toca + para comenzar</div></div>";
 }
+
 function ch(p){
-  const bc={viable:'bv',prospecto:'bp',descartado:'bd'}[p.status]||'bp';
-  const bl={viable:'Viable',prospecto:'Prospecto',descartado:'Descartado'}[p.status]||'Prospecto';
-  return '<div class="card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px"><div style="flex:1;margin-right:8px"><div style="font-size:18px;font-weight:700">'+p.nombre+'</div>'+(p.direccion?'<div style="font-size:12px;color:#6a7590;margin-top:2px">'+p.direccion+'</div>':'')+'</div><span class="badge '+bc+'" onclick="cs2(''+p.id+'')">'+bl+'</span></div>'+(p.denue?'<div style="display:flex;gap:16px;margin-bottom:10px"><div><div style="font-size:16px;font-weight:700;color:#22d18a">'+((p.inegi.pob||0)/1000).toFixed(1)+'K</div><div style="font-size:9px;color:#6a7590;text-transform:uppercase">Poblacion</div></div><div><div style="font-size:16px;font-weight:700;color:#f0c050">'+(p.inegi.viv||0).toLocaleString()+'</div><div style="font-size:9px;color:#6a7590;text-transform:uppercase">Viviendas</div></div><div><div style="font-size:16px;font-weight:700;color:#3a8fff">'+(p.denue.rest||0)+'</div><div style="font-size:9px;color:#6a7590;text-transform:uppercase">Restaurantes</div></div></div>':'')+'<div style="display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid rgba(255,255,255,.07)"><div style="font-size:12px;color:#6a7590">'+(p.ciudad||'')+(p.estado?', '+p.estado:'')+' - '+p.tipo+'</div><div style="display:flex;gap:8px"><button style="background:rgba(232,160,32,.12);border:1px solid rgba(232,160,32,.2);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px;color:#e8a020" onclick="ep(''+p.id+'')">Editar</button><button style="background:transparent;border:none;cursor:pointer;font-size:16px" onclick="dp(''+p.id+'')">🗑️</button></div></div></div>';
+  var bc={viable:"bv",prospecto:"bp",descartado:"bd"}[p.status]||"bp";
+  var bl={viable:"Viable",prospecto:"Prospecto",descartado:"Descartado"}[p.status]||"Prospecto";
+  var m=p.denue?"<div style='display:flex;gap:16px;margin-bottom:10px'><div><div style='font-size:16px;font-weight:700;color:#22d18a'>"+((p.inegi&&p.inegi.pob?p.inegi.pob:0)/1000).toFixed(1)+"K</div><div style='font-size:9px;color:#6a7590;text-transform:uppercase'>Poblacion</div></div><div><div style='font-size:16px;font-weight:700;color:#f0c050'>"+(p.inegi&&p.inegi.viv?p.inegi.viv:0).toLocaleString()+"</div><div style='font-size:9px;color:#6a7590;text-transform:uppercase'>Viviendas</div></div><div><div style='font-size:16px;font-weight:700;color:#3a8fff'>"+(p.denue.rest||0)+"</div><div style='font-size:9px;color:#6a7590;text-transform:uppercase'>Restaurantes</div></div></div>":"";
+  return "<div class='card' data-id='"+p.id+"'><div style='display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px'><div style='flex:1;margin-right:8px'><div style='font-size:18px;font-weight:700'>"+p.nombre+"</div>"+(p.direccion?"<div style='font-size:12px;color:#6a7590;margin-top:2px'>"+p.direccion+"</div>":"")+"</div><span class='badge "+bc+" card-status' data-id='"+p.id+"'>"+bl+"</span></div>"+m+"<div style='display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid rgba(255,255,255,.07)'><div style='font-size:12px;color:#6a7590'>"+(p.ciudad||"")+(p.estado?", "+p.estado:"")+" - "+p.tipo+"</div><div style='display:flex;gap:8px'><button class='card-edit' data-id='"+p.id+"' style='background:rgba(232,160,32,.12);border:1px solid rgba(232,160,32,.2);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px;color:#e8a020'>Editar</button><button class='card-del' data-id='"+p.id+"' style='background:transparent;border:none;cursor:pointer;font-size:16px'>🗑️</button></div></div></div>";
 }
+
 function rl(){
-  const q=(document.getElementById('q')||{}).value||'';
-  const list=PS.filter(p=>(AF==='todos'||p.status===AF)&&(!q||`${p.nombre} ${p.ciudad} ${p.estado}`.toLowerCase().includes(q.toLowerCase())));
-  document.getElementById('l-l').innerHTML=list.length?list.map(ch).join(''):'<div class="empty"><div style="font-size:48px;opacity:.3">🔍</div><div style="font-size:18px;font-weight:700;color:#6a7590">'+(PS.length===0?'Sin prospectos':'Sin resultados')+'</div></div>';
+  var q=(document.getElementById("q")||{}).value||"";
+  var list=PS.filter(function(p){return(AF==="todos"||p.status===AF)&&(!q||(""+p.nombre+" "+p.ciudad+" "+p.estado).toLowerCase().includes(q.toLowerCase()));});
+  document.getElementById("l-l").innerHTML=list.length?list.map(ch).join(""):"<div class='empty'><div style='font-size:48px;opacity:.3'>🔍</div><div style='font-size:18px;font-weight:700;color:#6a7590'>"+(PS.length===0?"Sin prospectos":"Sin resultados")+"</div></div>";
 }
-function sf(f,el){AF=f;document.querySelectorAll('.fc').forEach(c=>c.classList.remove('ok'));el.classList.add('ok');rl();}
-function cs2(id){const p=PS.find(x=>x.id===id);if(!p)return;const o=['prospecto','viable','descartado'];p.status=o[(o.indexOf(p.status)+1)%3];sv();ud();rl();toast('Estado: '+p.status);}
+
+function toast(m){
+  var t=document.getElementById("toast");
+  t.textContent=m;t.classList.add("on");
+  setTimeout(function(){t.classList.remove("on");},2500);
+}
+
 function doGPS(){
-  document.getElementById('gt').textContent='Obteniendo...';
+  document.getElementById("gt").textContent="Obteniendo...";
   if(!navigator.geolocation){simG();return;}
-  navigator.geolocation.getCurrentPosition(async function(pos){
+  navigator.geolocation.getCurrentPosition(function(pos){
     GD={lat:pos.coords.latitude,lng:pos.coords.longitude,acc:Math.round(pos.coords.accuracy||0)};
-    document.getElementById('gb').classList.add('ok');
-    document.getElementById('gi').textContent='✅';
-    document.getElementById('gt').textContent='Ubicacion capturada';
-    document.getElementById('gc').textContent=GD.lat.toFixed(5)+', '+GD.lng.toFixed(5)+' (+-'+GD.acc+'m)';
-    if(!dm)await geo();
-    showD();toast('GPS capturado');
+    document.getElementById("gb").classList.add("ok");
+    document.getElementById("gi").textContent="✅";
+    document.getElementById("gt").textContent="Ubicacion capturada";
+    document.getElementById("gc").textContent=GD.lat.toFixed(5)+", "+GD.lng.toFixed(5)+" (+-"+GD.acc+"m)";
+    if(!DM)geo();
+    showD();
+    toast("GPS capturado");
   },function(){simG();});
 }
+
 function simG(){
   var d=[{lat:24.7994,lng:-107.4394},{lat:21.1236,lng:-101.6829},{lat:20.5888,lng:-100.3899}];
   GD=Object.assign({},d[Math.floor(Math.random()*d.length)],{acc:8});
-  document.getElementById('gb').classList.add('ok');
-  document.getElementById('gi').textContent='✅';
-  document.getElementById('gt').textContent='Ubicacion demo';
-  document.getElementById('gc').textContent=GD.lat.toFixed(5)+', '+GD.lng.toFixed(5);
-  showD();toast('GPS demo');
+  document.getElementById("gb").classList.add("ok");
+  document.getElementById("gi").textContent="✅";
+  document.getElementById("gt").textContent="Ubicacion demo";
+  document.getElementById("gc").textContent=GD.lat.toFixed(5)+", "+GD.lng.toFixed(5);
+  showD();
+  toast("GPS demo");
 }
-async function geo(){
-  try{
-    var r=await fetch('https://nominatim.openstreetmap.org/reverse?lat='+GD.lat+'&lon='+GD.lng+'&format=json');
-    var d=await r.json();
+
+function geo(){
+  fetch("https://nominatim.openstreetmap.org/reverse?lat="+GD.lat+"&lon="+GD.lng+"&format=json")
+  .then(function(r){return r.json();})
+  .then(function(d){
     if(d.address){
       var a=d.address;
-      var dir=[(a.road||'')+(a.house_number?' '+a.house_number:''),a.suburb||a.neighbourhood||''].filter(Boolean).join(', ');
-      if(dir){document.getElementById('fd').value=dir;}
-      if(a.city||a.town)document.getElementById('fci').value=a.city||a.town||'';
-      if(a.state){var f=EST.find(function(e){return e.toLowerCase().includes(a.state.toLowerCase())||a.state.toLowerCase().includes(e.toLowerCase());});if(f){document.getElementById('fe').value=f;document.getElementById('fe-d').textContent=f;document.getElementById('fe-d').style.color='#e8ecf4';}}
+      var dir=[(a.road||"")+(a.house_number?" "+a.house_number:""),a.suburb||a.neighbourhood||""].filter(Boolean).join(", ");
+      if(dir)document.getElementById("fd").value=dir;
+      if(a.city||a.town)document.getElementById("fci").value=a.city||a.town||"";
+      if(a.state){
+        var f=EST.find(function(e){return e.toLowerCase().includes(a.state.toLowerCase())||a.state.toLowerCase().includes(e.toLowerCase());});
+        if(f){document.getElementById("fe").value=f;document.getElementById("fe-d").textContent=f;document.getElementById("fe-d").style.color="#e8ecf4";}
+      }
     }
-  }catch(e){}
+  }).catch(function(){});
 }
-async function showD(){
-  document.getElementById('dsec').style.display='block';
-  document.getElementById('dc').innerHTML='<div style="padding:20px;display:flex;align-items:center;gap:12px"><div class="spin"></div><span style="color:#6a7590;font-size:13px">Consultando DENUE...</span></div>';
-  var tok=localStorage.getItem('dtok')||TOK;
-  var R=null;
-  try{
-    var r1=await fetch('https://www.inegi.org.mx/app/api/denue/v1/consulta/buscar/todos/'+GD.lat+','+GD.lng+'/1500/1/1000/'+tok+'/json').then(function(r){return r.json();}).catch(function(){return null;});
-    var r2=await fetch('https://www.inegi.org.mx/app/api/denue/v1/consulta/buscar/restaurantes/'+GD.lat+','+GD.lng+'/1500/1/1000/'+tok+'/json').then(function(r){return r.json();}).catch(function(){return null;});
-    if(r1&&Array.isArray(r1)&&r1.length>0)R={real:true,rest:r2&&Array.isArray(r2)?r2.length:0,com:r1.filter(function(e){return (e.clase_actividad||'').startsWith('46');}).length,tot:r1.length,viv:Math.round(r1.length*4.2),pob:Math.round(r1.length*4.2*3.5)};
-  }catch(e){}
-  if(!R){var rest=30+Math.floor(Math.random()*100),com=100+Math.floor(Math.random()*300),tot=rest+com+150+Math.floor(Math.random()*400),viv=2000+Math.floor(Math.random()*7000);R={real:false,rest:rest,com:com,tot:tot,viv:viv,pob:Math.round(viv*3.5)};}
-  DR=R;
-  document.getElementById('dc').innerHTML='<div style="background:linear-gradient(135deg,#1a1230,#0e0c1e);padding:0"><div style="padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;justify-content:space-between;align-items:center"><span style="font-weight:700">Zona 1.5km</span><span style="font-size:10px;font-weight:700;padding:3px 7px;border-radius:5px;background:'+(R.real?'rgba(34,209,138,.12)':'rgba(232,160,32,.12)')+';color:'+(R.real?'#22d18a':'#e8a020')+'">'+(R.real?'REAL':'SIMULADO')+'</span></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr"><div style="padding:14px;border-right:1px solid rgba(255,255,255,.07);text-align:center"><div style="font-size:24px;font-weight:800;color:#f0c050">'+R.rest+'</div><div style="font-size:10px;color:#6a7590">Restaurantes</div></div><div style="padding:14px;border-right:1px solid rgba(255,255,255,.07);text-align:center"><div style="font-size:24px;font-weight:800;color:#f0c050">'+R.com+'</div><div style="font-size:10px;color:#6a7590">Comercios</div></div><div style="padding:14px;text-align:center"><div style="font-size:24px;font-weight:800;color:#f0c050">'+R.tot+'</div><div style="font-size:10px;color:#6a7590">Total</div></div></div><div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid rgba(255,255,255,.07)"><div style="padding:12px 14px;border-right:1px solid rgba(255,255,255,.07)"><div style="font-size:20px;font-weight:700;color:#22d18a">'+R.viv.toLocaleString()+'</div><div style="font-size:10px;color:#6a7590">Viviendas</div></div><div style="padding:12px 14px"><div style="font-size:20px;font-weight:700;color:#f0c050">'+(R.pob/1000).toFixed(1)+'K</div><div style="font-size:10px;color:#6a7590">Poblacion</div></div></div></div>';
+
+function showD(){
+  document.getElementById("dsec").style.display="block";
+  document.getElementById("dc").innerHTML="<div style='padding:20px;display:flex;align-items:center;gap:12px'><div class='spin'></div><span style='color:#6a7590;font-size:13px'>Consultando DENUE...</span></div>";
+  var tok=localStorage.getItem("dtok")||TOK;
+  var lat=GD.lat,lng=GD.lng;
+  Promise.all([
+    fetch("https://www.inegi.org.mx/app/api/denue/v1/consulta/buscar/todos/"+lat+","+lng+"/1500/1/1000/"+tok+"/json").then(function(r){return r.json();}).catch(function(){return null;}),
+    fetch("https://www.inegi.org.mx/app/api/denue/v1/consulta/buscar/restaurantes/"+lat+","+lng+"/1500/1/1000/"+tok+"/json").then(function(r){return r.json();}).catch(function(){return null;})
+  ]).then(function(res){
+    var r1=res[0],r2=res[1],R=null;
+    if(r1&&Array.isArray(r1)&&r1.length>0){
+      R={real:true,rest:r2&&Array.isArray(r2)?r2.length:0,com:r1.filter(function(e){return(e.clase_actividad||"").startsWith("46");}).length,tot:r1.length,viv:Math.round(r1.length*4.2),pob:Math.round(r1.length*4.2*3.5)};
+    }
+    if(!R){var rest=30+Math.floor(Math.random()*100),com=100+Math.floor(Math.random()*300),tot=rest+com+150+Math.floor(Math.random()*400),viv=2000+Math.floor(Math.random()*7000);R={real:false,rest:rest,com:com,tot:tot,viv:viv,pob:Math.round(viv*3.5)};}
+    DR=R;
+    document.getElementById("dc").innerHTML="<div style='padding:0'><div style='padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;justify-content:space-between;align-items:center'><span style='font-weight:700'>Zona 1.5km</span><span style='font-size:10px;font-weight:700;padding:3px 7px;border-radius:5px;background:"+(R.real?"rgba(34,209,138,.12)":"rgba(232,160,32,.12)")+";color:"+(R.real?"#22d18a":"#e8a020")+";'>"+(R.real?"REAL":"SIMULADO")+"</span></div><div style='display:grid;grid-template-columns:1fr 1fr 1fr'><div style='padding:14px;border-right:1px solid rgba(255,255,255,.07);text-align:center'><div style='font-size:24px;font-weight:800;color:#f0c050'>"+R.rest+"</div><div style='font-size:10px;color:#6a7590'>Restaurantes</div></div><div style='padding:14px;border-right:1px solid rgba(255,255,255,.07);text-align:center'><div style='font-size:24px;font-weight:800;color:#f0c050'>"+R.com+"</div><div style='font-size:10px;color:#6a7590'>Comercios</div></div><div style='padding:14px;text-align:center'><div style='font-size:24px;font-weight:800;color:#f0c050'>"+R.tot+"</div><div style='font-size:10px;color:#6a7590'>Total</div></div></div><div style='display:grid;grid-template-columns:1fr 1fr;border-top:1px solid rgba(255,255,255,.07)'><div style='padding:12px 14px;border-right:1px solid rgba(255,255,255,.07)'><div style='font-size:20px;font-weight:700;color:#22d18a'>"+R.viv.toLocaleString()+"</div><div style='font-size:10px;color:#6a7590'>Viviendas</div></div><div style='padding:12px 14px'><div style='font-size:20px;font-weight:700;color:#f0c050'>"+(R.pob/1000).toFixed(1)+"K</div><div style='font-size:10px;color:#6a7590'>Poblacion</div></div></div></div>";
+  });
 }
-function ap(e){Array.from(e.target.files).forEach(function(f){var r=new FileReader();r.onload=function(ev){PH.push(ev.target.result);rp();};r.readAsDataURL(f);});}
-function rp(){document.getElementById('pg').innerHTML=PH.map(function(s){return '<div class="pth"><img src="'+s+'"></div>';}).join('')+'<div class="padd" onclick="document.getElementById('fi').click()">+</div>';}
-function cs(){var fr=parseFloat(document.getElementById('ffr').value)||0,fo=parseFloat(document.getElementById('ffo').value)||0,el=document.getElementById('fsu');if(fr&&fo){el.style.display='block';el.textContent='Superficie: '+(fr*fo).toFixed(1)+' m2 ('+fr+'m x '+fo+'m)';}else el.style.display='none';}
-function st(el,t){document.querySelectorAll('.tipo').forEach(function(c){c.classList.remove('ok');});el.classList.add('ok');TI=t;}
-async function saveP(){
-  var n=(document.getElementById('fn').value||'').trim();
-  if(!n){toast('Ingresa el nombre');return;}
-  if(!GD){toast('Captura GPS primero');return;}
-  var b=document.getElementById('bsv');b.disabled=true;b.textContent='Consultando DENUE...';
-  if(!DR)await showD();
-  var p={id:Date.now().toString(),nombre:n,direccion:document.getElementById('fd').value||'',ciudad:document.getElementById('fci').value||'',estado:document.getElementById('fe').value||'',tipo:TI,m2Terreno:document.getElementById('fm2t').value||'',m2Construccion:document.getElementById('fm2c').value||'',frente:document.getElementById('ffr').value||'',fondo:document.getElementById('ffo').value||'',dueno:document.getElementById('fdu').value||'',tel:document.getElementById('fte').value||'',precio:document.getElementById('fpr').value||'',notas:document.getElementById('fno').value||'',lat:GD.lat,lng:GD.lng,status:'prospecto',fecha:new Date().toISOString().split('T')[0],fotos:[],denue:DR?{rest:DR.rest,com:DR.com,tot:DR.tot}:null,inegi:DR?{viv:DR.viv,pob:DR.pob}:null};
-  PS.unshift(p);sv();toast('Guardado: '+n);setTimeout(function(){go('list');},800);
-  b.disabled=false;b.textContent='GUARDAR PROSPECTO';
-}
+
 function rf(){
-  GD=null;PH=[];dm=0;DR=null;
-  ['fn','fd','fci','fdu','fte','fpr','fno','fm2t','fm2c','ffr','ffo'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
-  document.getElementById('fe').value='';document.getElementById('fe-d').textContent='Seleccionar...';document.getElementById('fe-d').style.color='#6a7590';
-  document.getElementById('gb').classList.remove('ok');document.getElementById('gi').textContent='📡';document.getElementById('gt').textContent='Capturar ubicacion';document.getElementById('gc').textContent='Toca para obtener coordenadas';
-  document.getElementById('dsec').style.display='none';document.getElementById('fsu').style.display='none';
-  document.getElementById('pg').innerHTML='<div class="padd" onclick="document.getElementById('fi').click()">+</div>';
-  document.querySelectorAll('.tipo').forEach(function(c){c.classList.remove('ok');});document.querySelector('.tipo').classList.add('ok');TI='Local comercial';
+  GD=null;PH=[];DM=false;DR=null;editId=null;
+  ["fn","fd","fci","fdu","fte","fpr","fno","fm2t","fm2c","ffr","ffo"].forEach(function(id){var e=document.getElementById(id);if(e)e.value="";});
+  document.getElementById("fe").value="";
+  document.getElementById("fe-d").textContent="Seleccionar...";
+  document.getElementById("fe-d").style.color="#6a7590";
+  document.getElementById("gb").classList.remove("ok");
+  document.getElementById("gi").textContent="📡";
+  document.getElementById("gt").textContent="Capturar ubicacion";
+  document.getElementById("gc").textContent="Toca para obtener coordenadas";
+  document.getElementById("dsec").style.display="none";
+  document.getElementById("fsu").style.display="none";
+  document.getElementById("pg").innerHTML="<div class='padd' id='padd'>+</div>";
+  document.querySelectorAll(".tipo").forEach(function(c){c.classList.remove("ok");});
+  document.querySelector(".tipo").classList.add("ok");
+  TI="Local comercial";
+  document.getElementById("bsv").textContent="GUARDAR PROSPECTO";
+  document.getElementById("padd").addEventListener("click",function(){document.getElementById("fi").click();});
+  document.getElementById("fsu").style.display="none";
 }
-function dp(id){if(!confirm('Eliminar?'))return;PS=PS.filter(function(p){return p.id!==id;});sv();ud();rl();toast('Eliminado');}
-function ep(id){
-  var p=PS.find(function(x){return x.id===id;});if(!p)return;
-  go('new');
-  setTimeout(function(){
-    document.getElementById('fn').value=p.nombre||'';
-    document.getElementById('fd').value=p.direccion||'';
-    document.getElementById('fci').value=p.ciudad||'';
-    document.getElementById('fdu').value=p.dueno||'';
-    document.getElementById('fte').value=p.tel||'';
-    document.getElementById('fpr').value=p.precio||'';
-    document.getElementById('fno').value=p.notas||'';
-    document.getElementById('fm2t').value=p.m2Terreno||'';
-    document.getElementById('fm2c').value=p.m2Construccion||'';
-    document.getElementById('ffr').value=p.frente||'';
-    document.getElementById('ffo').value=p.fondo||'';
-    document.getElementById('fe').value=p.estado||'';
-    document.getElementById('fe-d').textContent=p.estado||'Seleccionar...';
-    if(p.estado)document.getElementById('fe-d').style.color='#e8ecf4';
-    if(p.lat){GD={lat:p.lat,lng:p.lng,acc:0};document.getElementById('gb').classList.add('ok');document.getElementById('gi').textContent='✅';document.getElementById('gt').textContent='Ubicacion guardada';document.getElementById('gc').textContent=p.lat.toFixed(5)+', '+p.lng.toFixed(5);}
-    document.querySelectorAll('.tipo').forEach(function(c){if(c.textContent===p.tipo){c.classList.add('ok');TI=p.tipo;}else c.classList.remove('ok');});
-    cs();
-    var b=document.getElementById('bsv');
-    b.textContent='GUARDAR CAMBIOS';
-    b.onclick=function(){
-      p.nombre=document.getElementById('fn').value;p.direccion=document.getElementById('fd').value;p.ciudad=document.getElementById('fci').value;p.estado=document.getElementById('fe').value;p.tipo=TI;p.m2Terreno=document.getElementById('fm2t').value;p.m2Construccion=document.getElementById('fm2c').value;p.frente=document.getElementById('ffr').value;p.fondo=document.getElementById('ffo').value;p.dueno=document.getElementById('fdu').value;p.tel=document.getElementById('fte').value;p.precio=document.getElementById('fpr').value;p.notas=document.getElementById('fno').value;
-      sv();toast('Actualizado');go('list');b.textContent='GUARDAR PROSPECTO';b.onclick=saveP;
+
+function saveP(){
+  var n=(document.getElementById("fn").value||"").trim();
+  if(!n){toast("Ingresa el nombre");return;}
+  if(!GD){toast("Captura GPS primero");return;}
+  var b=document.getElementById("bsv");
+  b.disabled=true;b.textContent="Guardando...";
+  var finish=function(){
+    var p={
+      id:editId||Date.now().toString(),
+      nombre:n,
+      direccion:document.getElementById("fd").value||"",
+      ciudad:document.getElementById("fci").value||"",
+      estado:document.getElementById("fe").value||"",
+      tipo:TI,
+      m2Terreno:document.getElementById("fm2t").value||"",
+      m2Construccion:document.getElementById("fm2c").value||"",
+      frente:document.getElementById("ffr").value||"",
+      fondo:document.getElementById("ffo").value||"",
+      dueno:document.getElementById("fdu").value||"",
+      tel:document.getElementById("fte").value||"",
+      precio:document.getElementById("fpr").value||"",
+      notas:document.getElementById("fno").value||"",
+      lat:GD.lat,lng:GD.lng,
+      status:"prospecto",
+      fecha:new Date().toISOString().split("T")[0],
+      fotos:[],
+      denue:DR?{rest:DR.rest,com:DR.com,tot:DR.tot}:null,
+      inegi:DR?{viv:DR.viv,pob:DR.pob}:null
     };
+    if(editId){
+      var idx=PS.findIndex(function(x){return x.id===editId;});
+      if(idx>=0){p.status=PS[idx].status;PS[idx]=p;}
+    } else {
+      PS.unshift(p);
+    }
+    sv();
+    toast(editId?"Actualizado":"Guardado: "+n);
+    setTimeout(function(){go("list");},800);
+    b.disabled=false;
+    b.textContent="GUARDAR PROSPECTO";
+  };
+  if(!DR){
+    showD();
+    setTimeout(finish,2000);
+  } else {
+    finish();
+  }
+}
+
+function ep(id){
+  var p=PS.find(function(x){return x.id===id;});
+  if(!p)return;
+  editId=id;
+  go("new");
+  setTimeout(function(){
+    document.getElementById("fn").value=p.nombre||"";
+    document.getElementById("fd").value=p.direccion||"";
+    document.getElementById("fci").value=p.ciudad||"";
+    document.getElementById("fdu").value=p.dueno||"";
+    document.getElementById("fte").value=p.tel||"";
+    document.getElementById("fpr").value=p.precio||"";
+    document.getElementById("fno").value=p.notas||"";
+    document.getElementById("fm2t").value=p.m2Terreno||"";
+    document.getElementById("fm2c").value=p.m2Construccion||"";
+    document.getElementById("ffr").value=p.frente||"";
+    document.getElementById("ffo").value=p.fondo||"";
+    document.getElementById("fe").value=p.estado||"";
+    document.getElementById("fe-d").textContent=p.estado||"Seleccionar...";
+    if(p.estado)document.getElementById("fe-d").style.color="#e8ecf4";
+    if(p.lat){
+      GD={lat:p.lat,lng:p.lng,acc:0};
+      document.getElementById("gb").classList.add("ok");
+      document.getElementById("gi").textContent="✅";
+      document.getElementById("gt").textContent="Ubicacion guardada";
+      document.getElementById("gc").textContent=p.lat.toFixed(5)+", "+p.lng.toFixed(5);
+    }
+    document.querySelectorAll(".tipo").forEach(function(c){
+      if(c.dataset.tipo===p.tipo){c.classList.add("ok");TI=p.tipo;}
+      else c.classList.remove("ok");
+    });
+    document.getElementById("bsv").textContent="GUARDAR CAMBIOS";
+    var fr=parseFloat(p.frente)||0,fo=parseFloat(p.fondo)||0;
+    if(fr&&fo){document.getElementById("fsu").style.display="block";document.getElementById("fsu").textContent="Superficie: "+(fr*fo).toFixed(1)+" m2";}
   },150);
 }
-function openM(){document.getElementById('mb').classList.add('on');}
-function closeM(){document.getElementById('mb').classList.remove('on');}
-function selE(e){document.getElementById('fe').value=e;document.getElementById('fe-d').textContent=e;document.getElementById('fe-d').style.color='#e8ecf4';closeM();}
-function expC(){
-  if(!PS.length){toast('Sin datos');return;}
-  var h=['Nombre','Direccion','Ciudad','Estado','Tipo','M2T','M2C','Frente','Fondo','Dueno','Tel','Precio','Status','Fecha','Lat','Lng','Rest','Com','Tot','Viv','Pob','Notas'];
-  var r=PS.map(function(p){return[p.nombre||'',p.direccion||'',p.ciudad||'',p.estado||'',p.tipo||'',p.m2Terreno||'',p.m2Construccion||'',p.frente||'',p.fondo||'',p.dueno||'',p.tel||'',p.precio||'',p.status||'',p.fecha||'',p.lat||'',p.lng||'',p.denue?p.denue.rest:'',p.denue?p.denue.com:'',p.denue?p.denue.tot:'',p.inegi?p.inegi.viv:'',p.inegi?p.inegi.pob:'',p.notas||''];});
-  var csv='﻿'+[h].concat(r).map(function(x){return x.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('
-');
-  var a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='BAFAR_Scout.csv';a.click();toast('Exportado');
+
+function dp(id){
+  if(!confirm("Eliminar?"))return;
+  PS=PS.filter(function(p){return p.id!==id;});
+  sv();ud();rl();
+  toast("Eliminado");
 }
-function saveTk(){var t=(document.getElementById('ti').value||'').trim();if(!t){toast('Token invalido');return;}localStorage.setItem('dtok',t);document.getElementById('td').textContent=t.substring(0,8)+'...';document.getElementById('ti').value='';toast('Token guardado');}
-function delA(){if(!confirm('Eliminar TODO?'))return;PS=[];sv();ud();toast('Eliminado todo');}
-function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('on');setTimeout(function(){t.classList.remove('on');},2500);}
-document.getElementById('ml').innerHTML=EST.map(function(e){return '<div class="mi" onclick="selE(''+e+'')">'+e+'</div>';}).join('');
-ud();
+
+// Event listeners - sin onclicks inline
+document.addEventListener("DOMContentLoaded",function(){
+
+  // Nav items
+  document.querySelectorAll(".ni[data-page]").forEach(function(el){
+    el.addEventListener("click",function(){go(el.dataset.page);});
+  });
+
+  // FAB
+  document.getElementById("bfab").addEventListener("click",function(){go("new");});
+
+  // GPS
+  document.getElementById("gb").addEventListener("click",doGPS);
+
+  // Tipos
+  document.querySelectorAll(".tipo").forEach(function(el){
+    el.addEventListener("click",function(){
+      document.querySelectorAll(".tipo").forEach(function(c){c.classList.remove("ok");});
+      el.classList.add("ok");
+      TI=el.dataset.tipo;
+    });
+  });
+
+  // Estado selector
+  document.getElementById("fe-d").addEventListener("click",function(){
+    document.getElementById("mb").classList.add("on");
+  });
+
+  // Cerrar modal
+  document.getElementById("bcloseM").addEventListener("click",function(){
+    document.getElementById("mb").classList.remove("on");
+  });
+
+  // Filtros
+  document.querySelectorAll(".fc").forEach(function(el){
+    el.addEventListener("click",function(){
+      document.querySelectorAll(".fc").forEach(function(c){c.classList.remove("ok");});
+      el.classList.add("ok");
+      AF=el.dataset.filter;
+      rl();
+    });
+  });
+
+  // Busqueda
+  document.getElementById("q").addEventListener("input",rl);
+
+  // Guardar
+  document.getElementById("bsv").addEventListener("click",saveP);
+
+  // Cancelar
+  document.getElementById("bcan").addEventListener("click",function(){go("dash");});
+
+  // Fotos add
+  document.getElementById("padd").addEventListener("click",function(){document.getElementById("fi").click();});
+  document.getElementById("fi").addEventListener("change",function(e){
+    Array.from(e.target.files).forEach(function(f){
+      var r=new FileReader();
+      r.onload=function(ev){
+        PH.push(ev.target.result);
+        document.getElementById("pg").innerHTML=PH.map(function(s){return "<div class='pth'><img src='"+s+"'></div>";}).join("")+"<div class='padd' id='padd'>+</div>";
+        document.getElementById("padd").addEventListener("click",function(){document.getElementById("fi").click();});
+      };
+      r.readAsDataURL(f);
+    });
+  });
+
+  // Medidas calc
+  ["ffr","ffo","fm2t"].forEach(function(id){
+    document.getElementById(id).addEventListener("input",function(){
+      var fr=parseFloat(document.getElementById("ffr").value)||0;
+      var fo=parseFloat(document.getElementById("ffo").value)||0;
+      var el=document.getElementById("fsu");
+      if(fr&&fo){el.style.display="block";el.textContent="Superficie: "+(fr*fo).toFixed(1)+" m2 ("+fr+"m x "+fo+"m)";}
+      else el.style.display="none";
+    });
+  });
+
+  // Direccion manual
+  document.getElementById("fd").addEventListener("input",function(){DM=true;});
+
+  // Botones config
+  document.getElementById("bsavtok").addEventListener("click",function(){
+    var t=(document.getElementById("ti").value||"").trim();
+    if(!t){toast("Token invalido");return;}
+    localStorage.setItem("dtok",t);
+    document.getElementById("td").textContent=t.substring(0,8)+"...";
+    document.getElementById("ti").value="";
+    toast("Token guardado");
+  });
+
+  document.getElementById("bexp").addEventListener("click",function(){
+    if(!PS.length){toast("Sin datos");return;}
+    var h=["Nombre","Direccion","Ciudad","Estado","Tipo","M2T","M2C","Frente","Fondo","Dueno","Tel","Precio","Status","Fecha","Lat","Lng","Rest","Com","Tot","Viv","Pob","Notas"];
+    var r=PS.map(function(p){return[p.nombre||"",p.direccion||"",p.ciudad||"",p.estado||"",p.tipo||"",p.m2Terreno||"",p.m2Construccion||"",p.frente||"",p.fondo||"",p.dueno||"",p.tel||"",p.precio||"",p.status||"",p.fecha||"",p.lat||"",p.lng||"",p.denue?p.denue.rest:"",p.denue?p.denue.com:"",p.denue?p.denue.tot:"",p.inegi?p.inegi.viv:"",p.inegi?p.inegi.pob:"",p.notas||""];});
+    var csv="﻿"+[h].concat(r).map(function(x){return x.map(function(c){return '"'+String(c).replace(/"/g,"''")+'"';}).join(",");}).join("
+");
+    var a=document.createElement("a");a.href="data:text/csv;charset=utf-8,"+encodeURIComponent(csv);a.download="BAFAR_Scout.csv";a.click();
+    toast("Exportado");
+  });
+
+  document.getElementById("bdel").addEventListener("click",function(){
+    if(!confirm("Eliminar TODO?"))return;
+    PS=[];sv();ud();
+    toast("Eliminado todo");
+  });
+
+  // Delegacion de eventos para cards dinamicas
+  document.addEventListener("click",function(e){
+    var ed=e.target.closest(".card-edit");
+    var dd=e.target.closest(".card-del");
+    var sd=e.target.closest(".card-status");
+    if(ed)ep(ed.dataset.id);
+    if(dd)dp(dd.dataset.id);
+    if(sd){
+      var p=PS.find(function(x){return x.id===sd.dataset.id;});
+      if(p){
+        var o=["prospecto","viable","descartado"];
+        p.status=o[(o.indexOf(p.status)+1)%3];
+        sv();ud();rl();
+        toast("Estado: "+p.status);
+      }
+    }
+  });
+
+  // Estados modal
+  document.getElementById("ml").innerHTML=EST.map(function(e){
+    return "<div class='mi' data-estado='"+e+"'>"+e+"</div>";
+  }).join("");
+  document.getElementById("ml").addEventListener("click",function(e){
+    var mi=e.target.closest(".mi");
+    if(mi){
+      document.getElementById("fe").value=mi.dataset.estado;
+      document.getElementById("fe-d").textContent=mi.dataset.estado;
+      document.getElementById("fe-d").style.color="#e8ecf4";
+      document.getElementById("mb").classList.remove("on");
+    }
+  });
+
+  ud();
+});
 </script>
 </body>
 </html>
