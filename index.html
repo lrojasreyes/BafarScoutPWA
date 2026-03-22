@@ -556,8 +556,7 @@ document.addEventListener("DOMContentLoaded",function(){
     if(!PS.length){toast("Sin datos");return;}
     var h=["Nombre","Direccion","Ciudad","Estado","Tipo","M2T","M2C","Frente","Fondo","Dueno","Tel","Precio","Status","Fecha","Lat","Lng","Rest","Com","Tot","Viv","Pob","Notas"];
     var r=PS.map(function(p){return[p.nombre||"",p.direccion||"",p.ciudad||"",p.estado||"",p.tipo||"",p.m2Terreno||"",p.m2Construccion||"",p.frente||"",p.fondo||"",p.dueno||"",p.tel||"",p.precio||"",p.status||"",p.fecha||"",p.lat||"",p.lng||"",p.denue?p.denue.rest:"",p.denue?p.denue.com:"",p.denue?p.denue.tot:"",p.inegi?p.inegi.viv:"",p.inegi?p.inegi.pob:"",p.notas||""];});
-    var csv="﻿"+[h].concat(r).map(function(x){return x.map(function(c){return '"'+String(c).replace(/"/g,"''")+'"';}).join(",");}).join("
-");
+    var csv="\uFEFF"+[h].concat(r).map(function(x){return x.map(function(c){var s=String(c).replace(/"/g,"");return s;}).join(",");}).join("\r\n");
     var a=document.createElement("a");a.href="data:text/csv;charset=utf-8,"+encodeURIComponent(csv);a.download="BAFAR_Scout.csv";a.click();
     toast("Exportado");
   });
