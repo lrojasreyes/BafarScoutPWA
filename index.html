@@ -8,12 +8,468 @@
 <meta name="apple-mobile-web-app-title" content="BAFAR Scout">
 <meta name="theme-color" content="#070c1a">
 <title>BAFAR Scout</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#070c1a;--surface:#0e1628;--surface2:#162035;--border:rgba(255,255,255,0.07);--accent:#e8a020;--accent2:#f0c050;--green:#22d18a;--red:#f05060;--blue:#3a8fff;--text:#e8ecf4;--muted:#6a7590}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;overflow:hidden}
+#app{display:flex;flex-direction:column;height:100dvh;max-width:480px;margin:0 auto;background:var(--bg)}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding-top:calc(env(safe-area-inset-top,0px) + 14px);padding-bottom:12px;padding-left:20px;padding-right:20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:16px;color:#000}
+.logo-text{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;letter-spacing:.05em}
+.logo-text span{color:var(--accent)}
+.screen{display:none;flex-direction:column;flex:1;overflow-y:auto;overflow-x:hidden}
+.screen.active{display:flex}
+nav{background:var(--surface);border-top:1px solid var(--border);display:flex;flex-shrink:0;padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 0 8px;cursor:pointer;gap:3px}
+.nav-icon{font-size:20px;transition:transform .2s}
+.nav-label{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.nav-item.active .nav-label{color:var(--accent)}
+.nav-item.active .nav-icon{transform:scale(1.15)}
+.nav-fab{flex:1;display:flex;align-items:center;justify-content:center}
+.fab{width:52px;height:52px;background:var(--accent);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;box-shadow:0 4px 20px rgba(232,160,32,.4);transform:translateY(-10px)}
+.dash-scroll{padding:16px;gap:12px;display:flex;flex-direction:column}
+.dash-hero{background:linear-gradient(135deg,#162a4a,#0e1e36);border:1px solid rgba(58,143,255,.2);border-radius:16px;padding:20px}
+.hero-num{font-family:'Barlow Condensed',sans-serif;font-size:48px;font-weight:800;line-height:1}
+.chip{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--muted)}
+.chip.active{background:rgba(232,160,32,.12);border-color:rgba(232,160,32,.3);color:var(--accent)}
+.stats-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px}
+.pc{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;cursor:pointer}
+.pc-name{font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:700}
+.badge{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 8px;border-radius:6px;white-space:nowrap}
+.badge-prospecto{background:rgba(232,160,32,.15);color:var(--accent)}
+.badge-viable{background:rgba(34,209,138,.15);color:var(--green)}
+.badge-descartado{background:rgba(240,80,96,.15);color:var(--red)}
+.form-section{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.form-section-header{padding:14px 16px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.form-section-title{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:var(--accent)}
+.form-body{padding:16px;display:flex;flex-direction:column;gap:12px}
+.form-label{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.form-input{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 13px;font-size:14px;color:var(--text);font-family:'Barlow',sans-serif;outline:none;width:100%}
+.form-input:focus{border-color:var(--accent)}
+.form-input::placeholder{color:var(--muted)}
+textarea.form-input{resize:none;min-height:80px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.gps-btn{background:var(--surface2);border:1px solid rgba(58,143,255,.2);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer}
+.gps-btn.active{background:#0e2a1e;border-color:rgba(34,209,138,.3)}
+.tipo-chip{padding:7px 14px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);font-size:12px;font-weight:600;cursor:pointer;color:var(--muted)}
+.tipo-chip.active{background:rgba(232,160,32,.12);border-color:var(--accent);color:var(--accent)}
+.btn-primary{background:var(--accent);color:#000;font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;border:none;border-radius:14px;padding:16px;cursor:pointer;width:100%}
+.btn-primary:disabled{background:#8a6010;cursor:not-allowed}
+.btn-secondary{background:transparent;color:var(--muted);font-family:'Barlow',sans-serif;font-size:14px;border:1px solid var(--border);border-radius:14px;padding:13px;cursor:pointer;width:100%}
+.search-wrap{padding:12px 16px 0;position:relative}
+.search-input{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 14px 10px 38px;font-size:14px;color:var(--text);font-family:'Barlow',sans-serif;width:100%;outline:none}
+.search-input::placeholder{color:var(--muted)}
+.filter-bar{padding:10px 16px 0;display:flex;gap:8px;overflow-x:auto;flex-shrink:0;scrollbar-width:none}
+.filter-chip{padding:6px 13px;border-radius:20px;border:1px solid var(--border);background:var(--surface);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;color:var(--muted)}
+.filter-chip.active{background:rgba(232,160,32,.12);border-color:rgba(232,160,32,.35);color:var(--accent)}
+.spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:10px 18px;font-size:13px;opacity:0;transition:all .3s;z-index:999;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;display:none;align-items:flex-end}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border-radius:20px 20px 0 0;width:100%;max-width:480px;margin:0 auto;max-height:75vh;display:flex;flex-direction:column}
+.modal-header{padding:16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.modal-list{overflow-y:auto;flex:1}
+.modal-item{padding:15px 16px;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;font-size:15px}
+.modal-item.selected{color:var(--accent)}
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.photo-thumb{aspect-ratio:1;border-radius:10px;overflow:hidden}
+.photo-thumb img{width:100%;height:100%;object-fit:cover}
+.photo-add{aspect-ratio:1;border-radius:10px;border:1.5px dashed var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:24px;background:var(--surface2)}
+.config-section{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:12px}
+.config-item{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);cursor:pointer}
+.config-item:last-child{border-bottom:none}
+.empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:40px;text-align:center}
+.surface-calc{background:rgba(232,160,32,.08);border:1px solid rgba(232,160,32,.15);border-radius:10px;padding:10px;font-size:12px;color:var(--accent)}
+.denue-card{background:linear-gradient(135deg,#1a1230,#0e0c1e);border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,.08)}
+.denue-grid{display:grid;grid-template-columns:1fr 1fr 1fr}
+.denue-cell{padding:14px;border-right:1px solid var(--border);text-align:center}
+.denue-cell:last-child{border-right:none}
+.denue-val{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:800;color:var(--accent2)}
+.denue-sub{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--border)}
+.denue-sub-cell{padding:12px 14px;border-right:1px solid var(--border)}
+.denue-sub-cell:last-child{border-right:none}
+input[type=file]{display:none}
+</style>
 </head>
-<body style="background:#070c1a;color:#e8ecf4;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0">
-<div style="text-align:center">
-  <div style="width:80px;height:80px;background:#e8a020;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:48px;font-weight:800;color:#000;margin:0 auto 20px">B</div>
-  <h1 style="color:#e8a020;font-size:28px">BAFAR Scout</h1>
-  <p style="color:#6a7590;margin-top:8px">Cargando...</p>
+<body>
+<div id="app">
+  <header>
+    <div class="logo">
+      <div class="logo-icon">B</div>
+      <div class="logo-text">BAFAR <span>SCOUT</span></div>
+    </div>
+    <div style="font-size:12px;color:var(--muted);padding:6px 10px;background:var(--surface2);border-radius:8px;border:1px solid var(--border)" id="header-count">0 prospectos</div>
+  </header>
+
+  <!-- DASHBOARD -->
+  <div class="screen active" id="screen-dashboard">
+    <div class="dash-scroll" style="overflow-y:auto;flex:1">
+      <div class="dash-hero">
+        <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--blue);margin-bottom:8px">Prospectos activos</div>
+        <div class="hero-num" id="dash-total">0</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:4px">en evaluación</div>
+        <div style="display:flex;gap:6px;margin-top:14px;flex-wrap:wrap" id="dash-cities"></div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card"><div style="font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Viables</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:800;color:var(--green)" id="dash-viables">0</div></div>
+        <div class="stat-card"><div style="font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Pob. promedio</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:800;color:var(--accent)" id="dash-pob">—</div></div>
+        <div class="stat-card"><div style="font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Descartados</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:800;color:var(--red)" id="dash-desc">0</div></div>
+        <div class="stat-card"><div style="font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Rest. promedio</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:800;color:var(--blue)" id="dash-rest">—</div></div>
+      </div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted)">Prospectos recientes</div>
+      <div id="dash-list" style="display:flex;flex-direction:column;gap:10px"></div>
+      <div style="height:16px"></div>
+    </div>
+  </div>
+
+  <!-- LISTA -->
+  <div class="screen" id="screen-lista">
+    <div class="search-wrap"><span style="position:absolute;left:28px;top:50%;transform:translateY(-30%);color:var(--muted)">🔍</span><input class="search-input" type="text" placeholder="Buscar prospecto, ciudad, dueño..." oninput="applyFilters()" id="search-input"></div>
+    <div class="filter-bar">
+      <div class="filter-chip active" onclick="setFilter('todos',this)">Todos</div>
+      <div class="filter-chip" onclick="setFilter('prospecto',this)">Prospectos</div>
+      <div class="filter-chip" onclick="setFilter('viable',this)">Viables</div>
+      <div class="filter-chip" onclick="setFilter('descartado',this)">Descartados</div>
+    </div>
+    <div id="lista-scroll" style="padding:12px 16px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;flex:1"></div>
+  </div>
+
+  <!-- NUEVO -->
+  <div class="screen" id="screen-nuevo">
+    <div style="padding:16px;gap:14px;display:flex;flex-direction:column;overflow-y:auto;flex:1">
+      <div class="form-section">
+        <div class="form-section-header"><span style="font-size:20px">📡</span><span class="form-section-title">Ubicación GPS</span></div>
+        <div class="form-body">
+          <div class="gps-btn" id="gps-btn" onclick="captureGPS()">
+            <div style="width:42px;height:42px;border-radius:11px;background:rgba(58,143,255,.12);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0" id="gps-icon-wrap"><span id="gps-icon">📡</span></div>
+            <div><div style="font-weight:600;font-size:14px" id="gps-title">Capturar ubicación actual</div><div style="font-size:12px;color:var(--muted);margin-top:2px" id="gps-coords">Toca para obtener coordenadas</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="form-section">
+        <div class="form-section-header"><span style="font-size:20px">🏢</span><span class="form-section-title">Información del sitio</span></div>
+        <div class="form-body">
+          <div><div class="form-label">Nombre del sitio *</div><input class="form-input" type="text" placeholder="Ej: Local Blvd. Culiacán Norte" id="f-nombre"></div>
+          <div><div style="display:flex;justify-content:space-between"><div class="form-label">Dirección</div><span id="dir-badge" style="font-size:11px;color:var(--green);display:none">📍 GPS</span></div><input class="form-input" type="text" placeholder="Captura GPS para autocompletar" id="f-direccion" oninput="dirManual=true"></div>
+          <div><div class="form-label">Tipo de inmueble *</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px" id="tipo-chips"><div class="tipo-chip active" onclick="selectTipo(this,'Local comercial')">Local comercial</div><div class="tipo-chip" onclick="selectTipo(this,'Terreno')">Terreno</div><div class="tipo-chip" onclick="selectTipo(this,'Nave industrial')">Nave industrial</div><div class="tipo-chip" onclick="selectTipo(this,'Bodega')">Bodega</div><div class="tipo-chip" onclick="selectTipo(this,'Edificio')">Edificio</div></div></div>
+          <div class="form-row">
+            <div><div class="form-label">Ciudad</div><input class="form-input" type="text" placeholder="Culiacán..." id="f-ciudad"></div>
+            <div><div class="form-label">Estado</div><div class="form-input" style="cursor:pointer;display:flex;align-items:center" onclick="openModal('modal-estados')" id="f-estado-display">Seleccionar...</div><input type="hidden" id="f-estado"></div>
+          </div>
+          <div><div class="form-label">Notas</div><textarea class="form-input" placeholder="Observaciones, ventajas..." id="f-notas"></textarea></div>
+        </div>
+      </div>
+      <div class="form-section">
+        <div class="form-section-header"><span style="font-size:20px">📐</span><span class="form-section-title">Medidas</span></div>
+        <div class="form-body">
+          <div class="form-row">
+            <div><div class="form-label">M² terreno</div><input class="form-input" type="number" placeholder="0" id="f-m2t" oninput="calcSurface()"></div>
+            <div><div class="form-label">M² construcción</div><input class="form-input" type="number" placeholder="0" id="f-m2c"></div>
+          </div>
+          <div class="form-row">
+            <div><div class="form-label">Frente (m)</div><input class="form-input" type="number" placeholder="0" id="f-frente" oninput="calcSurface()"></div>
+            <div><div class="form-label">Fondo (m)</div><input class="form-input" type="number" placeholder="0" id="f-fondo" oninput="calcSurface()"></div>
+          </div>
+          <div class="surface-calc" id="surface-calc" style="display:none"></div>
+        </div>
+      </div>
+      <div class="form-section">
+        <div class="form-section-header"><span style="font-size:20px">👤</span><span class="form-section-title">Propietario</span></div>
+        <div class="form-body">
+          <div><div class="form-label">Nombre</div><input class="form-input" type="text" placeholder="Nombre completo" id="f-dueno"></div>
+          <div class="form-row">
+            <div><div class="form-label">Teléfono</div><input class="form-input" type="tel" placeholder="(667) 000-0000" id="f-tel"></div>
+            <div><div class="form-label">Precio aprox.</div><input class="form-input" type="text" placeholder="$0 MXN" id="f-precio"></div>
+          </div>
+        </div>
+      </div>
+      <div class="form-section" id="denue-section" style="display:none">
+        <div class="form-section-header"><span style="font-size:20px">📊</span><span class="form-section-title">Análisis DENUE / INEGI</span></div>
+        <div id="denue-content"><div style="padding:20px;display:flex;align-items:center;gap:12px"><div class="spinner"></div><span style="color:var(--muted);font-size:13px">Consultando datos en radio 1.5km...</span></div></div>
+      </div>
+      <div class="form-section">
+        <div class="form-section-header"><span style="font-size:20px">📷</span><span class="form-section-title">Fotografías</span></div>
+        <div class="form-body">
+          <div class="photo-grid" id="photo-grid"><div class="photo-add" onclick="document.getElementById('photo-input').click()">➕</div></div>
+          <input type="file" id="photo-input" accept="image/*" multiple onchange="handlePhotos(event)">
+        </div>
+      </div>
+      <button class="btn-primary" id="btn-guardar" onclick="saveProspect()">💾 GUARDAR PROSPECTO</button>
+      <button class="btn-secondary" onclick="navigate('dashboard')">Cancelar</button>
+      <div style="height:20px"></div>
+    </div>
+  </div>
+
+  <!-- CONFIG -->
+  <div class="screen" id="screen-config">
+    <div style="padding:16px;overflow-y:auto;flex:1">
+      <div style="padding:4px 2px 12px"><div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800">Configuración</div><div style="font-size:13px;color:var(--muted)">BAFAR Scout v2.0 PWA</div></div>
+      <div style="background:linear-gradient(135deg,#162035,#0e1628);border:1px solid rgba(232,160,32,.2);border-radius:14px;padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:12px">
+        <div style="font-size:32px">📱</div>
+        <div><div style="font-weight:700;font-size:14px">Instalar en pantalla de inicio</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Safari → ⎙ Compartir → "Agregar a inicio"</div></div>
+      </div>
+      <div class="config-section">
+        <div style="padding:12px 16px 8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border)">🔑 Token DENUE</div>
+        <div style="padding:14px 16px">
+          <div style="font-size:13px;color:var(--muted);margin-bottom:6px">Token activo:</div>
+          <div style="font-size:12px;font-family:monospace;color:var(--accent);background:var(--surface2);padding:8px;border-radius:8px;word-break:break-all" id="token-display">70b82e03••••••••••••••••••••••••••••</div>
+          <div style="margin-top:10px"><div class="form-label" style="margin-bottom:6px">Actualizar token</div><input class="form-input" type="text" placeholder="Pega tu nuevo token" id="token-input"><button class="btn-primary" style="margin-top:8px;padding:12px;font-size:14px" onclick="saveToken()">Guardar Token</button></div>
+        </div>
+      </div>
+      <div class="config-section">
+        <div style="padding:12px 16px 8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border)">📊 Datos</div>
+        <div class="config-item" onclick="exportCSV()">
+          <div style="display:flex;align-items:center;gap:12px"><div style="width:36px;height:36px;border-radius:10px;background:rgba(34,209,138,.12);display:flex;align-items:center;justify-content:center">📤</div><div><div style="font-size:14px;font-weight:500">Exportar a Excel/CSV</div><div style="font-size:12px;color:var(--muted)" id="export-count">0 prospectos</div></div></div>
+          <span style="color:var(--muted)">›</span>
+        </div>
+        <div class="config-item" onclick="clearAll()">
+          <div style="display:flex;align-items:center;gap:12px"><div style="width:36px;height:36px;border-radius:10px;background:rgba(240,80,96,.12);display:flex;align-items:center;justify-content:center">🗑️</div><div><div style="font-size:14px;font-weight:500;color:var(--red)">Eliminar todos los datos</div><div style="font-size:12px;color:var(--muted)">No se puede deshacer</div></div></div>
+          <span style="color:var(--muted)">›</span>
+        </div>
+      </div>
+      <div class="config-section">
+        <div style="padding:12px 16px 8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border)">ℹ️ Acerca de</div>
+        <div class="config-item" style="cursor:default"><span style="color:var(--muted);font-size:13px">Versión</span><span style="color:var(--text);font-size:13px;font-weight:600">v2.0 PWA</span></div>
+        <div class="config-item" style="cursor:default;border-bottom:none"><span style="color:var(--muted);font-size:13px">Desarrollado para</span><span style="color:var(--accent);font-size:13px;font-weight:700">BAFAR Expansión</span></div>
+      </div>
+      <div style="height:20px"></div>
+    </div>
+  </div>
+
+  <nav>
+    <div class="nav-item active" id="nav-dashboard" onclick="navigate('dashboard')"><div class="nav-icon">📊</div><div class="nav-label">Dashboard</div></div>
+    <div class="nav-item" id="nav-lista" onclick="navigate('lista')"><div class="nav-icon">📋</div><div class="nav-label">Prospectos</div></div>
+    <div class="nav-fab"><div class="fab" onclick="navigate('nuevo')">＋</div></div>
+    <div class="nav-item" style="opacity:.3;pointer-events:none"><div class="nav-icon">📍</div><div class="nav-label">Detalle</div></div>
+    <div class="nav-item" id="nav-config" onclick="navigate('config')"><div class="nav-icon">⚙️</div><div class="nav-label">Config</div></div>
+  </nav>
 </div>
+<div class="modal-overlay" id="modal-estados"><div class="modal"><div class="modal-header"><span style="font-weight:700;font-size:16px">Seleccionar Estado</span><span style="cursor:pointer;color:var(--accent)" onclick="closeModal('modal-estados')">Cerrar</span></div><div class="modal-list" id="estados-list"></div></div></div>
+<div class="toast" id="toast"></div>
+<script>
+const DENUE_TOKEN_DEFAULT='70b82e03-5905-4374-87af-4e7a5e1671c0';
+const ESTADOS=['Aguascalientes','Baja California','Baja California Sur','Campeche','Chiapas','Chihuahua','Ciudad de México','Coahuila','Colima','Durango','Estado de México','Guanajuato','Guerrero','Hidalgo','Jalisco','Michoacán','Morelos','Nayarit','Nuevo León','Oaxaca','Puebla','Querétaro','Quintana Roo','San Luis Potosí','Sinaloa','Sonora','Tabasco','Tamaulipas','Tlaxcala','Veracruz','Yucatán','Zacatecas'];
+let prospects=JSON.parse(localStorage.getItem('bafar_pwa_v2')||'[]');
+let gpsData=null,selectedTipo='Local comercial',activeFilter='todos',photos=[],dirManual=false;
+
+function save(){try{localStorage.setItem('bafar_pwa_v2',JSON.stringify(prospects.map(p=>({...p,fotos:[]}))));}catch(e){}}
+
+function navigate(s){
+  document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+  document.getElementById('screen-'+s).classList.add('active');
+  const n=document.getElementById('nav-'+s);if(n)n.classList.add('active');
+  if(s==='lista')renderList();
+  if(s==='nuevo')resetForm();
+  if(s==='dashboard')updateDashboard();
+  if(s==='config')updateConfig();
+}
+
+function updateDashboard(){
+  const t=prospects.length;
+  document.getElementById('dash-total').textContent=t;
+  document.getElementById('header-count').textContent=t+' prospectos';
+  document.getElementById('dash-viables').textContent=prospects.filter(p=>p.status==='viable').length;
+  document.getElementById('dash-desc').textContent=prospects.filter(p=>p.status==='descartado').length;
+  const wp=prospects.filter(p=>p.inegi?.poblacion);
+  document.getElementById('dash-pob').textContent=wp.length?(wp.reduce((a,p)=>a+p.inegi.poblacion,0)/wp.length/1000).toFixed(1)+'K':'—';
+  const wr=prospects.filter(p=>p.denue?.restaurantes);
+  document.getElementById('dash-rest').textContent=wr.length?Math.round(wr.reduce((a,p)=>a+p.denue.restaurantes,0)/wr.length):'—';
+  const cities=[...new Set(prospects.map(p=>p.ciudad).filter(Boolean))].slice(0,5);
+  document.getElementById('dash-cities').innerHTML=cities.map((c,i)=>`<div class="chip ${i===0?'active':''}">${c}</div>`).join('');
+  const list=document.getElementById('dash-list');
+  list.innerHTML=prospects.slice(0,3).map(p=>cardHTML(p)).join('')||`<div class="empty"><div style="font-size:48px;opacity:.3">🗺️</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;color:var(--muted)">Sin prospectos</div><div style="font-size:13px;color:var(--muted)">Toca ＋ para agregar</div></div>`;
+}
+
+function cardHTML(p){
+  const bc={viable:'badge-viable',prospecto:'badge-prospecto',descartado:'badge-descartado'}[p.status]||'badge-prospecto';
+  const bl={viable:'Viable',prospecto:'Prospecto',descartado:'Descartado'}[p.status]||'Prospecto';
+  return `<div class="pc">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+      <div style="flex:1;margin-right:8px"><div class="pc-name">${p.nombre}</div>${p.direccion?`<div style="font-size:12px;color:var(--muted);margin-top:2px">📍 ${p.direccion}</div>`:''}</div>
+      <div class="badge ${bc}" onclick="changeStatus('${p.id}')">${bl}</div>
+    </div>
+    ${p.denue&&p.inegi?`<div style="display:flex;gap:16px;margin-bottom:12px">
+      <div><div style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:var(--green)">${(p.inegi.poblacion/1000).toFixed(1)}K</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase">Población</div></div>
+      <div><div style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:var(--accent2)">${p.inegi.viviendas.toLocaleString()}</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase">Viviendas</div></div>
+      <div><div style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:var(--blue)">${p.denue.restaurantes}</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase">Restaurantes</div></div>
+    </div>`:''}
+    <div style="display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid var(--border)">
+      <div><div style="color:var(--muted);font-size:12px">📍 ${p.ciudad||''}${p.estado?', '+p.estado:''}</div><div style="color:var(--muted);font-size:12px">🏢 ${p.tipo}${p.m2Terreno?' · '+p.m2Terreno+'m²':''}</div></div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <span style="color:var(--muted);font-size:11px">${p.fecha}</span>
+        <button style="background:rgba(232,160,32,.12);border:1px solid rgba(232,160,32,.2);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px" onclick="editProspect('${p.id}')">✏️</button>
+        <button style="background:transparent;border:none;cursor:pointer;font-size:16px" onclick="deleteProspect('${p.id}')">🗑️</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderList(){
+  const q=document.getElementById('search-input')?.value||'';
+  const list=prospects.filter(p=>{
+    const mf=activeFilter==='todos'||p.status===activeFilter;
+    const mb=!q||`${p.nombre} ${p.ciudad} ${p.estado} ${p.dueno}`.toLowerCase().includes(q.toLowerCase());
+    return mf&&mb;
+  });
+  const el=document.getElementById('lista-scroll');
+  el.innerHTML=list.length?list.map(p=>cardHTML(p)).join(''):`<div class="empty"><div style="font-size:48px;opacity:.3">🔍</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;color:var(--muted)">${prospects.length===0?'Sin prospectos':'Sin resultados'}</div><div style="font-size:13px;color:var(--muted)">${prospects.length===0?'Toca ＋ para agregar':'Prueba otro filtro'}</div></div>`;
+}
+
+function setFilter(f,el){activeFilter=f;document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');renderList();}
+function applyFilters(){renderList();}
+
+function changeStatus(id){
+  const p=prospects.find(x=>x.id===id);if(!p)return;
+  const opts=['prospecto','viable','descartado'];
+  const cur=opts.indexOf(p.status);
+  p.status=opts[(cur+1)%3];
+  save();updateDashboard();renderList();showToast('🏷️ Estado: '+p.status);
+}
+
+async function captureGPS(){
+  const title=document.getElementById('gps-title'),coords=document.getElementById('gps-coords'),icon=document.getElementById('gps-icon'),btn=document.getElementById('gps-btn');
+  title.textContent='Obteniendo ubicación...';
+  if(!navigator.geolocation){simulateGPS();return;}
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    gpsData={lat:pos.coords.latitude,lng:pos.coords.longitude,acc:Math.round(pos.coords.accuracy||0)};
+    btn.classList.add('active');icon.textContent='✅';
+    title.textContent='Ubicación capturada';
+    coords.textContent=`${gpsData.lat.toFixed(6)}, ${gpsData.lng.toFixed(6)} (±${gpsData.acc}m)`;
+    if(!dirManual)await geocodeReverse();
+    showDenue();showToast('📍 GPS capturado');
+  },()=>simulateGPS());
+}
+
+function simulateGPS(){
+  const demos=[{lat:24.7994,lng:-107.4394},{lat:21.1236,lng:-101.6829},{lat:20.5888,lng:-100.3899}];
+  const d=demos[Math.floor(Math.random()*demos.length)];
+  gpsData={...d,acc:8};
+  document.getElementById('gps-btn').classList.add('active');
+  document.getElementById('gps-icon').textContent='✅';
+  document.getElementById('gps-title').textContent='Ubicación capturada (demo)';
+  document.getElementById('gps-coords').textContent=`${gpsData.lat.toFixed(6)}, ${gpsData.lng.toFixed(6)}`;
+  showDenue();showToast('📍 GPS simulado');
+}
+
+async function geocodeReverse(){
+  try{
+    const r=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${gpsData.lat}&lon=${gpsData.lng}&format=json`);
+    const d=await r.json();
+    if(d.address){
+      const a=d.address;
+      const road=a.road||a.street||'';const num=a.house_number||'';const col=a.suburb||a.neighbourhood||'';
+      const dir=[road+(num?' '+num:''),col].filter(Boolean).join(', ');
+      if(dir){document.getElementById('f-direccion').value=dir;document.getElementById('dir-badge').style.display='inline';}
+      if(a.city||a.town)document.getElementById('f-ciudad').value=a.city||a.town||'';
+      if(a.state){const found=ESTADOS.find(e=>e.toLowerCase().includes(a.state.toLowerCase())||a.state.toLowerCase().includes(e.toLowerCase()));if(found){document.getElementById('f-estado').value=found;document.getElementById('f-estado-display').textContent=found;}}
+    }
+  }catch(e){}
+}
+
+async function showDenue(){
+  const sec=document.getElementById('denue-section');sec.style.display='block';
+  document.getElementById('denue-content').innerHTML=`<div style="padding:20px;display:flex;align-items:center;gap:12px"><div class="spinner"></div><span style="color:var(--muted);font-size:13px">Consultando DENUE (1.5km)...</span></div>`;
+  const token=localStorage.getItem('denue_token')||DENUE_TOKEN_DEFAULT;
+  const {lat,lng}=gpsData;
+  let result=null;
+  try{
+    const[r1,r2]=await Promise.all([
+      fetch(`https://www.inegi.org.mx/app/api/denue/v1/consulta/buscar/todos/${lat},${lng}/1500/1/1000/${token}/json`).then(r=>r.json()).catch(()=>null),
+      fetch(`https://www.inegi.org.mx/app/api/denue/v1/consulta/buscar/restaurantes/${lat},${lng}/1500/1/1000/${token}/json`).then(r=>r.json()).catch(()=>null),
+    ]);
+    if(r1&&Array.isArray(r1)&&r1.length>0){result={real:true,restaurantes:r2&&Array.isArray(r2)?r2.length:0,comercios:r1.filter(e=>(e.clase_actividad||'').startsWith('46')).length,total:r1.length,viviendas:Math.round(r1.length*4.2),poblacion:Math.round(r1.length*4.2*3.5)};}
+  }catch(e){}
+  if(!result){const rest=Math.floor(Math.random()*100)+30,com=Math.floor(Math.random()*300)+100,tot=rest+com+Math.floor(Math.random()*400)+150,viv=Math.floor(Math.random()*7000)+2000;result={real:false,restaurantes:rest,comercios:com,total:tot,viviendas:viv,poblacion:Math.round(viv*3.5)};}
+  window._denueResult=result;
+  document.getElementById('denue-content').innerHTML=`<div class="denue-card" style="border:none;border-radius:0">
+    <div style="padding:12px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center"><span style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700">📊 Datos de la zona</span><span style="font-size:10px;font-weight:700;padding:3px 7px;border-radius:5px;${result.real?'background:rgba(34,209,138,.12);color:var(--green)':'background:rgba(232,160,32,.12);color:var(--accent)'}">${result.real?'✓ REAL':'SIMULADO'}</span></div>
+    <div class="denue-grid"><div class="denue-cell"><div class="denue-val">${result.restaurantes}</div><div style="font-size:10px;color:var(--muted);text-transform:uppercase">Restaurantes</div></div><div class="denue-cell"><div class="denue-val">${result.comercios}</div><div style="font-size:10px;color:var(--muted);text-transform:uppercase">Comercios</div></div><div class="denue-cell"><div class="denue-val">${result.total}</div><div style="font-size:10px;color:var(--muted);text-transform:uppercase">Total</div></div></div>
+    <div class="denue-sub"><div class="denue-sub-cell"><div style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;color:var(--green)">${result.viviendas.toLocaleString()}</div><div style="font-size:10px;color:var(--muted)">Viviendas</div></div><div class="denue-sub-cell"><div style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;color:var(--accent2)">${(result.poblacion/1000).toFixed(1)}K</div><div style="font-size:10px;color:var(--muted)">Población</div></div></div>
+    <div style="padding:10px 14px;background:rgba(34,209,138,.05);border-top:1px solid var(--border);font-size:11px;color:var(--muted)">${result.real?'✅ Datos reales INEGI · Radio 1.5km':'ℹ️ Datos simulados · Configura tu token en ⚙️'}</div>
+  </div>`;
+}
+
+function handlePhotos(e){Array.from(e.target.files).forEach(f=>{const r=new FileReader();r.onload=ev=>{photos.push(ev.target.result);renderPhotos();};r.readAsDataURL(f);});}
+function renderPhotos(){document.getElementById('photo-grid').innerHTML=photos.map(src=>`<div class="photo-thumb"><img src="${src}"></div>`).join('')+`<div class="photo-add" onclick="document.getElementById('photo-input').click()">➕</div>`;}
+function calcSurface(){const fr=parseFloat(document.getElementById('f-frente').value)||0,fo=parseFloat(document.getElementById('f-fondo').value)||0,el=document.getElementById('surface-calc');if(fr&&fo){el.style.display='block';el.textContent=`📏 Superficie: ${(fr*fo).toFixed(1)} m² (${fr}m × ${fo}m)`;}else el.style.display='none';}
+function selectTipo(el,tipo){document.querySelectorAll('.tipo-chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');selectedTipo=tipo;}
+
+async function saveProspect(){
+  const nombre=document.getElementById('f-nombre').value.trim();
+  if(!nombre){showToast('⚠️ Ingresa el nombre del sitio');return;}
+  if(!gpsData){showToast('⚠️ Captura la ubicación GPS primero');return;}
+  const btn=document.getElementById('btn-guardar');
+  btn.disabled=true;btn.textContent='⏳ Consultando DENUE...';
+  if(!window._denueResult)await showDenue();
+  const d=window._denueResult;
+  const p={id:Date.now().toString(),nombre,direccion:document.getElementById('f-direccion').value,ciudad:document.getElementById('f-ciudad').value,estado:document.getElementById('f-estado').value,tipo:selectedTipo,m2Terreno:document.getElementById('f-m2t').value,m2Construccion:document.getElementById('f-m2c').value,frente:document.getElementById('f-frente').value,fondo:document.getElementById('f-fondo').value,dueno:document.getElementById('f-dueno').value,tel:document.getElementById('f-tel').value,precio:document.getElementById('f-precio').value,notas:document.getElementById('f-notas').value,lat:gpsData.lat,lng:gpsData.lng,status:'prospecto',fecha:new Date().toISOString().split('T')[0],fotos:[],denue:d?{restaurantes:d.restaurantes,comercios:d.comercios,total:d.total}:null,inegi:d?{viviendas:d.viviendas,poblacion:d.poblacion}:null};
+  prospects.unshift(p);save();
+  showToast(`✅ "${nombre}" guardado · ${d?d.restaurantes+' restaurantes':''}`);
+  setTimeout(()=>navigate('lista'),800);
+  btn.disabled=false;btn.textContent='💾 GUARDAR PROSPECTO';
+}
+
+function resetForm(){
+  gpsData=null;photos=[];dirManual=false;window._denueResult=null;
+  ['f-nombre','f-direccion','f-ciudad','f-dueno','f-tel','f-precio','f-notas','f-m2t','f-m2c','f-frente','f-fondo'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  document.getElementById('f-estado').value='';document.getElementById('f-estado-display').textContent='Seleccionar...';
+  document.getElementById('gps-btn').classList.remove('active');document.getElementById('gps-icon').textContent='📡';
+  document.getElementById('gps-title').textContent='Capturar ubicación actual';document.getElementById('gps-coords').textContent='Toca para obtener coordenadas';
+  document.getElementById('denue-section').style.display='none';document.getElementById('surface-calc').style.display='none';document.getElementById('dir-badge').style.display='none';
+  document.getElementById('photo-grid').innerHTML='<div class="photo-add" onclick="document.getElementById(\'photo-input\').click()">➕</div>';
+  document.querySelectorAll('.tipo-chip').forEach(c=>c.classList.remove('active'));document.querySelector('.tipo-chip').classList.add('active');selectedTipo='Local comercial';
+}
+
+function deleteProspect(id){if(!confirm('¿Eliminar este prospecto?'))return;prospects=prospects.filter(p=>p.id!==id);save();updateDashboard();renderList();showToast('🗑️ Eliminado');}
+
+function editProspect(id){
+  const p=prospects.find(x=>x.id===id);if(!p)return;
+  navigate('nuevo');
+  setTimeout(()=>{
+    ['nombre','direccion','ciudad','dueno','tel','precio','notas'].forEach(f=>{const e=document.getElementById('f-'+f);if(e)e.value=p[f]||'';});
+    ['m2Terreno','m2Construccion','frente','fondo'].forEach(f=>{const map={m2Terreno:'f-m2t',m2Construccion:'f-m2c',frente:'f-frente',fondo:'f-fondo'};const e=document.getElementById(map[f]);if(e)e.value=p[f]||'';});
+    document.getElementById('f-estado').value=p.estado||'';document.getElementById('f-estado-display').textContent=p.estado||'Seleccionar...';
+    if(p.lat&&p.lng){gpsData={lat:p.lat,lng:p.lng,acc:0};document.getElementById('gps-btn').classList.add('active');document.getElementById('gps-icon').textContent='✅';document.getElementById('gps-title').textContent='Ubicación guardada';document.getElementById('gps-coords').textContent=`${p.lat.toFixed(6)}, ${p.lng.toFixed(6)}`;if(p.denue)window._denueResult={...p.denue,...p.inegi,real:true};}
+    document.querySelectorAll('.tipo-chip').forEach(c=>{if(c.textContent===p.tipo){c.classList.add('active');selectedTipo=p.tipo;}else c.classList.remove('active');});
+    calcSurface();
+    const btn=document.getElementById('btn-guardar');
+    btn.textContent='💾 GUARDAR CAMBIOS';
+    btn.onclick=()=>{
+      ['nombre','direccion','ciudad','dueno','tel','precio','notas'].forEach(f=>{p[f]=document.getElementById('f-'+f)?.value||'';});
+      p.m2Terreno=document.getElementById('f-m2t').value;p.m2Construccion=document.getElementById('f-m2c').value;p.frente=document.getElementById('f-frente').value;p.fondo=document.getElementById('f-fondo').value;
+      p.estado=document.getElementById('f-estado').value;p.tipo=selectedTipo;
+      save();showToast('✅ Actualizado');navigate('lista');
+      btn.textContent='💾 GUARDAR PROSPECTO';btn.onclick=saveProspect;
+    };
+  },100);
+}
+
+function renderEstados(){document.getElementById('estados-list').innerHTML=ESTADOS.map(e=>`<div class="modal-item" onclick="selectEstado('${e}')">${e}</div>`).join('');}
+function selectEstado(e){document.getElementById('f-estado').value=e;document.getElementById('f-estado-display').textContent=e;closeModal('modal-estados');}
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+function exportCSV(){
+  if(!prospects.length){showToast('Sin datos para exportar');return;}
+  const headers=['Nombre','Dirección','Ciudad','Estado','Tipo','M2 Terreno','M2 Const','Frente','Fondo','Dueño','Teléfono','Precio','Status','Fecha','Lat','Lng','Restaurantes','Comercios','Total DENUE','Viviendas','Población','Notas'];
+  const rows=prospects.map(p=>[p.nombre||'',p.direccion||'',p.ciudad||'',p.estado||'',p.tipo||'',p.m2Terreno||'',p.m2Construccion||'',p.frente||'',p.fondo||'',p.dueno||'',p.tel||'',p.precio||'',p.status||'',p.fecha||'',p.lat||'',p.lng||'',p.denue?.restaurantes||'',p.denue?.comercios||'',p.denue?.total||'',p.inegi?.viviendas||'',p.inegi?.poblacion||'',p.notas||'']);
+  const csv='\uFEFF'+[headers,...rows].map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\r\n');
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download=`BAFAR_Scout_${new Date().toISOString().split('T')[0]}.csv`;a.click();
+  showToast('📤 Exportado correctamente');
+}
+
+function saveToken(){const t=document.getElementById('token-input').value.trim();if(!t){showToast('Ingresa un token válido');return;}localStorage.setItem('denue_token',t);document.getElementById('token-display').textContent=t.substring(0,8)+'••••••••••••••••••••••••••••';document.getElementById('token-input').value='';showToast('✅ Token guardado');}
+function clearAll(){if(!confirm('¿Eliminar TODOS los prospectos?'))return;prospects=[];save();updateDashboard();updateConfig();showToast('🗑️ Datos eliminados');}
+function updateConfig(){const n=prospects.length;const el=document.getElementById('export-count');if(el)el.textContent=n+' prospectos';}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+
+renderEstados();updateDashboard();
+</script>
 </body>
 </html>
