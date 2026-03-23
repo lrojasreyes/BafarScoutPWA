@@ -534,8 +534,8 @@ function showD(){
   var tok=localStorage.getItem("dtok")||TOK;
   var lat=GD.lat,lng=GD.lng,r=RADIO;
   Promise.all([
-    fetch("https://www.inegi.org.mx/app/api/denue/v1/consulta/buscar/todos/"+lat+","+lng+"/"+r+"/1/1000/"+tok+"/json").then(function(x){return x.json();}).catch(function(){return null;}),
-    fetch("https://www.inegi.org.mx/app/api/denue/v1/consulta/buscar/restaurantes/"+lat+","+lng+"/"+r+"/1/1000/"+tok+"/json").then(function(x){return x.json();}).catch(function(){return null;})
+    fetch("https://pjacmizmjsjwxtoldpvr.supabase.co/functions/v1/clever-endpoint",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqYWNtaXptanNqd3h0b2xkcHZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyMTUwNjEsImV4cCI6MjA4OTc5MTA2MX0.Tg8Vw_C-laIqyyov_TDFphYfHATSNQ9O-m2-rMrrH24"},body:JSON.stringify({lat:lat,lng:lng,radio:r,token:tok,tipo:"todos"})}).then(function(x){return x.json();}).catch(function(){return null;}),
+    fetch("https://pjacmizmjsjwxtoldpvr.supabase.co/functions/v1/clever-endpoint",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqYWNtaXptanNqd3h0b2xkcHZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyMTUwNjEsImV4cCI6MjA4OTc5MTA2MX0.Tg8Vw_C-laIqyyov_TDFphYfHATSNQ9O-m2-rMrrH24"},body:JSON.stringify({lat:lat,lng:lng,radio:r,token:tok,tipo:"restaurantes"})}).then(function(x){return x.json();}).catch(function(){return null;})
   ]).then(function(res){
     var r1=res[0],r2=res[1],R=null;
     if(r1&&Array.isArray(r1)&&r1.length>0){R={real:true,rest:r2&&Array.isArray(r2)?r2.length:0,com:r1.filter(function(e){return(e.clase_actividad||"").startsWith("46");}).length,tot:r1.length,viv:Math.round(r1.length*4.2),pob:Math.round(r1.length*4.2*3.5)};}
