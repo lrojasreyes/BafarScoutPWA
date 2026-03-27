@@ -621,7 +621,7 @@ function renderDocs(){
 }
 
 function rf(){
-  GD=null;PH=[];DM=false;DR=null;editId=null;docState={};
+  GD=null;PH=[];DM=false;DR=null;editId=null;
   ["fn","fd","fci","fdu","fte","fpr","fno","fm2t","fm2c","ffr","ffo"].forEach(function(id){var e=document.getElementById(id);if(e)e.value="";});
   document.getElementById("fe").value="";
   document.getElementById("fe-d").textContent="Seleccionar...";
@@ -639,7 +639,7 @@ function rf(){
   document.getElementById("bsv").textContent="GUARDAR PROSPECTO";
   var padd=document.getElementById("padd");
   if(padd)padd.addEventListener("click",function(){document.getElementById("fi").click();});
-  renderDocs();
+
 }
 
 function saveP(){
@@ -770,7 +770,7 @@ function ep(id){
     document.getElementById("bsv").textContent="GUARDAR CAMBIOS";
     var fr=parseFloat(p.frente)||0,fo=parseFloat(p.fondo)||0;
     if(fr&&fo){document.getElementById("fsu").style.display="block";document.getElementById("fsu").textContent="Superficie: "+(fr*fo).toFixed(1)+" m2";}
-    renderDocs();
+  
   },150);
 }
 
@@ -851,29 +851,7 @@ function initUI(){
   });
 
   // Docs - delegacion
-  document.getElementById("doc-list").addEventListener("click",function(e){
-    var tog=e.target.closest(".doc-toggle");
-    var upl=e.target.closest(".doc-upload");
-    if(tog){
-      var d=tog.dataset.doc;
-      if(!docState[d])docState[d]={checked:false};
-      docState[d].checked=!docState[d].checked;
-      renderDocs();
-    }
-    if(upl){
-      var doc=upl.dataset.doc;
-      document.getElementById("doc-fi").onchange=function(ev){
-        if(ev.target.files[0]){
-          if(!docState[doc])docState[doc]={checked:false};
-          docState[doc].filename=ev.target.files[0].name;
-          docState[doc].checked=true;
-          renderDocs();
-          toast("Documento agregado");
-        }
-      };
-      document.getElementById("doc-fi").click();
-    }
-  });
+
 
   document.getElementById("bsavtok").addEventListener("click",function(){
     var t=(document.getElementById("ti").value||"").trim();
