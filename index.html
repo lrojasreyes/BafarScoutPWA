@@ -200,7 +200,7 @@ textarea{resize:none;min-height:80px}
               <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">Nombre</div><div style="font-size:14px;font-weight:600" id="det-dueno">-</div></div>
               <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">Telefono</div><div style="font-size:14px;font-weight:600" id="det-tel">-</div></div>
             </div>
-            <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">Precio</div><div style="font-size:18px;font-weight:800;color:#e8a020" id="det-precio">-</div></div>
+            <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">Monto de renta/venta</div><div style="font-size:18px;font-weight:800;color:#e8a020" id="det-precio">-</div></div>
           </div>
         </div>
         <div class="sec" style="margin-bottom:12px" id="det-notas-sec">
@@ -286,7 +286,7 @@ textarea{resize:none;min-height:80px}
           <div><label class="lbl">Nombre</label><input type="text" placeholder="Nombre completo" id="fdu"></div>
           <div class="r2">
             <div><label class="lbl">Telefono</label><input type="tel" placeholder="(667) 000-0000" id="fte"></div>
-            <div><label class="lbl">Precio</label><input type="text" placeholder="0 MXN" id="fpr"></div>
+            <div><label class="lbl">Monto de renta/venta</label><input type="text" placeholder="Ej: 45000" id="fpr"></div>
           </div>
         </div>
       </div>
@@ -872,7 +872,7 @@ function initUI(){
 
   document.getElementById("bexp").addEventListener("click",function(){
     if(!PS.length){toast("Sin datos");return;}
-    var h=["Nombre","Direccion","Ciudad","Estado","Tipo","M2T","M2C","Frente","Fondo","Dueno","Tel","Precio","Status","Fecha","Lat","Lng","Rest","Com","Tot","Viv","Pob","Docs%","Notas"];
+    var h=["Nombre","Direccion","Ciudad","Estado","Tipo","M2T","M2C","Frente","Fondo","Dueno","Tel","Monto de renta/venta","Status","Fecha","Lat","Lng","Rest","Com","Tot","Viv","Pob","Docs%","Notas"];
     var rows=PS.map(function(p){return[p.nombre||"",p.direccion||"",p.ciudad||"",p.estado||"",p.tipo||"",p.m2Terreno||"",p.m2Construccion||"",p.frente||"",p.fondo||"",p.dueno||"",p.tel||"",p.precio||"",p.status||"",p.fecha||"",p.lat||"",p.lng||"",p.denue?p.denue.rest:"",p.denue?p.denue.com:"",p.denue?p.denue.tot:"",p.inegi?p.inegi.viv:"",p.inegi?p.inegi.pob:"",docPct(p.documentos)+"%",p.notas||""];});
     var csv="\uFEFF"+[h].concat(rows).map(function(x){return x.map(function(c){return String(c).replace(/,/g," ");}).join(",");}).join("\r\n");
     var a=document.createElement("a");a.href="data:text/csv;charset=utf-8,"+encodeURIComponent(csv);a.download="BAFAR_Scout.csv";a.click();
