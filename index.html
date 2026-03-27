@@ -141,6 +141,81 @@ textarea{resize:none;min-height:80px}
       <div id="d-l"></div>
     </div>
 
+    <div class="page" id="p-detail">
+      <div style="padding:16px;overflow-y:auto;flex:1">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+          <button id="btn-back-detail" style="background:rgba(255,255,255,.07);border:none;border-radius:10px;padding:8px 14px;color:#e8ecf4;font-size:14px;cursor:pointer">← Volver</button>
+          <div style="font-size:18px;font-weight:700" id="det-nombre">-</div>
+        </div>
+        <div id="det-badge-wrap" style="margin-bottom:16px"></div>
+        <div class="sec" style="margin-bottom:12px">
+          <div class="sh"><span style="font-size:18px">📍</span><span style="font-size:14px;font-weight:700;color:#e8a020">Ubicacion</span></div>
+          <div class="sb">
+            <div style="font-size:14px" id="det-dir"></div>
+            <div style="font-size:13px;color:#6a7590" id="det-ciudad"></div>
+            <div style="font-size:12px;color:#6a7590;font-family:monospace" id="det-coords"></div>
+          </div>
+        </div>
+        <div class="sec" style="margin-bottom:12px">
+          <div class="sh"><span style="font-size:18px">🏢</span><span style="font-size:14px;font-weight:700;color:#e8a020">Inmueble</span></div>
+          <div class="sb">
+            <div class="r2">
+              <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">Tipo</div><div style="font-size:15px;font-weight:600" id="det-tipo">-</div></div>
+              <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">M2 Terreno</div><div style="font-size:15px;font-weight:600" id="det-m2t">-</div></div>
+            </div>
+            <div class="r2">
+              <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">Frente</div><div style="font-size:15px;font-weight:600" id="det-frente">-</div></div>
+              <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">Fondo</div><div style="font-size:15px;font-weight:600" id="det-fondo">-</div></div>
+            </div>
+            <div id="det-superficie" style="display:none" class="surf"></div>
+          </div>
+        </div>
+        <div class="sec" style="margin-bottom:12px" id="det-denue-sec">
+          <div class="sh"><span style="font-size:18px">📊</span><span style="font-size:14px;font-weight:700;color:#e8a020">DENUE / INEGI</span></div>
+          <div class="sb">
+            <div class="r2">
+              <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">Restaurantes</div><div style="font-size:22px;font-weight:800;color:#f0c050" id="det-rest">-</div></div>
+              <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">Comercios</div><div style="font-size:22px;font-weight:800;color:#f0c050" id="det-com">-</div></div>
+            </div>
+            <div class="r2">
+              <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">Viviendas</div><div style="font-size:22px;font-weight:800;color:#22d18a" id="det-viv">-</div></div>
+              <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">Poblacion</div><div style="font-size:22px;font-weight:800;color:#3a8fff" id="det-pob">-</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="sec" style="margin-bottom:12px" id="det-renta-sec">
+          <div class="sh"><span style="font-size:18px">💰</span><span style="font-size:14px;font-weight:700;color:#e8a020">Rentas comerciales</span></div>
+          <div class="sb">
+            <div class="r2">
+              <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">Promedio zona</div><div style="font-size:22px;font-weight:800;color:#e8a020" id="det-renta-zona">-</div><div style="font-size:10px;color:#6a7590">MXN/m²</div></div>
+              <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">Renta prospecto</div><div style="font-size:22px;font-weight:800;color:#22d18a" id="det-renta-prop">-</div><div style="font-size:10px;color:#6a7590">MXN/m²</div></div>
+            </div>
+            <div id="det-renta-total" style="background:rgba(232,160,32,.08);border:1px solid rgba(232,160,32,.15);border-radius:10px;padding:10px;font-size:13px;color:#e8a020;display:none"></div>
+          </div>
+        </div>
+        <div class="sec" style="margin-bottom:12px">
+          <div class="sh"><span style="font-size:18px">👤</span><span style="font-size:14px;font-weight:700;color:#e8a020">Propietario</span></div>
+          <div class="sb">
+            <div class="r2">
+              <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">Nombre</div><div style="font-size:14px;font-weight:600" id="det-dueno">-</div></div>
+              <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">Telefono</div><div style="font-size:14px;font-weight:600" id="det-tel">-</div></div>
+            </div>
+            <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">Precio</div><div style="font-size:18px;font-weight:800;color:#e8a020" id="det-precio">-</div></div>
+          </div>
+        </div>
+        <div class="sec" style="margin-bottom:12px" id="det-notas-sec">
+          <div class="sh"><span style="font-size:18px">📝</span><span style="font-size:14px;font-weight:700;color:#e8a020">Notas</span></div>
+          <div class="sb"><div style="font-size:14px;line-height:1.6" id="det-notas">-</div></div>
+        </div>
+        <div id="det-fotos-sec" style="display:none" class="sec" style="margin-bottom:12px">
+          <div class="sh"><span style="font-size:18px">📷</span><span style="font-size:14px;font-weight:700;color:#e8a020">Fotos</span></div>
+          <div class="sb"><div class="pgrid" id="det-fotos"></div></div>
+        </div>
+        <button class="btn" id="btn-edit-detail" style="margin-bottom:8px">✏️ EDITAR PROSPECTO</button>
+        <div style="height:20px"></div>
+      </div>
+    </div>
+
     <div class="page" id="p-list">
       <input class="srch" type="text" placeholder="Buscar..." id="q">
       <div class="fbar">
@@ -226,20 +301,7 @@ textarea{resize:none;min-height:80px}
           <input type="file" id="fi" accept="image/*" multiple style="display:none">
         </div>
       </div>
-      <div class="sec">
-        <div class="sh">
-          <span style="font-size:20px">📁</span>
-          <span style="font-size:15px;font-weight:700;color:#e8a020">Documentos</span>
-          <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
-            <span style="font-size:13px;font-weight:700;color:#22d18a" id="doc-pct">0%</span>
-          </div>
-        </div>
-        <div class="sb">
-          <div class="progress-bar"><div class="progress-fill" id="doc-bar" style="width:0%"></div></div>
-          <div id="doc-list"></div>
-          <input type="file" id="doc-fi" accept=".pdf,image/*" style="display:none">
-        </div>
-      </div>
+
       <button class="btn" id="bsv">GUARDAR PROSPECTO</button>
       <button class="btn2" id="bcan">Cancelar</button>
       <div style="height:30px"></div>
@@ -299,7 +361,7 @@ textarea{resize:none;min-height:80px}
     <div class="ni on" data-page="dash"><div class="ic">📊</div><div class="lb">Dashboard</div></div>
     <div class="ni" data-page="list"><div class="ic">📋</div><div class="lb">Prospectos</div></div>
     <div class="fabw"><button class="fab" id="bfab">+</button></div>
-    <div class="ni" style="opacity:.3"><div class="ic">📍</div><div class="lb">Detalle</div></div>
+    <div class="ni" id="n-detail" style="opacity:.3;pointer-events:none"><div class="ic">📍</div><div class="lb">Detalle</div></div>
     <div class="ni" data-page="cfg"><div class="ic">⚙️</div><div class="lb">Config</div></div>
   </nav>
 </div>
@@ -477,7 +539,7 @@ function ch(p){
   var pct=docPct(p.documentos);
   var m=p.denue?"<div style='display:flex;gap:16px;margin-bottom:10px'><div><div style='font-size:16px;font-weight:700;color:#22d18a'>"+((p.inegi&&p.inegi.pob?p.inegi.pob:0)/1000).toFixed(1)+"K</div><div style='font-size:9px;color:#6a7590;text-transform:uppercase'>Poblacion</div></div><div><div style='font-size:16px;font-weight:700;color:#f0c050'>"+(p.inegi&&p.inegi.viv?p.inegi.viv:0).toLocaleString()+"</div><div style='font-size:9px;color:#6a7590;text-transform:uppercase'>Viviendas</div></div><div><div style='font-size:16px;font-weight:700;color:#3a8fff'>"+(p.denue.rest||0)+"</div><div style='font-size:9px;color:#6a7590;text-transform:uppercase'>Restaurantes</div></div></div>":"";
   var docBar=pct>0?"<div style='margin-top:8px'><div style='display:flex;justify-content:space-between;font-size:11px;color:#6a7590;margin-bottom:4px'><span>Documentos</span><span style='color:"+(pct===100?"#22d18a":"#e8a020")+"'>"+pct+"%</span></div><div class='progress-bar'><div class='progress-fill' style='width:"+pct+"%'></div></div></div>":"";
-  return "<div class='card' data-id='"+p.id+"'><div style='display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px'><div style='flex:1;margin-right:8px'><div style='font-size:18px;font-weight:700'>"+p.nombre+"</div>"+(p.direccion?"<div style='font-size:12px;color:#6a7590;margin-top:2px'>"+p.direccion+"</div>":"")+"</div><span class='badge "+bc+" card-status' data-id='"+p.id+"'>"+bl+"</span></div>"+m+"<div style='display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid rgba(255,255,255,.07)'><div style='font-size:12px;color:#6a7590'>"+(p.ciudad||"")+(p.estado?", "+p.estado:"")+" - "+p.tipo+"</div><div style='display:flex;gap:8px'><button class='card-edit' data-id='"+p.id+"' style='background:rgba(232,160,32,.12);border:1px solid rgba(232,160,32,.2);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px;color:#e8a020'>Editar</button><button class='card-del' data-id='"+p.id+"' style='background:transparent;border:none;cursor:pointer;font-size:16px'>🗑️</button></div></div>"+docBar+"</div>";
+  return "<div class='card card-tap' data-id='"+p.id+"'><div style='display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px'><div style='flex:1;margin-right:8px'><div style='font-size:18px;font-weight:700'>"+p.nombre+"</div>"+(p.direccion?"<div style='font-size:12px;color:#6a7590;margin-top:2px'>"+p.direccion+"</div>":"")+"</div><span class='badge "+bc+" card-status' data-id='"+p.id+"'>"+bl+"</span></div>"+m+"<div style='display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid rgba(255,255,255,.07)'><div style='font-size:12px;color:#6a7590'>"+(p.ciudad||"")+(p.estado?", "+p.estado:"")+" - "+p.tipo+"</div><div style='display:flex;gap:8px'><button class='card-del' data-id='"+p.id+"' style='background:transparent;border:none;cursor:pointer;font-size:16px'>🗑️</button></div></div>"+docBar+"</div>";
 }
 
 function rl(){
@@ -587,6 +649,7 @@ function saveP(){
   var b=document.getElementById("bsv");
   b.disabled=true;b.textContent="Guardando...";
   var finish=function(){
+    var existing=editId?PS.find(function(x){return x.id===editId;}):null;
     var p={
       id:editId||Date.now().toString(),
       nombre:n,direccion:document.getElementById("fd").value||"",
@@ -596,15 +659,17 @@ function saveP(){
       frente:document.getElementById("ffr").value||"",fondo:document.getElementById("ffo").value||"",
       dueno:document.getElementById("fdu").value||"",tel:document.getElementById("fte").value||"",
       precio:document.getElementById("fpr").value||"",notas:document.getElementById("fno").value||"",
-      lat:GD.lat,lng:GD.lng,status:"prospecto",
-      fecha:new Date().toISOString().split("T")[0],
-      fotos:[],denue:DR?{rest:DR.rest,com:DR.com,tot:DR.tot}:null,
-      inegi:DR?{viv:DR.viv,pob:DR.pob}:null,
+      lat:GD?GD.lat:(existing?existing.lat:0),lng:GD?GD.lng:(existing?existing.lng:0),
+      status:existing?existing.status:"prospecto",
+      fecha:existing?existing.fecha:new Date().toISOString().split("T")[0],
+      fotos:existing?existing.fotos:[],
+      denue:DR?{rest:DR.rest,com:DR.com,tot:DR.tot}:(existing?existing.denue:null),
+      inegi:DR?{viv:DR.viv,pob:DR.pob}:(existing?existing.inegi:null),
       documentos:docState
     };
     if(editId){
       var idx=PS.findIndex(function(x){return x.id===editId;});
-      if(idx>=0){p.status=PS[idx].status;PS[idx]=p;}
+      if(idx>=0){PS[idx]=p;}
     } else {
       PS.unshift(p);
     }
@@ -615,6 +680,60 @@ function saveP(){
   };
   if(!DR){showD();setTimeout(finish,2500);}
   else{finish();}
+}
+
+function getRenta(ciudad){
+  if(!ciudad)return null;
+  var c=ciudad.toUpperCase().trim();
+  return RENTAS[c]||null;
+}
+
+function openDetail(id){
+  var p=PS.find(function(x){return x.id===id;});
+  if(!p)return;
+  go("detail");
+  document.getElementById("det-nombre").textContent=p.nombre||"-";
+  document.getElementById("btn-edit-detail").dataset.id=id;
+  var bc={viable:"bv",prospecto:"bp",descartado:"bd"}[p.status]||"bp";
+  var bl={viable:"Viable",prospecto:"Prospecto",descartado:"Descartado"}[p.status]||"Prospecto";
+  document.getElementById("det-badge-wrap").innerHTML="<span class='badge "+bc+"'>"+bl+"</span> <span style='font-size:12px;color:#6a7590;margin-left:8px'>"+p.fecha+"</span>";
+  document.getElementById("det-dir").textContent=p.direccion||"Sin direccion";
+  document.getElementById("det-ciudad").textContent=(p.ciudad||"")+(p.estado?", "+p.estado:"")+"";
+  document.getElementById("det-coords").textContent=p.lat&&p.lng?p.lat.toFixed(5)+", "+p.lng.toFixed(5):"";
+  document.getElementById("det-tipo").textContent=p.tipo||"-";
+  document.getElementById("det-m2t").textContent=p.m2Terreno?p.m2Terreno+" m²":"-";
+  document.getElementById("det-frente").textContent=p.frente?p.frente+" m":"-";
+  document.getElementById("det-fondo").textContent=p.fondo?p.fondo+" m":"-";
+  var fr=parseFloat(p.frente)||0,fo=parseFloat(p.fondo)||0;
+  var supEl=document.getElementById("det-superficie");
+  if(fr&&fo){supEl.style.display="block";supEl.textContent="Superficie: "+(fr*fo).toFixed(1)+" m²";}
+  else supEl.style.display="none";
+  if(p.denue){
+    document.getElementById("det-denue-sec").style.display="block";
+    document.getElementById("det-rest").textContent=p.denue.rest||0;
+    document.getElementById("det-com").textContent=p.denue.com||0;
+    document.getElementById("det-viv").textContent=p.inegi&&p.inegi.viv?p.inegi.viv.toLocaleString():"-";
+    document.getElementById("det-pob").textContent=p.inegi&&p.inegi.pob?(p.inegi.pob/1000).toFixed(1)+"K":"-";
+  } else {
+    document.getElementById("det-denue-sec").style.display="none";
+  }
+  var rentaZona=getRenta(p.ciudad);
+  var rentaProp=p.precio?parseFloat(p.precio.toString().replace(/[^0-9.]/g,"")):null;
+  var m2=parseFloat(p.m2Terreno)||0;
+  document.getElementById("det-renta-sec").style.display="block";
+  document.getElementById("det-renta-zona").textContent=rentaZona?"$"+rentaZona:"-";
+  document.getElementById("det-renta-prop").textContent=rentaProp&&m2?"$"+(rentaProp/m2).toFixed(0):"-";
+  var totalEl=document.getElementById("det-renta-total");
+  if(rentaZona&&m2){totalEl.style.display="block";totalEl.textContent="Renta estimada zona: $"+Math.round(rentaZona*m2).toLocaleString()+" MXN/mes ("+m2+" m² × $"+rentaZona+"/m²)";}
+  else totalEl.style.display="none";
+  document.getElementById("det-dueno").textContent=p.dueno||"-";
+  document.getElementById("det-tel").textContent=p.tel||"-";
+  document.getElementById("det-precio").textContent=p.precio||"-";
+  var notasEl=document.getElementById("det-notas-sec");
+  document.getElementById("det-notas").textContent=p.notas||"Sin notas";
+  var fotosEl=document.getElementById("det-fotos-sec");
+  if(p.fotos&&p.fotos.length>0){fotosEl.style.display="block";document.getElementById("det-fotos").innerHTML=p.fotos.map(function(s){return "<div class='pth'><img src='"+s+"'></div>";}).join("");}
+  else fotosEl.style.display="none";
 }
 
 function ep(id){
@@ -785,17 +904,20 @@ function initUI(){
     var ed=e.target.closest(".card-edit");
     var dd=e.target.closest(".card-del");
     var sd=e.target.closest(".card-status");
-    if(ed)ep(ed.dataset.id);
-    if(dd)dp(dd.dataset.id);
-    if(sd){
+    var tap=e.target.closest(".card-tap");
+    if(dd){e.stopPropagation();dp(dd.dataset.id);return;}
+    if(sd){e.stopPropagation();
       var p=PS.find(function(x){return x.id===sd.dataset.id;});
-      if(p){
-        var o=["prospecto","viable","descartado"];
-        p.status=o[(o.indexOf(p.status)+1)%3];
-        syncToSupabase(p);ud();rl();
-        toast("Estado: "+p.status);
-      }
+      if(p){var o=["prospecto","viable","descartado"];p.status=o[(o.indexOf(p.status)+1)%3];syncToSupabase(p);ud();rl();toast("Estado: "+p.status);}
+      return;
     }
+    if(tap){openDetail(tap.dataset.id);}
+  });
+
+  document.getElementById("btn-back-detail").addEventListener("click",function(){go("list");});
+  document.getElementById("btn-edit-detail").addEventListener("click",function(){
+    var id=document.getElementById("btn-edit-detail").dataset.id;
+    ep(id);
   });
 
   document.getElementById("ml").innerHTML=EST.map(function(e){return "<div class='mi' data-estado='"+e+"'>"+e+"</div>";}).join("");
