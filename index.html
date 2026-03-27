@@ -502,14 +502,14 @@ function deleteFromSupabase(id){
 }
 
 // NAV
-function go(p){
+function go(p,skipRf){
   document.querySelectorAll(".page").forEach(function(x){x.classList.remove("on");});
   document.querySelectorAll(".ni").forEach(function(x){x.classList.remove("on");});
   document.getElementById("p-"+p).classList.add("on");
   var n=document.querySelector(".ni[data-page="+p+"]");
   if(n)n.classList.add("on");
   if(p==="list")rl();
-  if(p==="new")rf();
+  if(p==="new"&&!skipRf)rf();
   if(p==="dash")ud();
   if(p==="cfg"){var e=document.getElementById("ec");if(e)e.textContent=PS.length+" prospectos";}
 }
@@ -540,7 +540,7 @@ function ch(p){
   var pct=docPct(p.documentos);
   var m=p.denue?"<div style='display:flex;gap:16px;margin-bottom:10px'><div><div style='font-size:16px;font-weight:700;color:#22d18a'>"+((p.inegi&&p.inegi.pob?p.inegi.pob:0)/1000).toFixed(1)+"K</div><div style='font-size:9px;color:#6a7590;text-transform:uppercase'>Poblacion</div></div><div><div style='font-size:16px;font-weight:700;color:#f0c050'>"+(p.inegi&&p.inegi.viv?p.inegi.viv:0).toLocaleString()+"</div><div style='font-size:9px;color:#6a7590;text-transform:uppercase'>Viviendas</div></div><div><div style='font-size:16px;font-weight:700;color:#3a8fff'>"+(p.denue.rest||0)+"</div><div style='font-size:9px;color:#6a7590;text-transform:uppercase'>Restaurantes</div></div></div>":"";
   var docBar=pct>0?"<div style='margin-top:8px'><div style='display:flex;justify-content:space-between;font-size:11px;color:#6a7590;margin-bottom:4px'><span>Documentos</span><span style='color:"+(pct===100?"#22d18a":"#e8a020")+"'>"+pct+"%</span></div><div class='progress-bar'><div class='progress-fill' style='width:"+pct+"%'></div></div></div>":"";
-  return "<div class='card card-tap' data-id='"+p.id+"'><div style='display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px'><div style='flex:1;margin-right:8px'><div style='font-size:18px;font-weight:700'>"+p.nombre+"</div>"+(p.direccion?"<div style='font-size:12px;color:#6a7590;margin-top:2px'>"+p.direccion+"</div>":"")+"</div><span class='badge "+bc+" card-status' data-id='"+p.id+"'>"+bl+"</span></div>"+m+"<div style='display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid rgba(255,255,255,.07)'><div style='font-size:12px;color:#6a7590'>"+(p.ciudad||"")+(p.estado?", "+p.estado:"")+" - "+p.tipo+"</div><div style='display:flex;gap:8px'><button class='card-del' data-id='"+p.id+"' style='background:transparent;border:none;cursor:pointer;font-size:16px'>🗑️</button></div></div>"+docBar+"</div>";
+  return "<div class='card card-tap' data-id='"+p.id+"'><div style='display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px'><div style='flex:1;margin-right:8px'><div style='font-size:18px;font-weight:700'>"+p.nombre+"</div>"+(p.direccion?"<div style='font-size:12px;color:#6a7590;margin-top:2px'>"+p.direccion+"</div>":"")+"</div><span class='badge "+bc+" card-status' data-id='"+p.id+"'>"+bl+"</span></div>"+m+"<div style='display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid rgba(255,255,255,.07)'><div style='font-size:12px;color:#6a7590'>"+(p.ciudad||"")+(p.estado?", "+p.estado:"")+" - "+p.tipo+"</div><div style='display:flex;gap:8px'><button class='card-del' data-id='"+p.id+"' style='background:transparent;border:none;cursor:pointer;font-size:16px'>🗑️</button></div></div>"+rentaBar+"</div>";
 }
 
 function rl(){
@@ -665,8 +665,8 @@ function saveP(){
       fecha:existing?existing.fecha:new Date().toISOString().split("T")[0],
       updatedAt:new Date().toLocaleString('es-MX',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}),
       fotos:PH.length>0?PH:(existing?existing.fotos:[]),
-      denue:DR?{rest:DR.rest,com:DR.com,tot:DR.tot}:(existing?existing.denue:null),
-      inegi:DR?{viv:DR.viv,pob:DR.pob}:(existing?existing.inegi:null),
+      denue:DR&&DR.real?{rest:DR.rest,com:DR.com,tot:DR.tot}:(existing?existing.denue:null),
+      inegi:DR&&DR.real?{viv:DR.viv,pob:DR.pob}:(existing?existing.inegi:null),
       documentos:docState
     };
     if(editId){
@@ -742,7 +742,7 @@ function ep(id){
   var p=PS.find(function(x){return x.id===id;});
   if(!p)return;
   editId=id;docState=p.documentos||{};
-  go("new");
+  go("new",true);
   setTimeout(function(){
     document.getElementById("fn").value=p.nombre||"";
     document.getElementById("fd").value=p.direccion||"";
