@@ -627,6 +627,12 @@ function renderDocs(){
   }).join("");
 }
 
+function renderFotoGrid(){
+  document.getElementById("pg").innerHTML=PH.map(function(s){return "<div class='pth'><img src='"+s+"'></div>";}).join("")+"<div class='padd' id='padd2'>+</div>";
+  var p2=document.getElementById("padd2");
+  if(p2)p2.addEventListener("click",function(){document.getElementById("fi").click();});
+}
+
 function rf(){
   GD=null;PH=[];DM=false;DR=null;editId=null;
   ["fn","fd","fci","fdu","fte","fpr","fno","fm2t","fm2c","ffr","ffo"].forEach(function(id){var e=document.getElementById(id);if(e)e.value="";});
@@ -816,14 +822,20 @@ function initUI(){
   document.getElementById("padd").addEventListener("click",function(){document.getElementById("fi").click();});
   document.getElementById("fi").addEventListener("change",function(e){
     Array.from(e.target.files).forEach(function(f){
-      var r=new FileReader();
-      r.onload=function(ev){
-        PH.push(ev.target.result);
-        document.getElementById("pg").innerHTML=PH.map(function(s){return "<div class='pth'><img src='"+s+"'></div>";}).join("")+"<div class='padd' id='padd2'>+</div>";
-        var p2=document.getElementById("padd2");
-        if(p2)p2.addEventListener("click",function(){document.getElementById("fi").click();});
-      };
-      r.readAsDataURL(f);
+      var fname=Date.now()+"_"+f.name.replace(/[^a-zA-Z0-9.]/g,"_");
+      var path=(currentUser?currentUser.id:"anon")+"/"+fname;
+      sb.storage.from("fotos").upload(path,f,{contentType:f.type}).then(function(res){
+        if(res.error){
+          // fallback a base64
+          var r=new FileReader();
+          r.onload=function(ev){PH.push(ev.target.result);renderFotoGrid();};
+          r.readAsDataURL(f);
+        } else {
+          var url=sb.storage.from("fotos").getPublicUrl(path).data.publicUrl;
+          PH.push(url);
+          renderFotoGrid();
+        }
+      });
     });
   });
   ["ffr","ffo","fm2t"].forEach(function(id){
