@@ -565,6 +565,10 @@ function rl(){
 }
 
 function doGPS(){
+  if(GD&&GD.locked){
+    if(!confirm("¿Actualizar la ubicacion GPS? Esto reemplazara la ubicacion guardada del prospecto.")){return;}
+    GD.locked=false;
+  }
   document.getElementById("gt").textContent="Obteniendo...";
   if(!navigator.geolocation){simG();return;}
   navigator.geolocation.getCurrentPosition(function(pos){
@@ -643,7 +647,7 @@ function renderFotoGrid(){
 }
 
 function rf(){
-  GD=null;PH=[];DM=false;DR=null;editId=null;
+  GD=null;PH=[];DM=false;DR=null;editId=null;docState={};
   ["fn","fd","fci","fdu","fte","fpr","fno","fm2t","fm2c","ffr","ffo"].forEach(function(id){var e=document.getElementById(id);if(e)e.value="";});
   document.getElementById("fe").value="";
   document.getElementById("fe-d").textContent="Seleccionar...";
@@ -807,10 +811,10 @@ function ep(id){
     document.getElementById("fe-d").textContent=p.estado||"Seleccionar...";
     if(p.estado)document.getElementById("fe-d").style.color="#e8ecf4";
     if(p.lat){
-      GD={lat:p.lat,lng:p.lng,acc:0};
+      GD={lat:p.lat,lng:p.lng,acc:0,locked:true};
       document.getElementById("gb").classList.add("ok");
-      document.getElementById("gi").textContent="✅";
-      document.getElementById("gt").textContent="Ubicacion guardada";
+      document.getElementById("gi").textContent="📍";
+      document.getElementById("gt").textContent="Ubicacion guardada — toca para actualizar";
       document.getElementById("gc").textContent=p.lat.toFixed(5)+", "+p.lng.toFixed(5);
     }
     document.querySelectorAll(".tipo").forEach(function(c){
