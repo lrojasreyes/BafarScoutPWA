@@ -492,12 +492,6 @@ function loadFromSupabase(){
   setSyncStatus(false);
   sb.from("prospectos").select("*").eq("user_id",currentUser.id).order("created_at",{ascending:false}).then(function(res){
     if(res.error){toast("Error cargando datos");setSyncStatus(false);return;}
-    // Precargar rentas para todas las ciudades unicas
-    var ciudades=[...new Set(res.data.map(function(r){return(r.estado||"").toUpperCase()+"|||"+(r.ciudad||"").toUpperCase();}))];
-    ciudades.forEach(function(ce){
-      var parts=ce.split("|||");
-      getRentaAsync(parts[1],"Local comercial","renta",parts[0],function(){});
-    });
     PS=res.data.map(function(r){
       return {
         id:r.id,nombre:r.nombre||"",direccion:r.direccion||"",ciudad:r.ciudad||"",
