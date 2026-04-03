@@ -207,9 +207,15 @@ textarea{resize:none;min-height:80px}
           <div class="sh"><span style="font-size:18px">📝</span><span style="font-size:14px;font-weight:700;color:#e8a020">Notas</span></div>
           <div class="sb"><div style="font-size:14px;line-height:1.6" id="det-notas">-</div></div>
         </div>
-        <div id="det-fotos-sec" style="display:none" class="sec" style="margin-bottom:12px">
-          <div class="sh"><span style="font-size:18px">📷</span><span style="font-size:14px;font-weight:700;color:#e8a020">Fotos</span></div>
-          <div class="sb"><div class="pgrid" id="det-fotos"></div></div>
+        <div class="sec" style="margin-bottom:12px">
+          <div class="sh"><span style="font-size:18px">📷</span><span style="font-size:14px;font-weight:700;color:#e8a020">Fotografias</span></div>
+          <div class="sb">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+              <div><div style="font-size:10px;color:#6a7590;text-transform:uppercase;margin-bottom:6px;text-align:center">Frente</div><div id="det-foto-frente" style="aspect-ratio:1;border-radius:12px;background:#162035;overflow:hidden;display:flex;align-items:center;justify-content:center"><span style="font-size:24px;opacity:.3">📸</span></div></div>
+              <div><div style="font-size:10px;color:#6a7590;text-transform:uppercase;margin-bottom:6px;text-align:center">Lateral</div><div id="det-foto-lateral" style="aspect-ratio:1;border-radius:12px;background:#162035;overflow:hidden;display:flex;align-items:center;justify-content:center"><span style="font-size:24px;opacity:.3">📸</span></div></div>
+              <div><div style="font-size:10px;color:#6a7590;text-transform:uppercase;margin-bottom:6px;text-align:center">Entorno</div><div id="det-foto-entorno" style="aspect-ratio:1;border-radius:12px;background:#162035;overflow:hidden;display:flex;align-items:center;justify-content:center"><span style="font-size:24px;opacity:.3">📸</span></div></div>
+            </div>
+          </div>
         </div>
         <button class="btn" id="btn-edit-detail" style="margin-bottom:8px">✏️ EDITAR PROSPECTO</button>
         <div style="height:20px"></div>
@@ -300,10 +306,29 @@ textarea{resize:none;min-height:80px}
         <div id="dc"></div>
       </div>
       <div class="sec">
-        <div class="sh"><span style="font-size:20px">📷</span><span style="font-size:15px;font-weight:700;color:#e8a020">Fotos</span></div>
+        <div class="sh"><span style="font-size:20px">📷</span><span style="font-size:15px;font-weight:700;color:#e8a020">Fotografias</span></div>
         <div class="sb">
-          <div class="pgrid" id="pg"><div class="padd" id="padd">+</div></div>
-          <input type="file" id="fi" accept="image/*" multiple style="display:none">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+            <div>
+              <div style="font-size:10px;color:#6a7590;text-transform:uppercase;margin-bottom:6px;text-align:center">Frente</div>
+              <div class="foto-slot" id="slot-frente" data-slot="frente" style="aspect-ratio:1;border-radius:12px;border:1.5px dashed rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;cursor:pointer;background:#162035;overflow:hidden;position:relative">
+                <span style="font-size:28px">📸</span>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:10px;color:#6a7590;text-transform:uppercase;margin-bottom:6px;text-align:center">Lateral</div>
+              <div class="foto-slot" id="slot-lateral" data-slot="lateral" style="aspect-ratio:1;border-radius:12px;border:1.5px dashed rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;cursor:pointer;background:#162035;overflow:hidden;position:relative">
+                <span style="font-size:28px">📸</span>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:10px;color:#6a7590;text-transform:uppercase;margin-bottom:6px;text-align:center">Entorno</div>
+              <div class="foto-slot" id="slot-entorno" data-slot="entorno" style="aspect-ratio:1;border-radius:12px;border:1.5px dashed rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;cursor:pointer;background:#162035;overflow:hidden;position:relative">
+                <span style="font-size:28px">📸</span>
+              </div>
+            </div>
+          </div>
+          <input type="file" id="fi" accept="image/*" style="display:none">
         </div>
       </div>
 
@@ -387,7 +412,7 @@ var RENTAS={"AGUASCALIENTES": {"AGUASCALIENTES": {"rl": 206.0, "rt": 65.92, "vt"
 var EST=["Aguascalientes","Baja California","Baja California Sur","Campeche","Chiapas","Chihuahua","Ciudad de Mexico","Coahuila","Colima","Durango","Estado de Mexico","Guanajuato","Guerrero","Hidalgo","Jalisco","Michoacan","Morelos","Nayarit","Nuevo Leon","Oaxaca","Puebla","Queretaro","Quintana Roo","San Luis Potosi","Sinaloa","Sonora","Tabasco","Tamaulipas","Tlaxcala","Veracruz","Yucatan","Zacatecas"];
 var DOCS=["Escrituras / Titulo de Propiedad","Plano Catastral","Pago Predial / Carta no adeudo","Factibilidad Uso de Suelo","Comprobante no adeudo Agua","Alineamiento y Numero Oficial","Libertad de Gravamen","Constancia Situacion Fiscal","Formato 32D opinion positiva","Identificacion Propietario","Caratula Estado de Cuenta Bancario"];
 var sb=supabase.createClient(SURL,SKEY);
-var PS=[],GD=null,TI="Local comercial",AF="todos",PH=[],DM=false,DR=null,editId=null,RADIO=1000,currentUser=null,docState={};
+var PS=[],GD=null,TI="Local comercial",AF="todos",PH={frente:null,lateral:null,entorno:null},DM=false,DR=null,editId=null,RADIO=1000,currentUser=null,docState={};
 
 function toast(m){var t=document.getElementById("toast");t.textContent=m;t.classList.add("on");setTimeout(function(){t.classList.remove("on");},2500);}
 
@@ -474,7 +499,7 @@ function loadFromSupabase(){
         m2Construccion:r.m2_construccion||"",frente:r.frente||"",fondo:r.fondo||"",
         dueno:r.dueno||"",tel:r.tel||"",precio:r.precio||"",operacion:r.operacion||"renta",notas:r.notas||"",
         lat:r.lat,lng:r.lng,status:r.status||"prospecto",fecha:r.fecha||"",
-        fotos:[],denue:r.denue,inegi:r.inegi,documentos:r.documentos||{}
+        fotos:r.fotos||[],denue:r.denue,inegi:r.inegi,documentos:r.documentos||{}
       };
     });
     setSyncStatus(true);
@@ -489,7 +514,7 @@ function syncToSupabase(p){
     id:p.id,user_id:currentUser.id,nombre:p.nombre,direccion:p.direccion,
     ciudad:p.ciudad,estado:p.estado,tipo:p.tipo,m2_terreno:p.m2Terreno,
     m2_construccion:p.m2Construccion,frente:p.frente,fondo:p.fondo,
-    dueno:p.dueno,tel:p.tel,precio:p.precio,operacion:p.operacion||"renta",notas:p.notas,
+    dueno:p.dueno,tel:p.tel,precio:p.precio,operacion:p.operacion||"renta",notas:p.notas,fotos:p.fotos||[],
     lat:p.lat,lng:p.lng,status:p.status,fecha:p.fecha,
     denue:p.denue,inegi:p.inegi,documentos:p.documentos||{},
     updated_at:new Date().toISOString()
@@ -555,7 +580,7 @@ function ch(p){
   var esVenta=(p.operacion||"renta")==="venta";
   var rentaEstimada=rentaZona&&m2prop>0?Math.round(rentaZona*m2prop).toLocaleString():null;
   var rentaBar=rentaZona||rentaPropM2?"<div style='padding:8px 0;border-top:1px solid rgba(255,255,255,.05);margin-top:8px'>"+(rentaZona||rentaPropM2?"<div style='display:flex;justify-content:space-between;align-items:center'>":"")+(rentaZona?"<div><div style='font-size:9px;color:#6a7590;text-transform:uppercase'>"+rentaLabel+"</div><div style='font-size:14px;font-weight:700;color:#e8a020'>$"+rentaZona+"/m²</div></div>":"")+(rentaPropM2?"<div><div style='font-size:9px;color:#6a7590;text-transform:uppercase'>"+(esVenta?"Precio/m² prospecto":"Renta/m² prospecto")+"</div><div style='font-size:14px;font-weight:700;color:#22d18a'>$"+rentaPropM2+"/m²</div></div>":"")+(rentaZona||rentaPropM2?"</div>":"")+(precioProp?"<div style='margin-top:6px'><div style='font-size:9px;color:#6a7590;text-transform:uppercase'>"+(esVenta?"Precio de venta":"Monto de renta")+"</div><div style='font-size:20px;font-weight:800;color:#22d18a'>$"+precioProp.toLocaleString()+" MXN</div></div>":"")+(rentaEstimada?"<div style='font-size:11px;color:#6a7590'>"+(esVenta?"Valor estimado zona":"Renta estimada/mes")+":\u0020$"+rentaEstimada+" "+(esVenta?"MXN":"MXN/mes")+"</div>":"")+"</div>":"";
-  return "<div class='card card-tap' data-id='"+p.id+"'><div style='display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px'><div style='flex:1;margin-right:8px'><div style='font-size:18px;font-weight:700'>"+p.nombre+"</div>"+(p.direccion?"<div style='font-size:12px;color:#6a7590;margin-top:2px'>"+p.direccion+"</div>":"")+"</div><span class='badge "+bc+" card-status' data-id='"+p.id+"'>"+bl+"</span></div>"+m+"<div style='display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid rgba(255,255,255,.07)'><div style='font-size:12px;color:#6a7590'>"+(p.ciudad||"")+(p.estado?", "+p.estado:"")+" - "+p.tipo+"</div><div style='display:flex;gap:8px'><button class='card-del' data-id='"+p.id+"' style='background:transparent;border:none;cursor:pointer;font-size:16px'>🗑️</button></div></div>"+rentaBar+"</div>";
+  return "<div class='card card-tap' data-id='"+p.id+"'><div style='display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px'><div style='flex:1;margin-right:8px'><div style='font-size:18px;font-weight:700'>"+p.nombre+"</div>"+(p.direccion?"<div style='font-size:12px;color:#6a7590;margin-top:2px'>"+p.direccion+"</div>":"")+"</div><span class='badge "+bc+" card-status' data-id='"+p.id+"'>"+bl+"</span></div>"+m+"<div style='display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid rgba(255,255,255,.07)'><div style='font-size:12px;color:#6a7590'>"+(p.ciudad||"")+(p.estado?", "+p.estado:"")+" - "+p.tipo+"</div><div style='display:flex;gap:8px'><button class='card-del' data-id='"+p.id+"' style='background:transparent;border:none;cursor:pointer;font-size:16px'>🗑️</button></div></div>"+rentaBar+(p.fotos&&(p.fotos.frente||p.fotos.lateral||p.fotos.entorno)?"<div style=\'display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:10px\'>"+(p.fotos.frente?"<img src=\'"+p.fotos.frente+"\" style=\'width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px\'>":" <div style=\'aspect-ratio:1;background:#162035;border-radius:8px\'></div>")+(p.fotos.lateral?"<img src=\'"+p.fotos.lateral+"\" style=\'width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px\'>":" <div style=\'aspect-ratio:1;background:#162035;border-radius:8px\'></div>")+(p.fotos.entorno?"<img src=\'"+p.fotos.entorno+"\" style=\'width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px\'>":" <div style=\'aspect-ratio:1;background:#162035;border-radius:8px\'></div>")+"</div>":"")+"</div>";
 }
 
 function rl(){
@@ -640,14 +665,26 @@ function renderDocs(){
   }).join("");
 }
 
-function renderFotoGrid(){
-  document.getElementById("pg").innerHTML=PH.map(function(s){return "<div class='pth'><img src='"+s+"'></div>";}).join("")+"<div class='padd' id='padd2'>+</div>";
-  var p2=document.getElementById("padd2");
-  if(p2)p2.addEventListener("click",function(){document.getElementById("fi").click();});
+function renderSlot(slot, url){
+  var el=document.getElementById("slot-"+slot);
+  if(!el)return;
+  if(url){
+    el.innerHTML="<img src='"+url+"' style='width:100%;height:100%;object-fit:cover'><div style='position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,.5);border-radius:6px;padding:2px 6px;font-size:10px;cursor:pointer' class='foto-del' data-slot='"+slot+"'>✕</div>";
+    el.style.border="1.5px solid rgba(34,209,138,.4)";
+  } else {
+    el.innerHTML="<span style='font-size:28px'>📸</span>";
+    el.style.border="1.5px dashed rgba(255,255,255,.15)";
+  }
+}
+
+function renderAllSlots(){
+  ["frente","lateral","entorno"].forEach(function(slot){
+    renderSlot(slot, PH[slot]);
+  });
 }
 
 function rf(){
-  GD=null;PH=[];DM=false;DR=null;editId=null;docState={};
+  GD=null;PH={frente:null,lateral:null,entorno:null};DM=false;DR=null;editId=null;docState={};
   ["fn","fd","fci","fdu","fte","fpr","fno","fm2t","fm2c","ffr","ffo"].forEach(function(id){var e=document.getElementById(id);if(e)e.value="";});
   document.getElementById("fe").value="";
   document.getElementById("fe-d").textContent="Seleccionar...";
@@ -689,7 +726,7 @@ function saveP(){
       status:existing?existing.status:"prospecto",
       fecha:existing?existing.fecha:new Date().toISOString().split("T")[0],
       updatedAt:new Date().toLocaleString('es-MX',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}),
-      fotos:PH.length>0?PH:(existing?existing.fotos:[]),
+      fotos:Object.values(PH).some(function(v){return v;})?PH:(existing?existing.fotos:{frente:null,lateral:null,entorno:null}),
       denue:DR&&DR.real?{rest:DR.rest,com:DR.com,tot:DR.tot}:(existing?existing.denue:null),
       inegi:DR&&DR.real?{viv:DR.viv,pob:DR.pob}:(existing?existing.inegi:null),
       documentos:docState
@@ -781,9 +818,11 @@ function openDetail(id){
   document.getElementById("det-precio").textContent=p.precio||"-";
   var notasEl=document.getElementById("det-notas-sec");
   document.getElementById("det-notas").textContent=p.notas||"Sin notas";
-  var fotosEl=document.getElementById("det-fotos-sec");
-  if(p.fotos&&p.fotos.length>0){fotosEl.style.display="block";document.getElementById("det-fotos").innerHTML=p.fotos.map(function(s){return "<div class='pth'><img src='"+s+"'></div>";}).join("");}
-  else fotosEl.style.display="none";
+  ["frente","lateral","entorno"].forEach(function(slot){
+    var el=document.getElementById("det-foto-"+slot);
+    var url=p.fotos&&p.fotos[slot];
+    if(el){el.innerHTML=url?"<img src='"+url+"' style='width:100%;height:100%;object-fit:cover'>":"<span style='font-size:24px;opacity:.3'>📸</span>";}
+  });
 }
 
 function ep(id){
@@ -821,6 +860,12 @@ function ep(id){
       if(c.dataset.tipo===p.tipo){c.classList.add("ok");TI=p.tipo;}
       else c.classList.remove("ok");
     });
+    PH={frente:null,lateral:null,entorno:null};
+    if(p.fotos&&typeof p.fotos==="object"){
+      ["frente","lateral","entorno"].forEach(function(slot){
+        if(p.fotos[slot]){PH[slot]=p.fotos[slot];renderSlot(slot,p.fotos[slot]);}
+      });
+    }
     document.getElementById("bsv").textContent="GUARDAR CAMBIOS";
     var fr=parseFloat(p.frente)||0,fo=parseFloat(p.fondo)||0;
     if(fr&&fo){document.getElementById("fsu").style.display="block";document.getElementById("fsu").textContent="Superficie: "+(fr*fo).toFixed(1)+" m2";}
@@ -868,23 +913,38 @@ function initUI(){
   document.getElementById("bsv").addEventListener("click",saveP);
   document.getElementById("bcan").addEventListener("click",function(){go("dash");});
   document.getElementById("padd").addEventListener("click",function(){document.getElementById("fi").click();});
-  document.getElementById("fi").addEventListener("change",function(e){
-    Array.from(e.target.files).forEach(function(f){
-      var fname=Date.now()+"_"+f.name.replace(/[^a-zA-Z0-9.]/g,"_");
-      var path=(currentUser?currentUser.id:"anon")+"/"+fname;
-      sb.storage.from("fotos").upload(path,f,{contentType:f.type}).then(function(res){
-        if(res.error){
-          // fallback a base64
-          var r=new FileReader();
-          r.onload=function(ev){PH.push(ev.target.result);renderFotoGrid();};
-          r.readAsDataURL(f);
-        } else {
-          var url=sb.storage.from("fotos").getPublicUrl(path).data.publicUrl;
-          PH.push(url);
-          renderFotoGrid();
-        }
-      });
+  var currentSlot=null;
+  document.querySelectorAll(".foto-slot").forEach(function(slot){
+    slot.addEventListener("click",function(){
+      currentSlot=slot.dataset.slot;
+      document.getElementById("fi").click();
     });
+  });
+
+  document.getElementById("fi").addEventListener("change",function(e){
+    var f=e.target.files[0];
+    if(!f||!currentSlot)return;
+    var fname=currentSlot+"_"+Date.now()+"_"+f.name.replace(/[^a-zA-Z0-9.]/g,"_");
+    var path=(currentUser?currentUser.id:"anon")+"/"+fname;
+    var slotEl=document.getElementById("slot-"+currentSlot);
+    if(slotEl)slotEl.innerHTML="<div style='width:100%;height:100%;display:flex;align-items:center;justify-content:center'><div class='spin'></div></div>";
+    sb.storage.from("fotos").upload(path,f,{contentType:f.type,upsert:true}).then(function(res){
+      var url;
+      if(res.error){
+        var r=new FileReader();
+        r.onload=function(ev){
+          url=ev.target.result;
+          PH[currentSlot]=url;
+          renderSlot(currentSlot,url);
+        };
+        r.readAsDataURL(f);
+      } else {
+        url=sb.storage.from("fotos").getPublicUrl(path).data.publicUrl;
+        PH[currentSlot]=url;
+        renderSlot(currentSlot,url);
+      }
+    });
+    e.target.value="";
   });
   ["ffr","ffo","fm2t"].forEach(function(id){
     document.getElementById(id).addEventListener("input",function(){
@@ -947,6 +1007,13 @@ function initUI(){
   });
 
   document.addEventListener("click",function(e){
+    var fd=e.target.closest(".foto-del");
+    if(fd){
+      var slot=fd.dataset.slot;
+      PH[slot]=null;
+      renderSlot(slot,null);
+      return;
+    }
     var ed=e.target.closest(".card-edit");
     var dd=e.target.closest(".card-del");
     var sd=e.target.closest(".card-status");
