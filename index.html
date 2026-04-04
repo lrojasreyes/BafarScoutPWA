@@ -708,7 +708,7 @@ function showD(){
     var r1={real:true,restaurantes:totalRest,comercios:totalCom,total:totalRest+totalCom,desglose:desglose};
     var R=null;
     var R=null;
-    if(r1&&r1.total>0){R={real:true,rest:r1.rest_count||0,com:r1.com_count||0,tot:r1.total||0,viv:Math.round((r1.total||0)*4.2),pob:Math.round((r1.total||0)*4.2*3.5)};}
+    if(r1&&r1.real){R={real:true,rest:r1.restaurantes||0,com:r1.comercios||0,tot:r1.total||0,desglose:r1.desglose||{},viv:0,pob:0al||0)*4.2*3.5)};}
     if(!R){var rest=30+Math.floor(Math.random()*100),com=100+Math.floor(Math.random()*300),tot=rest+com+150+Math.floor(Math.random()*400),viv=2000+Math.floor(Math.random()*7000);R={real:false,rest:rest,com:com,tot:tot,viv:viv,pob:Math.round(viv*3.5)};}
     DR=R;
     var desgloseHTML=Object.keys(R.desglose||{}).sort(function(a,b){return R.desglose[b]-R.desglose[a];}).map(function(g){return "<div style='display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04)'><span style='font-size:12px;color:#e8ecf4'>"+g+"</span><span style='font-size:13px;font-weight:700;color:#f0c050'>"+R.desglose[g]+"</span></div>";}).join("");
