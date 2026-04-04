@@ -706,43 +706,7 @@ function showD(){
     procesar(arrRest,false);
     procesar(arrCom,true);
     var r1={real:true,restaurantes:totalRest,comercios:totalCom,total:totalRest+totalCom,desglose:desglose};
-    var R=null;.then(function(res){
-    var desglose={},totalRest=0,totalCom=0,vistos={};
-    res.forEach(function(item){
-      var sc=item.sc; var arr=Array.isArray(item.d)?item.d:[];
-      arr.forEach(function(est){
-        var id=est.Id||est.id||Math.random().toString();
-        if(vistos[id]) return; vistos[id]=true;
-        var nombre=est.Nombre||""; var act=est.Clase_actividad||"";
-        var n=(nombre).toLowerCase(); var a=(act).toLowerCase();
-        var excluir=["farmacia","oxxo","papeleria","herbalife","jugos","panaderia","tortilleria","rosticeria","mcdonald","burger king","starbucks","dominos","subway","kfc","pizza hut","vips","toks","helado","nieve","raspado","churro"];
-        if(!nombre||n.indexOf("sin nombre")>=0) return;
-        if(excluir.some(function(t){return n.indexOf(t)>=0||a.indexOf(t)>=0;})) return;
-        var giro="Restaurante";
-        if(sc==="461121") giro="Minisuper";
-        else if(sc==="461150") giro="Carniceria";
-        else if(sc==="461123") giro="Tenderos o Cremerias";
-        else if(sc==="722412") giro="Bares y cantinas";
-        else if(sc==="722320") giro="Comedores Industriales";
-        else if(sc==="722310") giro="Eloteros";
-        else if(n.indexOf("taco")>=0||a.indexOf("tacos y tortas")>=0) giro="Taqueria";
-        else if(n.indexOf("fonda")>=0||n.indexOf("cocina")>=0) giro="Fondas o Cocinas";
-        else if(n.indexOf("birria")>=0||n.indexOf("barbacoa")>=0) giro="Birreria o Barbacoa";
-        else if(a.indexOf("mariscos")>=0||n.indexOf("mariscos")>=0) giro="Restaurante de Mariscos";
-        else if(a.indexOf("pizza")>=0||n.indexOf("pizza")>=0) giro="Pizzas";
-        else if(n.indexOf("torta")>=0) giro="Tortas";
-        else if(n.indexOf("hambur")>=0||a.indexOf("hambur")>=0) giro="Hamburguesas";
-        else if(n.indexOf("sushi")>=0) giro="Sushi";
-        else if(n.indexOf("tamale")>=0) giro="Tamales";
-        else if(n.indexOf("gordita")>=0) giro="Gorditas";
-        else if(n.indexOf("menudo")>=0) giro="Menuderia";
-        else if(n.indexOf("carnita")>=0) giro="Carnitas";
-        else if(n.indexOf("cafe")>=0||a.indexOf("cafe")>=0) giro="Cafeterias";
-        desglose[giro]=(desglose[giro]||0)+1;
-        if(SCIAN_REST.indexOf(sc)>=0) totalRest++; else totalCom++;
-      });
-    });
-    var r1={real:true,restaurantes:totalRest,comercios:totalCom,total:totalRest+totalCom,desglose:desglose};
+    var R=null;
     var R=null;
     if(r1&&r1.total>0){R={real:true,rest:r1.rest_count||0,com:r1.com_count||0,tot:r1.total||0,viv:Math.round((r1.total||0)*4.2),pob:Math.round((r1.total||0)*4.2*3.5)};}
     if(!R){var rest=30+Math.floor(Math.random()*100),com=100+Math.floor(Math.random()*300),tot=rest+com+150+Math.floor(Math.random()*400),viv=2000+Math.floor(Math.random()*7000);R={real:false,rest:rest,com:com,tot:tot,viv:viv,pob:Math.round(viv*3.5)};}
