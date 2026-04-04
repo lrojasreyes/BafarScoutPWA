@@ -13,7 +13,12 @@ export default async function handler(req) {
 
   try {
     const { lat, lng, radio, scian, token } = await req.json();
-    const url = `https://www.inegi.org.mx/app/api/denue/v1/consulta/Buscar/${scian}/${lat},${lng}/${radio}/${token}`;
+    let url;
+    if(scian === 'restaurantes') {
+      url = `https://www.inegi.org.mx/app/api/denue/v1/consulta/Buscar/0/${lat},${lng}/${radio}/${token}/restaurantes`;
+    } else {
+      url = `https://www.inegi.org.mx/app/api/denue/v1/consulta/Buscar/${scian}/${lat},${lng}/${radio}/${token}`;
+    }
 
     const resp = await fetch(url, {
       headers: {
