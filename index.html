@@ -523,7 +523,14 @@ function qcConsultar(){
     }).then(function(x){return x.json();}).catch(function(){return [];});
   }));
 
+  var qcTimeout = setTimeout(function(){
+    document.getElementById("qc-btn").textContent="CONSULTAR";
+    document.getElementById("qc-btn").disabled=false;
+    toast("Tiempo de espera agotado, intenta de nuevo");
+  }, 15000);
+
   Promise.all([pInegi, pDenue]).then(function(res){
+    clearTimeout(qcTimeout);
     var inegi = res[0];
     var denue = res[1];
     
