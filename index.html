@@ -18,6 +18,8 @@ header{background:#0e1628;padding:50px 20px 14px;border-bottom:1px solid rgba(25
 .page{position:absolute;top:0;left:0;right:0;bottom:0;overflow-y:auto;display:none;-webkit-overflow-scrolling:touch;padding:16px}
 .page.on{display:block}
 nav{background:#0e1628;border-top:1px solid rgba(255,255,255,.07);display:flex;flex-shrink:0;padding-bottom:20px}
+.qc-radio{padding:8px 16px;background:#162035;border:1.5px solid rgba(255,255,255,.1);border-radius:8px;color:#6a7590;font-size:13px;font-weight:600;cursor:pointer}
+.qc-radio.ok{background:rgba(232,160,32,.15);border-color:#e8a020;color:#e8a020}
 .ni{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 0 4px;cursor:pointer}
 .ni .ic{font-size:22px}
 .ni .lb{font-size:10px;font-weight:600;text-transform:uppercase;color:#6a7590;margin-top:3px}
@@ -400,9 +402,62 @@ textarea{resize:none;min-height:80px}
     </div>
 
   </div>
+  <div class="page" id="p-consulta">
+    <div class="sh"><span style="font-size:20px">🔍</span><span style="font-size:15px;font-weight:700;color:#e8a020">Consulta Rápida</span></div>
+    <div class="sec">
+      <div style="margin-bottom:12px">
+        <label class="lbl">Coordenadas o enlace Google Maps</label>
+        <input type="text" id="qc-input" placeholder="19.0414, -98.2063 o https://maps.google.com/..." style="width:100%;padding:12px;background:#162035;border:1.5px solid rgba(255,255,255,.1);border-radius:10px;color:#e8ecf4;font-size:14px;box-sizing:border-box">
+      </div>
+      <div style="margin-bottom:16px">
+        <label class="lbl">Radio de consulta</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="qc-radio ok" data-r="500">500m</button>
+          <button class="qc-radio" data-r="1000">1km</button>
+          <button class="qc-radio" data-r="1500">1.5km</button>
+          <button class="qc-radio" data-r="2000">2km</button>
+        </div>
+      </div>
+      <button id="qc-btn" style="width:100%;padding:14px;background:#e8a020;border:none;border-radius:10px;color:#0a0f1e;font-weight:800;font-size:15px;cursor:pointer">CONSULTAR</button>
+    </div>
+    <div id="qc-result" style="display:none">
+      <div class="sec" style="margin-top:0">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+          <div style="background:#162035;border-radius:10px;padding:14px;text-align:center">
+            <div style="font-size:10px;color:#6a7590;text-transform:uppercase;margin-bottom:4px">Población</div>
+            <div style="font-size:28px;font-weight:800;color:#3a8fff" id="qc-pob">-</div>
+          </div>
+          <div style="background:#162035;border-radius:10px;padding:14px;text-align:center">
+            <div style="font-size:10px;color:#6a7590;text-transform:uppercase;margin-bottom:4px">Viviendas</div>
+            <div style="font-size:28px;font-weight:800;color:#22d18a" id="qc-viv">-</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px">
+          <div style="background:#162035;border-radius:10px;padding:14px;text-align:center">
+            <div style="font-size:10px;color:#6a7590;text-transform:uppercase;margin-bottom:4px">Restaurantes</div>
+            <div style="font-size:24px;font-weight:800;color:#f0c050" id="qc-rest">-</div>
+          </div>
+          <div style="background:#162035;border-radius:10px;padding:14px;text-align:center">
+            <div style="font-size:10px;color:#6a7590;text-transform:uppercase;margin-bottom:4px">DENUEs</div>
+            <div style="font-size:24px;font-weight:800;color:#f0c050" id="qc-com">-</div>
+          </div>
+          <div style="background:#162035;border-radius:10px;padding:14px;text-align:center">
+            <div style="font-size:10px;color:#6a7590;text-transform:uppercase;margin-bottom:4px">Total</div>
+            <div style="font-size:24px;font-weight:800;color:#f0c050" id="qc-tot">-</div>
+          </div>
+        </div>
+        <div id="qc-desglose" style="background:#162035;border-radius:10px;padding:14px">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#6a7590;margin-bottom:8px;letter-spacing:1px">Desglose por giro</div>
+          <div id="qc-desglose-list"></div>
+        </div>
+        <div style="margin-top:8px;font-size:11px;color:#6a7590;text-align:center" id="qc-coords"></div>
+      </div>
+    </div>
+  </div>
   <nav>
     <div class="ni on" data-page="dash"><div class="ic">📊</div><div class="lb">Dashboard</div></div>
     <div class="ni" data-page="list"><div class="ic">📋</div><div class="lb">Prospectos</div></div>
+    <div class="ni" data-page="consulta"><div class="ic">🔍</div><div class="lb">Consulta</div></div>
     <div class="fabw"><button class="fab" id="bfab">+</button></div>
     <div class="ni" id="n-detail" style="opacity:.3;pointer-events:none"><div class="ic">📍</div><div class="lb">Detalle</div></div>
     <div class="ni" data-page="cfg"><div class="ic">⚙️</div><div class="lb">Config</div></div>
@@ -428,6 +483,91 @@ var sb=supabase.createClient(SURL,SKEY);
 var PS=[],GD=null,TI="Local comercial",AF="todos",PH={frente:null,lateral:null,entorno:null},DM=false,DR=null,editId=null,RADIO=1000,currentUser=null,docState={};
 
 function toast(m){var t=document.getElementById("toast");t.textContent=m;t.classList.add("on");setTimeout(function(){t.classList.remove("on");},2500);}
+
+var QC_RADIO = 500;
+
+function qcParseInput(val){
+  val = val.trim();
+  // Link de Google Maps: extraer coordenadas
+  var gmaps = val.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+  if(gmaps) return {lat:parseFloat(gmaps[1]),lng:parseFloat(gmaps[2])};
+  // Coordenadas directas: "19.0414, -98.2063"
+  var coords = val.match(/(-?\d+\.\d+)[,\s]+(-?\d+\.\d+)/);
+  if(coords) return {lat:parseFloat(coords[1]),lng:parseFloat(coords[2])};
+  return null;
+}
+
+function qcConsultar(){
+  var input = document.getElementById("qc-input").value;
+  var coords = qcParseInput(input);
+  if(!coords){toast("Ingresa coordenadas o link de Google Maps");return;}
+  
+  var btn = document.getElementById("qc-btn");
+  btn.textContent = "Consultando...";
+  btn.disabled = true;
+  document.getElementById("qc-result").style.display = "none";
+  
+  var lat = coords.lat, lng = coords.lng, r = QC_RADIO;
+  
+  // Consultar población e INEGI
+  var pInegi = fetch("https://pjacmizmjsjwxtoldpvr.supabase.co/functions/v1/poblacion-inegi",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({lat:lat,lng:lng,radio:r})
+  }).then(function(x){return x.json();}).catch(function(){return {};});
+
+  // Consultar DENUE
+  var SCIAN_REST=["restaurantes","abarrotes","carniceria","minisuper"];
+  var pDenue = Promise.all(SCIAN_REST.map(function(scian){
+    return fetch("/api/denue",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({lat:lat,lng:lng,radio:r,scian:scian,token:"0e4c4af9-a631-4f6d-8c35-2d2eb7314785"})
+    }).then(function(x){return x.json();}).catch(function(){return [];});
+  }));
+
+  Promise.all([pInegi, pDenue]).then(function(res){
+    var inegi = res[0];
+    var denue = res[1];
+    
+    // Procesar DENUE
+    var desglose={}, totalRest=0, totalCom=0, vistos={};
+    denue.forEach(function(arr){
+      if(!Array.isArray(arr))return;
+      arr.forEach(function(e){
+        var id=e.Id||e.id||"";
+        if(vistos[id])return;
+        vistos[id]=true;
+        var nom=e.Nombre||e.nombre||"";
+        var act=e.Clase_actividad||e.clase_actividad||"";
+        var scian=e.CLEE||"";
+        var esCom=["461121","461150","461123"].some(function(c){return scian.includes(c);});
+        var giro=nom||act||"Otro";
+        if(esCom)totalCom++;else totalRest++;
+        desglose[giro]=(desglose[giro]||0)+1;
+      });
+    });
+    var totalTot=totalRest+totalCom;
+    
+    // Mostrar resultados
+    document.getElementById("qc-pob").textContent=inegi.pob?(inegi.pob/1000).toFixed(1)+"K":"-";
+    document.getElementById("qc-viv").textContent=inegi.viv?inegi.viv.toLocaleString():"-";
+    document.getElementById("qc-rest").textContent=totalRest;
+    document.getElementById("qc-com").textContent=totalTot;
+    document.getElementById("qc-tot").textContent=totalTot;
+    document.getElementById("qc-coords").textContent=lat.toFixed(5)+", "+lng.toFixed(5)+" · Radio "+r+"m · Censo 2020 INEGI";
+    
+    // Desglose
+    var dg=desglose;
+    document.getElementById("qc-desglose-list").innerHTML=Object.keys(dg).sort(function(a,b){return dg[b]-dg[a];}).slice(0,10).map(function(g){
+      return "<div style='display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04)'><span style='font-size:12px;color:#e8ecf4'>"+g+"</span><span style='font-size:13px;font-weight:700;color:#f0c050'>"+dg[g]+"</span></div>";
+    }).join("");
+    
+    document.getElementById("qc-result").style.display="block";
+    btn.textContent="CONSULTAR";
+    btn.disabled=false;
+  });
+}
 
 function setSyncStatus(ok){
   var el=document.getElementById("sync-status");
@@ -1019,6 +1159,23 @@ function dp(id){
 function initUI(){
   document.querySelectorAll(".ni[data-page]").forEach(function(el){
     el.addEventListener("click",function(){go(el.dataset.page);});
+  });
+
+  // Consulta rápida - botones radio
+  document.querySelectorAll(".qc-radio").forEach(function(btn){
+    btn.addEventListener("click",function(){
+      document.querySelectorAll(".qc-radio").forEach(function(b){b.classList.remove("ok");});
+      btn.classList.add("ok");
+      QC_RADIO=parseInt(btn.dataset.r);
+    });
+  });
+
+  // Consulta rápida - botón consultar
+  document.getElementById("qc-btn").addEventListener("click",qcConsultar);
+  
+  // Consulta rápida - Enter en input
+  document.getElementById("qc-input").addEventListener("keydown",function(e){
+    if(e.key==="Enter")qcConsultar();
   });
   document.getElementById("bfab").addEventListener("click",function(){go("new");});
   document.getElementById("gb").addEventListener("click",doGPS);
