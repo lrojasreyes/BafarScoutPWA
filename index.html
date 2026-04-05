@@ -530,23 +530,37 @@ function qcConsultar(){
     var inegi = res[0];
     var denue = res[1];
     
-    // Procesar DENUE
+    // Procesar DENUE con misma lógica que showD
     var desglose={}, totalRest=0, totalCom=0, vistos={};
-    denue.forEach(function(arr){
-      if(!Array.isArray(arr))return;
-      arr.forEach(function(e){
-        var id=e.Id||e.id||"";
-        if(vistos[id])return;
-        vistos[id]=true;
-        var nom=e.Nombre||e.nombre||"";
-        var act=e.Clase_actividad||e.clase_actividad||"";
-        var scian=e.CLEE||"";
-        var esCom=["461121","461150","461123"].some(function(c){return scian.includes(c);});
-        var giro=nom||act||"Otro";
-        if(esCom)totalCom++;else totalRest++;
+    var arrRest2=Array.isArray(denue[0])?denue[0]:[];
+    var arrCom2=[].concat(Array.isArray(denue[1])?denue[1]:[]).concat(Array.isArray(denue[2])?denue[2]:[]).concat(Array.isArray(denue[3])?denue[3]:[]);
+    function procesar2(arr,esCom){
+      arr.forEach(function(est){
+        var id=est.Id||est.id||Math.random().toString();
+        if(vistos[id])return; vistos[id]=true;
+        var nombre=est.Nombre||""; var act=est.Clase_actividad||"";
+        var n=nombre.toLowerCase(); var a=act.toLowerCase();
+        var excluir=["farmacia","oxxo","papeleria","herbalife","jugos","panaderia","tortilleria","rosticeria","mcdonald","burger king","starbucks","dominos","subway","kfc","pizza hut","vips","toks","helado","nieve","raspado"];
+        if(!nombre||n.indexOf("sin nombre")>=0)return;
+        if(excluir.some(function(t){return n.indexOf(t)>=0||a.indexOf(t)>=0;}))return;
+        var giro=esCom?(n.indexOf("carnic")>=0?"Carniceria":n.indexOf("cremeria")>=0||n.indexOf("lacteo")>=0?"Tenderos o Cremerias":"Minisuper"):"Restaurante";
+        if(!esCom){
+          if(n.indexOf("taco")>=0) giro="Taqueria";
+          else if(n.indexOf("fonda")>=0||n.indexOf("cocina")>=0) giro="Fondas o Cocinas";
+          else if(n.indexOf("birria")>=0||n.indexOf("barbacoa")>=0) giro="Birreria o Barbacoa";
+          else if(n.indexOf("mariscos")>=0||a.indexOf("mariscos")>=0) giro="Restaurante de Mariscos";
+          else if(n.indexOf("pizza")>=0) giro="Pizzas";
+          else if(n.indexOf("torta")>=0) giro="Tortas";
+          else if(n.indexOf("hambur")>=0) giro="Hamburguesas";
+          else if(n.indexOf("cafe")>=0) giro="Cafeterias";
+          else if(n.indexOf("bar")>=0||n.indexOf("cantina")>=0) giro="Bares y cantinas";
+        }
         desglose[giro]=(desglose[giro]||0)+1;
+        if(esCom)totalCom++;else totalRest++;
       });
-    });
+    }
+    procesar2(arrRest2,false);
+    procesar2(arrCom2,true);
     var totalTot=totalRest+totalCom;
     
     // Mostrar resultados
