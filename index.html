@@ -1353,38 +1353,26 @@ function initUI(){
     var id=document.getElementById("btn-edit-detail").dataset.id;
     var p=PS.find(function(x){return x.id===id;});
     if(!p)return;
-    var texto="📍 *"+p.nombre+"*
-";
-    texto+="📌 "+p.direccion+"
-";
-    texto+=(p.ciudad?p.ciudad+", ":"")+p.estado+"
-
-";
+    var nl="\n";
+    var texto="📍 *"+p.nombre+"*"+nl;
+    texto+="📌 "+p.direccion+nl;
+    texto+=(p.ciudad?p.ciudad+", ":"")+p.estado+nl+nl;
     if(p.inegi&&p.inegi.pob){
-      texto+="👥 Población: "+(p.inegi.pob/1000).toFixed(1)+"K habitantes
-";
-      texto+="🏠 Viviendas: "+p.inegi.viv.toLocaleString()+"
-
-";
+      texto+="👥 Población: "+(p.inegi.pob/1000).toFixed(1)+"K habitantes"+nl;
+      texto+="🏠 Viviendas: "+p.inegi.viv.toLocaleString()+nl+nl;
     }
     if(p.denue){
-      texto+="🍽️ Restaurantes: "+p.denue.rest+"
-";
-      texto+="🏪 DENUEs Total: "+p.denue.tot+"
-";
+      texto+="🍽️ Restaurantes: "+p.denue.rest+nl;
+      texto+="🏪 DENUEs Total: "+p.denue.tot+nl;
       if(p.denue.desglose){
-        texto+="
-Desglose por giro:
-";
+        texto+=nl+"Desglose por giro:"+nl;
         var dg=p.denue.desglose;
         Object.keys(dg).sort(function(a,b){return dg[b]-dg[a];}).forEach(function(g){
-          texto+="  • "+g+": "+dg[g]+"
-";
+          texto+="  • "+g+": "+dg[g]+nl;
         });
       }
     }
-    texto+="
-📊 Radio: "+RADIO+"m | Fuente: DENUE INEGI + Censo 2020";
+    texto+=nl+"📊 Radio: "+RADIO+"m | Fuente: DENUE INEGI + Censo 2020";
     if(navigator.share){
       navigator.share({title:p.nombre,text:texto}).catch(function(){});
     } else {
