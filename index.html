@@ -450,6 +450,7 @@ textarea{resize:none;min-height:80px}
           <div id="qc-desglose-list"></div>
         </div>
         <div style="margin-top:8px;font-size:11px;color:#6a7590;text-align:center" id="qc-coords"></div>
+        <button id="qc-share-btn" style="width:100%;padding:12px;background:rgba(34,209,138,.15);border:1.5px solid #22d18a;border-radius:10px;color:#22d18a;font-weight:700;font-size:14px;cursor:pointer;margin-top:10px">📤 COMPARTIR CONSULTA</button>
       </div>
     </div>
   </div>
@@ -1232,6 +1233,36 @@ function initUI(){
   // Consulta rápida - Enter en input
   document.getElementById("qc-input").addEventListener("keydown",function(e){
     if(e.key==="Enter")qcConsultar();
+  });
+
+  // Compartir consulta rápida
+  document.getElementById("qc-share-btn").addEventListener("click",function(){
+    var pob=document.getElementById("qc-pob").textContent;
+    var viv=document.getElementById("qc-viv").textContent;
+    var rest=document.getElementById("qc-rest").textContent;
+    var tot=document.getElementById("qc-tot").textContent;
+    var coords=document.getElementById("qc-coords").textContent;
+    var nl="\n";
+    var texto="🔍 *Consulta Rápida BAFAR Scout*"+nl+nl;
+    texto+="📍 "+coords+nl+nl;
+    texto+="👥 Población: "+pob+" habitantes"+nl;
+    texto+="🏠 Viviendas: "+viv+nl+nl;
+    texto+="🍽️ Restaurantes: "+rest+nl;
+    texto+="🏪 DENUEs Total: "+tot+nl+nl;
+    var dg=document.getElementById("qc-desglose-list");
+    if(dg&&dg.children.length>0){
+      texto+="Desglose por giro:"+nl;
+      Array.from(dg.children).forEach(function(row){
+        var spans=row.querySelectorAll("span");
+        if(spans.length===2)texto+="  • "+spans[0].textContent+": "+spans[1].textContent+nl;
+      });
+    }
+    texto+=nl+"📊 Fuente: DENUE INEGI + Censo 2020 INEGI";
+    if(navigator.share){
+      navigator.share({title:"Consulta BAFAR Scout",text:texto}).catch(function(){});
+    } else {
+      navigator.clipboard.writeText(texto).then(function(){toast("Copiado al portapapeles");});
+    }
   });
   document.getElementById("bfab").addEventListener("click",function(){go("new");});
   document.getElementById("gb").addEventListener("click",doGPS);
