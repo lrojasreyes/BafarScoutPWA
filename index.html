@@ -838,7 +838,7 @@ function saveP(){
     setTimeout(function(){go("list");},800);
     b.disabled=false;b.textContent="GUARDAR PROSPECTO";
   };
-  if(!DR){showD();setTimeout(finish,2500);}
+  if(!DR){showD();setTimeout(finish,2500);} else if(DR.real&&(!DR.pob||DR.pob===0)){setTimeout(finish,4000);}
   else{finish();}
 }
 
