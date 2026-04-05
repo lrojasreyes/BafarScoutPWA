@@ -727,6 +727,7 @@ function deleteFromSupabase(id){
 
 // NAV
 function go(p,skipRf){
+  if(document.activeElement)document.activeElement.blur();
   document.querySelectorAll(".page").forEach(function(x){x.classList.remove("on");});
   document.querySelectorAll(".ni").forEach(function(x){x.classList.remove("on");});
   document.getElementById("p-"+p).classList.add("on");
