@@ -824,8 +824,8 @@ function saveP(){
       fecha:existing?existing.fecha:new Date().toISOString().split("T")[0],
       updatedAt:new Date().toLocaleString('es-MX',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}),
       fotos:Object.values(PH).some(function(v){return v;})?PH:(existing?existing.fotos:{frente:null,lateral:null,entorno:null}),
-      denue:DR&&DR.real?{rest:DR.rest,com:DR.com,tot:DR.tot,desglose:DR.desglose||{}}:(existing?existing.denue:null),
-      inegi:DR&&DR.real?{viv:DR.viv,pob:DR.pob}:(existing?existing.inegi:null),
+      denue:editId?(existing?existing.denue:null):(DR&&DR.real?{rest:DR.rest,com:DR.com,tot:DR.tot,desglose:DR.desglose||{}}:null),
+      inegi:editId?(existing?existing.inegi:null):(DR&&DR.real?{viv:DR.viv,pob:DR.pob}:null),
       documentos:docState
     };
     if(editId){
@@ -1100,7 +1100,7 @@ function initUI(){
       document.querySelectorAll(".rchip[data-radio]").forEach(function(c){c.classList.remove("ok");});
       el.classList.add("ok");
       RADIO=parseInt(el.dataset.radio);
-      if(GD)showD();
+      if(GD&&!editId)showD();
     });
   });
 
