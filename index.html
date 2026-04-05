@@ -408,8 +408,10 @@ textarea{resize:none;min-height:80px}
     <div class="sec">
       <div style="margin-bottom:12px">
         <label class="lbl">Coordenadas o enlace Google Maps</label>
-        <input type="text" id="qc-input" placeholder="19.0414, -98.2063 o https://maps.google.com/..." style="width:100%;padding:12px;background:#162035;border:1.5px solid rgba(255,255,255,.1);border-radius:10px;color:#e8ecf4;font-size:14px;box-sizing:border-box">
+        <input type="text" id="qc-input" placeholder="19.0414, -98.2063 o link maps.google.com/..." style="width:100%;padding:12px;background:#162035;border:1.5px solid rgba(255,255,255,.1);border-radius:10px;color:#e8ecf4;font-size:14px;box-sizing:border-box">
+      <div style="font-size:11px;color:#6a7590;margin-top:6px">⚠️ Links cortos (maps.app.goo.gl) no son compatibles — usa coordenadas o el botón GPS</div>
       </div>
+      <button id="qc-gps-btn" style="width:100%;padding:10px;background:rgba(58,143,255,.15);border:1.5px solid rgba(58,143,255,.3);border-radius:10px;color:#3a8fff;font-weight:700;font-size:13px;cursor:pointer;margin-bottom:12px">📡 Usar mi ubicación actual</button>
       <div style="margin-bottom:16px">
         <label class="lbl">Radio de consulta</label>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -1193,6 +1195,26 @@ function dp(id){
 function initUI(){
   document.querySelectorAll(".ni[data-page]").forEach(function(el){
     el.addEventListener("click",function(){go(el.dataset.page);});
+  });
+
+  // Consulta rápida - botón GPS
+  document.getElementById("qc-gps-btn").addEventListener("click",function(){
+    var btn=document.getElementById("qc-gps-btn");
+    btn.textContent="📡 Obteniendo ubicación...";
+    btn.disabled=true;
+    if(!navigator.geolocation){toast("GPS no disponible");btn.textContent="📡 Usar mi ubicación actual";btn.disabled=false;return;}
+    navigator.geolocation.getCurrentPosition(function(pos){
+      var lat=pos.coords.latitude.toFixed(5);
+      var lng=pos.coords.longitude.toFixed(5);
+      document.getElementById("qc-input").value=lat+", "+lng;
+      btn.textContent="📡 Usar mi ubicación actual";
+      btn.disabled=false;
+      toast("Ubicación capturada");
+    },function(){
+      toast("No se pudo obtener ubicación");
+      btn.textContent="📡 Usar mi ubicación actual";
+      btn.disabled=false;
+    });
   });
 
   // Consulta rápida - botones radio
