@@ -1470,38 +1470,29 @@ function initUI(){
   function generarFichaPDF(p){
     var dg=p.denue&&p.denue.desglose?p.denue.desglose:{};
     var dgItems=Object.keys(dg).sort(function(a,b){return dg[b]-dg[a];});
-    var dgHTML=dgItems.map(function(g){
-      return "<tr><td style='padding:4px 8px;border-bottom:1px solid #f0f0f0;font-size:11px;color:#374151'>"+g+"</td><td style='padding:4px 8px;border-bottom:1px solid #f0f0f0;font-weight:700;text-align:right;font-size:11px'>"+dg[g]+"</td></tr>";
-    }).join("");
+    var dgHTML=dgItems.map(function(g){return "<tr><td style='padding:3px 6px;border-bottom:1px solid #f0f0f0;font-size:11px;color:#374151'>"+g+"</td><td style='padding:3px 6px;border-bottom:1px solid #f0f0f0;font-weight:700;text-align:right;font-size:11px'>"+dg[g]+"</td></tr>";}).join("");
     var foto1=p.fotos&&p.fotos.frente?p.fotos.frente:null;
     var foto2=p.fotos&&p.fotos.lateral?p.fotos.lateral:null;
     var foto3=p.fotos&&p.fotos.entorno?p.fotos.entorno:null;
     var gmapsUrl="https://www.google.com/maps?q="+p.lat+","+p.lng+"&z=16";
     var statusLabel=p.status==="viable"?"VIABLE":p.status==="descartado"?"DESCARTADO":"PROSPECTO";
     var statusColor=p.status==="viable"?"#22d18a":p.status==="descartado"?"#ef4444":"#3a8fff";
-
-    var fotosHTML="";
-    if(foto1||foto2||foto3){
-      fotosHTML="<div style='display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;height:130px'>"
-        +(foto1?"<img src='"+foto1+"' style='width:100%;height:100%;object-fit:cover;border-radius:5px'>":"<div style='background:#f0f0f0;border-radius:5px;height:100%'></div>")
-        +(foto2?"<img src='"+foto2+"' style='width:100%;height:100%;object-fit:cover;border-radius:5px'>":"<div style='background:#f0f0f0;border-radius:5px;height:100%'></div>")
-        +(foto3?"<img src='"+foto3+"' style='width:100%;height:100%;object-fit:cover;border-radius:5px'>":"<div style='background:#f0f0f0;border-radius:5px;height:100%'></div>")
-        +"</div>";
-    }
-
+    var rentaZonaVal="-";
+    try{var rv=getRentaValores(null,p.tipo,p.operacion);if(rv&&rv.zona)rentaZonaVal="$"+rv.zona+"/m\u00b2";}catch(e){}
+    var sinFoto="<div style='background:#f0f2f5;border-radius:5px;width:100%;height:100%'></div>";
     var html="<!DOCTYPE html><html><head><meta charset='UTF-8'><title>Ficha: "+p.nombre+"</title>"
       +"<style>*{box-sizing:border-box;margin:0;padding:0}"
       +"body{font-family:Arial,sans-serif;background:#f0f2f5;padding:12px;color:#111}"
       +"@media print{body{background:white;padding:0}.no-print{display:none}@page{margin:6mm;size:A4}}"
-      +".ficha{max-width:720px;margin:0 auto;background:white;padding:16px;border-radius:8px}"
+      +".ficha{max-width:720px;margin:0 auto;background:white;padding:16px}"
       +".header{background:#003087;color:white;padding:10px 14px;border-radius:7px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}"
       +".badge{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;border:1.5px solid "+statusColor+";color:"+statusColor+"}"
-      +".titulo{font-size:17px;font-weight:800;margin-bottom:2px}"
-      +".dir{font-size:11px;color:#6a7590;margin-bottom:10px}"
-      +".kpi-box{background:#f8f9fa;border-radius:7px;padding:8px;text-align:center;border:1px solid #e5e7eb}"
-      +".kpi-label{font-size:8px;text-transform:uppercase;color:#9ca3af;letter-spacing:1px;margin-bottom:2px}"
-      +".kpi-val{font-size:20px;font-weight:800}"
-      +".sec{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#6b7280;margin-bottom:5px;padding-bottom:3px;border-bottom:2px solid #e5e7eb}"
+      +".sec{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#6b7280;margin-bottom:6px;padding-bottom:3px;border-bottom:2px solid #e5e7eb}"
+      +".bloque{background:#f8f9fa;border-radius:7px;padding:10px;border:1px solid #e5e7eb;overflow:hidden}"
+      +".kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:6px}"
+      +".kpi{background:white;border-radius:5px;padding:6px;text-align:center;border:1px solid #e5e7eb}"
+      +".kl{font-size:8px;text-transform:uppercase;color:#9ca3af;letter-spacing:1px}"
+      +".kv{font-size:17px;font-weight:800}"
       +".footer{margin-top:8px;padding-top:6px;border-top:1px solid #f0f0f0;font-size:9px;color:#9ca3af;display:flex;justify-content:space-between}"
       +"</style></head><body><div class='ficha'>"
       +"<div class='no-print' style='display:flex;gap:8px;margin-bottom:10px'>"
@@ -1511,63 +1502,50 @@ function initUI(){
       +"<div class='header'>"
       +"<div style='display:flex;align-items:center;gap:10px'>"
       +"<img src='"+_LOGO_BAFAR+"' style='height:32px;width:auto'>"
-      +"<div><div style='font-size:15px;font-weight:900;color:white;letter-spacing:1px'>EXPANSIÓN BAFAR</div>"
+      +"<div><div style='font-size:15px;font-weight:900;color:white;letter-spacing:1px'>EXPANSI\u00d3N BAFAR</div>"
       +"<div style='font-size:9px;color:rgba(255,255,255,.6)'>Ficha de Prospecto</div></div></div>"
       +"<span class='badge'>"+statusLabel+"</span></div>"
-      +"<div class='titulo'>"+p.nombre+"</div>"
-      +"<div class='dir'>"+p.direccion+" &bull; "+(p.ciudad||"")+(p.estado?", "+p.estado:"")+"</div>"
-
-      // FILA 1: Fotos + Datos duros
-      +"<div style='display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px'>"
-
-      // Columna izquierda: fotos
-      +"<div>"
-      +(fotosHTML?"<div class='sec'>Fotografías</div>"+fotosHTML:"<div style='height:130px;background:#f0f2f5;border-radius:7px;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:12px'>Sin fotografías</div>")
+      +"<div style='font-size:17px;font-weight:800;margin-bottom:2px'>"+p.nombre+"</div>"
+      +"<div style='font-size:11px;color:#6a7590;margin-bottom:10px'>"+p.direccion+" &bull; "+(p.ciudad||"")+(p.estado?", "+p.estado:"")+"</div>"
+      +"<div style='display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:8px;height:440px;margin-bottom:8px'>"
+      +"<div class='bloque'>"
+      +"<div class='sec'>DENUE &bull; Radio "+RADIO+"m</div>"
+      +"<div class='kpi-grid'>"
+      +"<div class='kpi'><div class='kl'>Restaurantes</div><div class='kv' style='color:#f59e0b'>"+(p.denue?p.denue.rest||0:0)+"</div></div>"
+      +"<div class='kpi'><div class='kl'>DENUEs Total</div><div class='kv' style='color:#f59e0b'>"+(p.denue?p.denue.tot||0:0)+"</div></div>"
       +"</div>"
-
-      // Columna derecha: datos duros
-      +"<div>"
-      +"<div class='sec'>Datos del inmueble</div>"
-      +"<div style='display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px'>"
-      +(p.tipo?"<div class='kpi-box'><div class='kpi-label'>Tipo</div><div style='font-size:13px;font-weight:700;padding-top:2px'>"+p.tipo+"</div></div>":"")
-      +(p.operacion?"<div class='kpi-box'><div class='kpi-label'>Operación</div><div style='font-size:13px;font-weight:700;padding-top:2px;text-transform:capitalize'>"+p.operacion+"</div></div>":"")
-      +(p.precio?"<div class='kpi-box'><div class='kpi-label'>"+(p.operacion==="venta"?"Precio":"Renta/mes")+"</div><div style='font-size:14px;font-weight:800;color:#22d18a;padding-top:2px'>$"+parseFloat(p.precio).toLocaleString()+"</div></div>":"")
-      +(p.m2Terreno?"<div class='kpi-box'><div class='kpi-label'>Terreno</div><div style='font-size:14px;font-weight:800;color:#6366f1;padding-top:2px'>"+p.m2Terreno+"m²</div></div>":"")
-      +(p.frente&&p.fondo?"<div class='kpi-box'><div class='kpi-label'>Frente x Fondo</div><div style='font-size:12px;font-weight:700;padding-top:2px'>"+p.frente+"m x "+p.fondo+"m</div></div>":"")
-      +(p.m2Construccion?"<div class='kpi-box'><div class='kpi-label'>Construcción</div><div style='font-size:14px;font-weight:800;padding-top:2px'>"+p.m2Construccion+"m²</div></div>":"")
+      +(dgHTML?"<table style='width:100%;border-collapse:collapse'>"+dgHTML+"</table>":"")
       +"</div>"
-      +(p.inegi&&p.inegi.pob?"<div class='sec'>Demografía &bull; Censo 2020 &bull; Radio "+RADIO+"m</div>"
-        +"<div style='display:grid;grid-template-columns:1fr 1fr;gap:6px'>"
-        +"<div class='kpi-box'><div class='kpi-label'>Población</div><div class='kpi-val' style='color:#3a8fff'>"+(p.inegi.pob/1000).toFixed(1)+"K</div></div>"
-        +"<div class='kpi-box'><div class='kpi-label'>Viviendas</div><div class='kpi-val' style='color:#22d18a'>"+p.inegi.viv.toLocaleString()+"</div></div>"
-        +"</div>":"")
+      +"<div class='bloque'>"
+      +"<div class='sec'>Datos Generales</div>"
+      +"<div class='kpi-grid'>"
+      +(p.inegi&&p.inegi.pob?"<div class='kpi'><div class='kl'>Poblaci\u00f3n</div><div class='kv' style='color:#3a8fff'>"+(p.inegi.pob/1000).toFixed(1)+"K</div></div>":"")
+      +(p.inegi&&p.inegi.viv?"<div class='kpi'><div class='kl'>Viviendas</div><div class='kv' style='color:#22d18a'>"+p.inegi.viv.toLocaleString()+"</div></div>":"")
+      +(p.precio?"<div class='kpi'><div class='kl'>"+(p.operacion==="venta"?"Precio":"Renta/mes")+"</div><div class='kv' style='color:#22d18a;font-size:14px'>$"+parseFloat(p.precio).toLocaleString()+"</div></div>":"")
+      +"<div class='kpi'><div class='kl'>Renta zona</div><div class='kv' style='font-size:13px;color:#6366f1'>"+rentaZonaVal+"</div></div>"
+      +(p.m2Terreno?"<div class='kpi'><div class='kl'>Superficie</div><div class='kv' style='font-size:14px'>"+p.m2Terreno+"m\u00b2</div></div>":"")
+      +(p.frente&&p.fondo?"<div class='kpi'><div class='kl'>Frente x Fondo</div><div class='kv' style='font-size:12px'>"+p.frente+"m x "+p.fondo+"m</div></div>":"")
+      +"</div>"
+      +"<div style='margin-top:6px;padding:7px;background:white;border-radius:6px;border:1px solid #e5e7eb'>"
+      +"<div style='font-size:9px;color:#9ca3af;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px'>GPS</div>"
+      +"<div style='font-size:11px;font-weight:600;color:#374151;margin-bottom:3px'>"+p.lat.toFixed(5)+", "+p.lng.toFixed(5)+"</div>"
+      +"<div style='font-size:9px;word-break:break-all;color:#3a8fff'>"+gmapsUrl+"</div>"
       +"</div>"
       +"</div>"
-
-      // FILA 2: Mapa + DENUE
-      +"<div style='display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px'>"
-
-      // Mapa
-      +"<div><div class='sec'>Ubicaci\u00f3n</div>"
-      +"<div style='background:#f0f4ff;border-radius:7px;padding:16px;height:200px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;border:2px dashed #c7d2fe'>"+"<div style='font-size:32px;margin-bottom:8px'>\uD83D\uDCCD</div>"+"<div style='font-size:13px;font-weight:700;color:#3730a3;margin-bottom:4px'>"+(p.ciudad||'')+", "+(p.estado||'')+"</div>"+"<div style='font-size:11px;color:#6b7280;margin-bottom:12px'>"+(p.lat.toFixed(5))+", "+(p.lng.toFixed(5))+"</div>"+"<a href='"+gmapsUrl+"' style='font-size:11px;font-weight:700;color:white;background:#003087;padding:6px 16px;border-radius:20px;text-decoration:none'>Ver en Google Maps</a>"+"</div>"
-
-      // DENUE
-      +(p.denue?"<div><div class='sec'>DENUE &bull; Radio "+RADIO+"m</div>"
-        +"<div style='display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px'>"
-        +"<div class='kpi-box'><div class='kpi-label'>Restaurantes</div><div class='kpi-val' style='color:#f59e0b'>"+(p.denue.rest||0)+"</div></div>"
-        +"<div class='kpi-box'><div class='kpi-label'>DENUEs Total</div><div class='kpi-val' style='color:#f59e0b'>"+(p.denue.tot||0)+"</div></div>"
-        +"</div>"
-        +(dgHTML?"<table style='width:100%;border-collapse:collapse'>"+dgHTML+"</table>":"")
-        +"</div>":"<div></div>")
+      +"<div style='border-radius:7px;overflow:hidden'>"
+      +(foto1?"<img src='"+foto1+"' style='width:100%;height:100%;object-fit:cover;border-radius:7px;display:block'>":sinFoto)
       +"</div>"
-
-      +(p.notas?"<div style='font-size:11px;color:#374151;padding:7px;background:#f8f9fa;border-radius:6px;margin-bottom:8px'><b>Notas:</b> "+p.notas+"</div>":"")
+      +"<div style='display:grid;grid-template-rows:1fr 1fr;gap:8px'>"
+      +(foto2?"<img src='"+foto2+"' style='width:100%;height:100%;object-fit:cover;border-radius:5px;display:block'>":sinFoto)
+      +(foto3?"<img src='"+foto3+"' style='width:100%;height:100%;object-fit:cover;border-radius:5px;display:block'>":sinFoto)
+      +"</div>"
+      +"</div>"
+      +(p.notas?"<div style='font-size:11px;color:#374151;padding:7px;background:#f8f9fa;border-radius:6px;margin-bottom:6px'><b>Notas:</b> "+p.notas+"</div>":"")
       +"<div class='footer'>"
       +"<span>"+p.lat.toFixed(5)+", "+p.lng.toFixed(5)+"</span>"
-      +"<span>"+p.fecha+"</span>"
+      +"<span>"+p.tipo+" &bull; "+p.fecha+"</span>"
       +"<span>BAFAR Scout &bull; Censo 2020 INEGI</span>"
       +"</div></div></body></html>";
-
     var win=window.open("","_blank");
     if(win){win.document.write(html);win.document.close();}
     else{toast("Permite ventanas emergentes para generar PDF");}
