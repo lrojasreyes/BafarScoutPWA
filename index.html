@@ -1479,7 +1479,6 @@ function initUI(){
     var statusColor=p.status==="viable"?"#22d18a":p.status==="descartado"?"#ef4444":"#3a8fff";
     var rentaZonaVal="-";
     try{var rv=getRentaValores(null,p.tipo,p.operacion);if(rv&&rv.zona)rentaZonaVal="$"+rv.zona+"/m\u00b2";}catch(e){}
-    var sinFoto="<div style='background:#f0f2f5;border-radius:5px;width:100%;height:100%'></div>";
     var html="<!DOCTYPE html><html><head><meta charset='UTF-8'><title>Ficha: "+p.nombre+"</title>"
       +"<style>*{box-sizing:border-box;margin:0;padding:0}"
       +"body{font-family:Arial,sans-serif;background:#f0f2f5;padding:12px;color:#111}"
@@ -1487,8 +1486,8 @@ function initUI(){
       +".ficha{max-width:720px;margin:0 auto;background:white;padding:16px}"
       +".header{background:#003087;color:white;padding:10px 14px;border-radius:7px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}"
       +".badge{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;border:1.5px solid "+statusColor+";color:"+statusColor+"}"
+      +".bloque{background:#f8f9fa;border-radius:7px;padding:10px;border:1px solid #e5e7eb}"
       +".sec{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#6b7280;margin-bottom:6px;padding-bottom:3px;border-bottom:2px solid #e5e7eb}"
-      +".bloque{background:#f8f9fa;border-radius:7px;padding:10px;border:1px solid #e5e7eb;overflow:hidden}"
       +".kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:6px}"
       +".kpi{background:white;border-radius:5px;padding:6px;text-align:center;border:1px solid #e5e7eb}"
       +".kl{font-size:8px;text-transform:uppercase;color:#9ca3af;letter-spacing:1px}"
@@ -1507,7 +1506,7 @@ function initUI(){
       +"<span class='badge'>"+statusLabel+"</span></div>"
       +"<div style='font-size:17px;font-weight:800;margin-bottom:2px'>"+p.nombre+"</div>"
       +"<div style='font-size:11px;color:#6a7590;margin-bottom:10px'>"+p.direccion+" &bull; "+(p.ciudad||"")+(p.estado?", "+p.estado:"")+"</div>"
-      +"<div style='display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:8px;height:440px;margin-bottom:8px'>"
+      +"<div style='display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px'>"
       +"<div class='bloque'>"
       +"<div class='sec'>DENUE &bull; Radio "+RADIO+"m</div>"
       +"<div class='kpi-grid'>"
@@ -1532,12 +1531,12 @@ function initUI(){
       +"<div style='font-size:9px;word-break:break-all;color:#3a8fff'>"+gmapsUrl+"</div>"
       +"</div>"
       +"</div>"
-      +"<div style='border-radius:7px;overflow:hidden'>"
-      +(foto1?"<img src='"+foto1+"' style='width:100%;height:100%;object-fit:cover;border-radius:7px;display:block'>":sinFoto)
       +"</div>"
+      +"<div style='display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px'>"
+      +(foto1?"<img src='"+foto1+"' style='width:100%;height:200px;object-fit:cover;border-radius:7px'>":"<div style='height:200px;background:#f0f2f5;border-radius:7px'></div>")
       +"<div style='display:grid;grid-template-rows:1fr 1fr;gap:8px'>"
-      +(foto2?"<img src='"+foto2+"' style='width:100%;height:100%;object-fit:cover;border-radius:5px;display:block'>":sinFoto)
-      +(foto3?"<img src='"+foto3+"' style='width:100%;height:100%;object-fit:cover;border-radius:5px;display:block'>":sinFoto)
+      +(foto2?"<img src='"+foto2+"' style='width:100%;height:96px;object-fit:cover;border-radius:5px'>":"<div style='height:96px;background:#f0f2f5;border-radius:5px'></div>")
+      +(foto3?"<img src='"+foto3+"' style='width:100%;height:96px;object-fit:cover;border-radius:5px'>":"<div style='height:96px;background:#f0f2f5;border-radius:5px'></div>")
       +"</div>"
       +"</div>"
       +(p.notas?"<div style='font-size:11px;color:#374151;padding:7px;background:#f8f9fa;border-radius:6px;margin-bottom:6px'><b>Notas:</b> "+p.notas+"</div>":"")
