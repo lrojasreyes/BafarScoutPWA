@@ -1471,25 +1471,25 @@ function initUI(){
     var dgRows=Object.keys(dg).sort(function(a,b){return dg[b]-dg[a];}).map(function(g){
       return "<tr><td style='padding:6px 10px;border-bottom:1px solid #e5e7eb;font-size:13px'>"+g+"</td><td style='padding:6px 10px;border-bottom:1px solid #e5e7eb;font-weight:700;text-align:right;font-size:13px'>"+dg[g]+"</td></tr>";
     }).join("");
-    var fotoHtml=p.fotos&&p.fotos.frente?"<img src='"+p.fotos.frente+"' style='width:100%;height:200px;object-fit:cover;border-radius:8px;margin-bottom:12px'>":"";
-    var mapHtml="<div style='margin-bottom:16px;border-radius:8px;overflow:hidden;border:1px solid #e5e7eb'>"+"<iframe width='100%' height='200' frameborder='0' scrolling='no' src='https://www.openstreetmap.org/export/embed.html?bbox="+(p.lng-0.015)+","+(p.lat-0.010)+","+(p.lng+0.015)+","+(p.lat+0.010)+"&layer=mapnik&marker="+p.lat+","+p.lng+"' style='border:none'></iframe>"+"</div>";
+    var fotoHtml=p.fotos&&p.fotos.frente?"<img src='"+p.fotos.frente+"' style='width:100%;height:160px;object-fit:cover;border-radius:8px;margin-bottom:10px'>":"";
+    var mapHtml="<div style='margin-bottom:16px;border-radius:8px;overflow:hidden;border:1px solid #e5e7eb'>"+"<iframe width='100%' height='150' frameborder='0' scrolling='no' src='https://www.openstreetmap.org/export/embed.html?bbox="+(p.lng-0.015)+","+(p.lat-0.010)+","+(p.lng+0.015)+","+(p.lat+0.010)+"&layer=mapnik&marker="+p.lat+","+p.lng+"' style='border:none'></iframe>"+"</div>";
     var statusLabel=p.status==="viable"?"VIABLE":p.status==="descartado"?"DESCARTADO":"PROSPECTO";
     var statusColor=p.status==="viable"?"#22d18a":p.status==="descartado"?"#ef4444":"#3a8fff";
     var html="<!DOCTYPE html><html><head><meta charset='UTF-8'><title>Ficha: "+p.nombre+"</title>"
       +"<style>body{font-family:Arial,sans-serif;margin:0;padding:20px;background:#f8f9fa;color:#1a1a2e}"
       +"@media print{body{background:white;padding:0}.no-print{display:none}@page{margin:10mm}}"
-      +".ficha{max-width:760px;margin:0 auto;background:white;padding:28px;border-radius:12px;box-shadow:0 2px 20px rgba(0,0,0,.08)}"
-      +".header{background:#003087;color:white;padding:18px 22px;border-radius:10px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center}"
+      +".ficha{max-width:760px;margin:0 auto;background:white;padding:18px;border-radius:12px;box-shadow:0 2px 20px rgba(0,0,0,.08)}"
+      +".header{background:#003087;color:white;padding:12px 18px;border-radius:8px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}"
       +".logo{font-size:20px;font-weight:900;color:white}"
       +".badge{padding:5px 14px;border-radius:20px;font-size:11px;font-weight:700;border:1.5px solid "+statusColor+";color:"+statusColor+";background:rgba(0,0,0,.2)}"
       +".titulo{font-size:22px;font-weight:800;margin-bottom:3px}"
       +".subtitulo{font-size:13px;color:#6a7590;margin-bottom:18px}"
       +".sec-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#9ca3af;margin-bottom:8px;padding-bottom:5px;border-bottom:2px solid #f3f4f6}"
-      +".grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}"
-      +".grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}"
-      +".card{background:#f8f9fa;border-radius:8px;padding:12px;text-align:center;border:1px solid #f3f4f6}"
+      +".grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}"
+      +".grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}"
+      +".card{background:#f8f9fa;border-radius:6px;padding:8px;text-align:center;border:1px solid #f3f4f6}"
       +".clabel{font-size:9px;text-transform:uppercase;color:#9ca3af;margin-bottom:3px;letter-spacing:1px}"
-      +".cval{font-size:24px;font-weight:800}"
+      +".cval{font-size:20px;font-weight:800}"
       +".pob{color:#3a8fff}.viv{color:#22d18a}.rest{color:#f59e0b}.den{color:#f59e0b}"
       +"table{width:100%;border-collapse:collapse;margin-bottom:16px}"
       +".footer{margin-top:16px;padding-top:10px;border-top:1px solid #f3f4f6;font-size:10px;color:#9ca3af;display:flex;justify-content:space-between}"
@@ -1514,7 +1514,7 @@ function initUI(){
         +(p.m2Terreno?"<div class='card'><div class='clabel'>Terreno</div><div class='cval' style='color:#6366f1'>"+p.m2Terreno+"m2</div></div>":"<div class='card'><div class='clabel'>Tipo</div><div class='cval' style='font-size:13px;padding-top:6px'>"+p.tipo+"</div></div>")
         +(p.precio?"<div class='card'><div class='clabel'>"+(p.operacion==="venta"?"Precio":"Renta/mes")+"</div><div class='cval' style='color:#22d18a;font-size:16px'>$"+parseFloat(p.precio).toLocaleString()+"</div></div>":"<div class='card'><div class='clabel'>Fecha</div><div class='cval' style='font-size:13px;padding-top:6px'>"+p.fecha+"</div></div>")
         +"</div>"
-        +(dgRows?"<div class='sec-title'>Desglose por giro</div><table><tbody>"+dgRows+"</tbody></table>":"")
+        +(dgRows?"<div class='sec-title'>Desglose por giro</div><div style=\'display:grid;grid-template-columns:1fr 1fr;\'>"+dgRows+"</div>":"")
         :"")
       +(p.notas?"<div class='sec-title'>Notas</div><p style='font-size:13px;color:#374151;margin:0 0 16px'>"+p.notas+"</p>":"")
       +"<div class='footer'>"
