@@ -717,10 +717,15 @@ function showD(){
     if(r1&&r1.real){R={real:true,rest:r1.restaurantes||0,com:r1.comercios||0,tot:r1.total||0,desglose:r1.desglose||{},viv:0,pob:0};}
     if(!R){var rest=30+Math.floor(Math.random()*100),com=100+Math.floor(Math.random()*300),tot=rest+com+150+Math.floor(Math.random()*400),viv=2000+Math.floor(Math.random()*7000);R={real:false,rest:rest,com:com,tot:tot,viv:viv,pob:Math.round(viv*3.5)};}
     DR=R;
-    // Consultar poblacion INEGI en paralelo
-    fetch("/api/inegi",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({lat:lat,lng:lng})}).then(function(x){return x.json();}).catch(function(){return{pob:0,viv:0};}).then(function(inegi){
-      if(inegi&&(inegi.pob||inegi.viv)){DR.pob=inegi.pob||0;DR.viv=inegi.viv||0;}
-    });
+    // Estimacion de poblacion por area (densidad urbana Mexico ~8,000 hab/km2)
+    (function(){
+      var areaKm2=Math.PI*(r/1000)*(r/1000);
+      var densidad=8000; // hab/km2 promedio ciudad mexicana
+      var pobEst=Math.round(areaKm2*densidad);
+      var vivEst=Math.round(pobEst/3.5);
+      DR.pob=pobEst;
+      DR.viv=vivEst;
+    })();
     var desgloseHTML=Object.keys(R.desglose||{}).sort(function(a,b){return R.desglose[b]-R.desglose[a];}).map(function(g){return "<div style='display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04)'><span style='font-size:12px;color:#e8ecf4'>"+g+"</span><span style='font-size:13px;font-weight:700;color:#f0c050'>"+R.desglose[g]+"</span></div>";}).join("");
   document.getElementById("dc").innerHTML="<div style='padding:0'><div style='padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;justify-content:space-between;align-items:center'><span style='font-weight:700'>Zona "+RADIO+"m</span><span style='font-size:10px;font-weight:700;padding:3px 7px;border-radius:5px;background:"+(R.real?"rgba(34,209,138,.12)":"rgba(232,160,32,.12)")+";color:"+(R.real?"#22d18a":"#e8a020")+";'>"+(R.real?"REAL":"SIMULADO")+"</span></div><div style='display:grid;grid-template-columns:1fr 1fr 1fr'><div style='padding:14px;border-right:1px solid rgba(255,255,255,.07);text-align:center'><div style='font-size:24px;font-weight:800;color:#f0c050'>"+R.rest+"</div><div style='font-size:10px;color:#6a7590'>Restaurantes</div></div><div style='padding:14px;border-right:1px solid rgba(255,255,255,.07);text-align:center'><div style='font-size:24px;font-weight:800;color:#f0c050'>"+R.com+"</div><div style='font-size:10px;color:#6a7590'>Comercios</div></div><div style='padding:14px;text-align:center'><div style='font-size:24px;font-weight:800;color:#f0c050'>"+R.tot+"</div><div style='font-size:10px;color:#6a7590'>Total DENUE</div></div></div>"+(desgloseHTML?"<div style='padding:10px 14px;border-top:1px solid rgba(255,255,255,.07)'><div style='font-size:10px;font-weight:700;text-transform:uppercase;color:#6a7590;margin-bottom:8px;letter-spacing:1px'>Desglose por giro</div>"+desgloseHTML+"</div>":"")+"</div>";
   });
