@@ -1478,11 +1478,8 @@ function initUI(){
     var statusLabel=p.status==="viable"?"VIABLE":p.status==="descartado"?"DESCARTADO":"PROSPECTO";
     var statusColor=p.status==="viable"?"#22d18a":p.status==="descartado"?"#ef4444":"#3a8fff";
     var rentaZonaVal="-";
-    try{
-      var rr=RENTAS_CACHE[p.ciudad]||RENTAS_CACHE[(p.ciudad||"").toLowerCase()]||null;
-      if(!rr&&p.ciudad){var ck=Object.keys(RENTAS_CACHE).find(function(k){return k.toLowerCase().includes(p.ciudad.toLowerCase());});if(ck)rr=RENTAS_CACHE[ck];}
-      if(rr){var rv2=getRentaValores(rr,p.tipo,p.operacion);if(rv2&&rv2.zona)rentaZonaVal="$"+rv2.zona+"/m\u00b2";}
-    }catch(e){}
+    try{var rr=RENTAS_CACHE[p.ciudad]||null;if(!rr&&p.ciudad){var ck=Object.keys(RENTAS_CACHE).find(function(k){return k.toLowerCase().includes(p.ciudad.toLowerCase());});if(ck)rr=RENTAS_CACHE[ck];}if(rr){var rv2=getRentaValores(rr,p.tipo,p.operacion);if(rv2&&rv2.zona)rentaZonaVal="$"+rv2.zona+"/m\u00b2";}}catch(e){}
+    var fotoSrc=foto1||foto2||foto3;
     var html="<!DOCTYPE html><html><head><meta charset='UTF-8'><title>Ficha: "+p.nombre+"</title>"
       +"<style>*{box-sizing:border-box;margin:0;padding:0}"
       +"body{font-family:Arial,sans-serif;background:#f0f2f5;padding:12px;color:#111}"
@@ -1490,7 +1487,7 @@ function initUI(){
       +".ficha{max-width:720px;margin:0 auto;background:white;padding:16px}"
       +".header{background:#003087;color:white;padding:10px 14px;border-radius:7px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}"
       +".badge{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;border:1.5px solid "+statusColor+";color:"+statusColor+"}"
-      +".bloque{background:#f8f9fa;border-radius:7px;padding:10px;border:1px solid #e5e7eb}"
+      +".bloque{background:#f8f9fa;border-radius:7px;padding:10px;border:1px solid #e5e7eb;margin-bottom:8px}"
       +".sec{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#6b7280;margin-bottom:6px;padding-bottom:3px;border-bottom:2px solid #e5e7eb}"
       +".kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:6px}"
       +".kpi{background:white;border-radius:5px;padding:6px;text-align:center;border:1px solid #e5e7eb}"
@@ -1510,8 +1507,12 @@ function initUI(){
       +"<span class='badge'>"+statusLabel+"</span></div>"
       +"<div style='font-size:17px;font-weight:800;margin-bottom:2px'>"+p.nombre+"</div>"
       +"<div style='font-size:11px;color:#6a7590;margin-bottom:10px'>"+p.direccion+" &bull; "+(p.ciudad||"")+(p.estado?", "+p.estado:"")+"</div>"
-      +"<div style='display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;align-items:start'>"
-      +"<div class='bloque' style='min-height:220px'>"
+      +"<div style='display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px'>"
+      +"<div style='border-radius:8px;overflow:hidden'>"
+      +(fotoSrc?"<img src='"+fotoSrc+"' style='width:100%;height:100%;object-fit:cover;min-height:400px'>":"<div style='width:100%;min-height:400px;background:#f0f2f5;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#9ca3af'>Sin foto</div>")
+      +"</div>"
+      +"<div>"
+      +"<div class='bloque'>"
       +"<div class='sec'>DENUE &bull; Radio "+RADIO+"m</div>"
       +"<div class='kpi-grid'>"
       +"<div class='kpi'><div class='kl'>Restaurantes</div><div class='kv' style='color:#f59e0b'>"+(p.denue?p.denue.rest||0:0)+"</div></div>"
@@ -1519,7 +1520,7 @@ function initUI(){
       +"</div>"
       +(dgHTML?"<table style='width:100%;border-collapse:collapse'>"+dgHTML+"</table>":"")
       +"</div>"
-      +"<div class='bloque' style='min-height:220px'>"
+      +"<div class='bloque'>"
       +"<div class='sec'>Datos Generales</div>"
       +"<div class='kpi-grid'>"
       +(p.inegi&&p.inegi.pob?"<div class='kpi'><div class='kl'>Poblaci\u00f3n</div><div class='kv' style='color:#3a8fff'>"+(p.inegi.pob/1000).toFixed(1)+"K</div></div>":"")
@@ -1529,19 +1530,13 @@ function initUI(){
       +(p.m2Terreno?"<div class='kpi'><div class='kl'>Superficie</div><div class='kv' style='font-size:14px'>"+p.m2Terreno+"m\u00b2</div></div>":"")
       +(p.frente&&p.fondo?"<div class='kpi'><div class='kl'>Frente x Fondo</div><div class='kv' style='font-size:12px'>"+p.frente+"m x "+p.fondo+"m</div></div>":"")
       +"</div>"
-      +"<div style='margin-top:6px;padding:7px;background:white;border-radius:6px;border:1px solid #e5e7eb'>"
+      +"<div style='padding:7px;background:white;border-radius:6px;border:1px solid #e5e7eb;margin-top:6px'>"
       +"<div style='font-size:9px;color:#9ca3af;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px'>GPS</div>"
       +"<div style='font-size:11px;font-weight:600;color:#374151;margin-bottom:3px'>"+p.lat.toFixed(5)+", "+p.lng.toFixed(5)+"</div>"
       +"<div style='font-size:9px;word-break:break-all;color:#3a8fff'>"+gmapsUrl+"</div>"
       +"</div>"
       +"</div>"
       +"</div>"
-      +"<div style='display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px'>"
-      +"<div style='display:grid;grid-template-rows:1fr 1fr;gap:8px'>"
-      +(foto1?"<img src='"+foto1+"' style='width:100%;height:96px;object-fit:cover;border-radius:5px'>":"<div style='height:96px;background:#f0f2f5;border-radius:5px'></div>")
-      +(foto2?"<img src='"+foto2+"' style='width:100%;height:96px;object-fit:cover;border-radius:5px'>":"<div style='height:96px;background:#f0f2f5;border-radius:5px'></div>")
-      +"</div>"
-      +(foto3?"<img src='"+foto3+"' style='width:100%;height:200px;object-fit:cover;border-radius:7px'>":"<div style='height:200px;background:#f0f2f5;border-radius:7px'></div>")
       +"</div>"
       +(p.notas?"<div style='font-size:11px;color:#374151;padding:7px;background:#f8f9fa;border-radius:6px;margin-bottom:6px'><b>Notas:</b> "+p.notas+"</div>":"")
       +"<div class='footer'>"
