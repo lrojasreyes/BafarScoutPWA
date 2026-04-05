@@ -1511,7 +1511,7 @@ function initUI(){
       +"<div style='font-size:17px;font-weight:800;margin-bottom:2px'>"+p.nombre+"</div>"
       +"<div style='font-size:11px;color:#6a7590;margin-bottom:10px'>"+p.direccion+" &bull; "+(p.ciudad||"")+(p.estado?", "+p.estado:"")+"</div>"
       +"<div style='display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;align-items:start'>"
-      +"<div class='bloque'>"
+      +"<div class='bloque' style='min-height:220px'>"
       +"<div class='sec'>DENUE &bull; Radio "+RADIO+"m</div>"
       +"<div class='kpi-grid'>"
       +"<div class='kpi'><div class='kl'>Restaurantes</div><div class='kv' style='color:#f59e0b'>"+(p.denue?p.denue.rest||0:0)+"</div></div>"
@@ -1519,7 +1519,7 @@ function initUI(){
       +"</div>"
       +(dgHTML?"<table style='width:100%;border-collapse:collapse'>"+dgHTML+"</table>":"")
       +"</div>"
-      +"<div class='bloque'>"
+      +"<div class='bloque' style='min-height:220px'>"
       +"<div class='sec'>Datos Generales</div>"
       +"<div class='kpi-grid'>"
       +(p.inegi&&p.inegi.pob?"<div class='kpi'><div class='kl'>Poblaci\u00f3n</div><div class='kv' style='color:#3a8fff'>"+(p.inegi.pob/1000).toFixed(1)+"K</div></div>":"")
