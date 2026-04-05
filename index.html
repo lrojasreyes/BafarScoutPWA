@@ -506,21 +506,30 @@ function qcConsultar(){
   
   var lat = coords.lat, lng = coords.lng, r = QC_RADIO;
   
+  // Fetch con timeout
+  function fetchTimeout(url, opts, ms){
+    var ctrl = new AbortController();
+    var timer = setTimeout(function(){ctrl.abort();}, ms);
+    return fetch(url, Object.assign({}, opts, {signal:ctrl.signal}))
+      .then(function(x){clearTimeout(timer);return x;})
+      .catch(function(){clearTimeout(timer);return null;});
+  }
+
   // Consultar población e INEGI
-  var pInegi = fetch("https://pjacmizmjsjwxtoldpvr.supabase.co/functions/v1/poblacion-inegi",{
+  var pInegi = fetchTimeout("https://pjacmizmjsjwxtoldpvr.supabase.co/functions/v1/poblacion-inegi",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({lat:lat,lng:lng,radio:r})
-  }).then(function(x){return x.json();}).catch(function(){return {};});
+  }, 8000).then(function(x){return x?x.json():{};}).catch(function(){return {};});
 
   // Consultar DENUE
   var SCIAN_REST=["restaurantes","abarrotes","carniceria","minisuper"];
   var pDenue = Promise.all(SCIAN_REST.map(function(scian){
-    return fetch("/api/denue",{
+    return fetchTimeout("/api/denue",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({lat:lat,lng:lng,radio:r,scian:scian,token:"0e4c4af9-a631-4f6d-8c35-2d2eb7314785"})
-    }).then(function(x){return x.json();}).catch(function(){return [];});
+    }, 8000).then(function(x){return x?x.json():[];}).catch(function(){return [];});
   }));
 
   var qcTimeout = setTimeout(function(){
