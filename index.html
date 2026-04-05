@@ -733,9 +733,10 @@ function showD(){
             if(d&&d.pob){
               DR.pob=d.pob;DR.viv=d.viv;
               var pid=PS.length>0?PS[0].id:null;
-              if(pid){
-                var idx=PS.findIndex(function(x){return x.id===pid;});
-                if(idx>=0&&PS[idx]&&!PS[idx].inegi){
+              if(DR._prospecto_id){
+                var pid2=DR._prospecto_id;
+                var idx=PS.findIndex(function(x){return x.id===pid2;});
+                if(idx>=0&&PS[idx]){
                   PS[idx].inegi={viv:d.viv,pob:d.pob};
                   syncToSupabase(PS[idx]);
                 }
@@ -833,6 +834,7 @@ function saveP(){
     } else {
       PS.unshift(p);
     }
+    if(DR)DR._prospecto_id=p.id;
     syncToSupabase(p);
     toast(editId?"Actualizado":"Guardado: "+n);
     setTimeout(function(){go("list");},800);
