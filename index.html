@@ -1429,32 +1429,102 @@ function initUI(){
     var id=document.getElementById("btn-edit-detail").dataset.id;
     var p=PS.find(function(x){return x.id===id;});
     if(!p)return;
+    var menu=document.createElement("div");
+    menu.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:flex-end;justify-content:center";
+    menu.innerHTML="<div style='background:#0e1628;border-radius:16px 16px 0 0;padding:20px;width:100%;max-width:500px'>"
+      +"<div style='font-size:15px;font-weight:700;margin-bottom:16px;text-align:center'>Compartir prospecto</div>"
+      +"<button id='sh-pdf' style='width:100%;padding:14px;background:#162035;border:1.5px solid rgba(255,255,255,.1);border-radius:10px;color:#e8ecf4;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:10px'>&#128196; Generar Ficha PDF</button>"
+      +"<button id='sh-txt' style='width:100%;padding:14px;background:#162035;border:1.5px solid rgba(255,255,255,.1);border-radius:10px;color:#e8ecf4;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:10px'>&#128228; Compartir como texto</button>"
+      +"<button id='sh-cancel' style='width:100%;padding:14px;background:transparent;border:none;color:#6a7590;font-size:14px;cursor:pointer'>Cancelar</button>"
+      +"</div>";
+    document.body.appendChild(menu);
+    document.getElementById("sh-cancel").onclick=function(){document.body.removeChild(menu);};
+    document.getElementById("sh-txt").onclick=function(){document.body.removeChild(menu);compartirTexto(p);};
+    document.getElementById("sh-pdf").onclick=function(){document.body.removeChild(menu);generarFichaPDF(p);};
+  });
+
+  function compartirTexto(p){
     var nl="\n";
-    var texto="📍 *"+p.nombre+"*"+nl;
-    texto+="📌 "+p.direccion+nl;
+    var texto="* "+p.nombre+"*"+nl;
+    texto+="  "+p.direccion+nl;
     texto+=(p.ciudad?p.ciudad+", ":"")+p.estado+nl+nl;
     if(p.inegi&&p.inegi.pob){
-      texto+="👥 Población: "+(p.inegi.pob/1000).toFixed(1)+"K habitantes"+nl;
-      texto+="🏠 Viviendas: "+p.inegi.viv.toLocaleString()+nl+nl;
+      texto+="Poblacion: "+(p.inegi.pob/1000).toFixed(1)+"K hab"+nl;
+      texto+="Viviendas: "+p.inegi.viv.toLocaleString()+nl+nl;
     }
     if(p.denue){
-      texto+="🍽️ Restaurantes: "+p.denue.rest+nl;
-      texto+="🏪 DENUEs Total: "+p.denue.tot+nl;
+      texto+="Restaurantes: "+p.denue.rest+nl;
+      texto+="DENUEs Total: "+p.denue.tot+nl;
       if(p.denue.desglose){
-        texto+=nl+"Desglose por giro:"+nl;
+        texto+=nl+"Desglose:"+nl;
         var dg=p.denue.desglose;
-        Object.keys(dg).sort(function(a,b){return dg[b]-dg[a];}).forEach(function(g){
-          texto+="  • "+g+": "+dg[g]+nl;
-        });
+        Object.keys(dg).sort(function(a,b){return dg[b]-dg[a];}).forEach(function(g){texto+="  - "+g+": "+dg[g]+nl;});
       }
     }
-    texto+=nl+"📊 Radio: "+RADIO+"m | Fuente: DENUE INEGI + Censo 2020";
-    if(navigator.share){
-      navigator.share({title:p.nombre,text:texto}).catch(function(){});
-    } else {
-      navigator.clipboard.writeText(texto).then(function(){toast("Copiado al portapapeles");});
-    }
-  });
+    texto+=nl+"Radio: "+RADIO+"m | Censo 2020 INEGI";
+    if(navigator.share){navigator.share({title:p.nombre,text:texto}).catch(function(){});}
+    else{navigator.clipboard.writeText(texto).then(function(){toast("Copiado al portapapeles");});}
+  }
+
+  function generarFichaPDF(p){
+    var dg=p.denue&&p.denue.desglose?p.denue.desglose:{};
+    var dgRows=Object.keys(dg).sort(function(a,b){return dg[b]-dg[a];}).map(function(g){
+      return "<tr><td style='padding:6px 10px;border-bottom:1px solid #e5e7eb;font-size:13px'>"+g+"</td><td style='padding:6px 10px;border-bottom:1px solid #e5e7eb;font-weight:700;text-align:right;font-size:13px'>"+dg[g]+"</td></tr>";
+    }).join("");
+    var fotoHtml=p.fotos&&p.fotos.frente?"<img src='"+p.fotos.frente+"' style='width:100%;height:220px;object-fit:cover;border-radius:8px;margin-bottom:16px'>":"";
+    var statusLabel=p.status==="viable"?"VIABLE":p.status==="descartado"?"DESCARTADO":"PROSPECTO";
+    var statusColor=p.status==="viable"?"#22d18a":p.status==="descartado"?"#ef4444":"#3a8fff";
+    var html="<!DOCTYPE html><html><head><meta charset='UTF-8'><title>Ficha: "+p.nombre+"</title>"
+      +"<style>body{font-family:Arial,sans-serif;margin:0;padding:20px;background:#f8f9fa;color:#1a1a2e}"
+      +"@media print{body{background:white;padding:0}.no-print{display:none}@page{margin:10mm}}"
+      +".ficha{max-width:760px;margin:0 auto;background:white;padding:28px;border-radius:12px;box-shadow:0 2px 20px rgba(0,0,0,.08)}"
+      +".header{background:#0a0f1e;color:white;padding:18px 22px;border-radius:10px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center}"
+      +".logo{font-size:20px;font-weight:900;color:#e8a020}"
+      +".badge{padding:5px 14px;border-radius:20px;font-size:11px;font-weight:700;border:1.5px solid "+statusColor+";color:"+statusColor+";background:rgba(0,0,0,.2)}"
+      +".titulo{font-size:22px;font-weight:800;margin-bottom:3px}"
+      +".subtitulo{font-size:13px;color:#6a7590;margin-bottom:18px}"
+      +".sec-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#9ca3af;margin-bottom:8px;padding-bottom:5px;border-bottom:2px solid #f3f4f6}"
+      +".grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}"
+      +".grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}"
+      +".card{background:#f8f9fa;border-radius:8px;padding:12px;text-align:center;border:1px solid #f3f4f6}"
+      +".clabel{font-size:9px;text-transform:uppercase;color:#9ca3af;margin-bottom:3px;letter-spacing:1px}"
+      +".cval{font-size:24px;font-weight:800}"
+      +".pob{color:#3a8fff}.viv{color:#22d18a}.rest{color:#f59e0b}.den{color:#f59e0b}"
+      +"table{width:100%;border-collapse:collapse;margin-bottom:16px}"
+      +".footer{margin-top:16px;padding-top:10px;border-top:1px solid #f3f4f6;font-size:10px;color:#9ca3af;display:flex;justify-content:space-between}"
+      +".btn-print{display:block;width:100%;padding:13px;background:#e8a020;border:none;border-radius:8px;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:16px;color:#0a0f1e}"
+      +"</style></head><body>"
+      +"<div class='ficha'>"
+      +"<button class='btn-print no-print' onclick='window.print()'>Guardar como PDF / Imprimir</button>"
+      +"<div class='header'><div><div class='logo'>BAFAR SCOUT</div><div style='font-size:10px;color:#6a7590;margin-top:2px'>Ficha de Prospecto</div></div>"
+      +"<span class='badge'>"+statusLabel+"</span></div>"
+      +fotoHtml
+      +"<div class='titulo'>"+p.nombre+"</div>"
+      +"<div class='subtitulo'>"+p.direccion+" - "+(p.ciudad||"")+(p.estado?", "+p.estado:"")+"</div>"
+      +(p.inegi&&p.inegi.pob?"<div class='sec-title'>Demografia - Censo 2020 INEGI - Radio "+RADIO+"m</div>"
+        +"<div class='grid2'>"
+        +"<div class='card'><div class='clabel'>Poblacion</div><div class='cval pob'>"+(p.inegi.pob/1000).toFixed(1)+"K</div></div>"
+        +"<div class='card'><div class='clabel'>Viviendas</div><div class='cval viv'>"+p.inegi.viv.toLocaleString()+"</div></div>"
+        +"</div>":"")
+      +(p.denue?"<div class='sec-title'>DENUE - Establecimientos en radio "+RADIO+"m</div>"
+        +"<div class='grid4'>"
+        +"<div class='card'><div class='clabel'>Restaurantes</div><div class='cval rest'>"+(p.denue.rest||0)+"</div></div>"
+        +"<div class='card'><div class='clabel'>DENUEs Total</div><div class='cval den'>"+(p.denue.tot||0)+"</div></div>"
+        +(p.m2Terreno?"<div class='card'><div class='clabel'>Terreno</div><div class='cval' style='color:#6366f1'>"+p.m2Terreno+"m2</div></div>":"<div class='card'><div class='clabel'>Tipo</div><div class='cval' style='font-size:13px;padding-top:6px'>"+p.tipo+"</div></div>")
+        +(p.precio?"<div class='card'><div class='clabel'>"+(p.operacion==="venta"?"Precio":"Renta/mes")+"</div><div class='cval' style='color:#22d18a;font-size:16px'>$"+parseFloat(p.precio).toLocaleString()+"</div></div>":"<div class='card'><div class='clabel'>Fecha</div><div class='cval' style='font-size:13px;padding-top:6px'>"+p.fecha+"</div></div>")
+        +"</div>"
+        +(dgRows?"<div class='sec-title'>Desglose por giro</div><table><tbody>"+dgRows+"</tbody></table>":"")
+        :"")
+      +(p.notas?"<div class='sec-title'>Notas</div><p style='font-size:13px;color:#374151;margin:0 0 16px'>"+p.notas+"</p>":"")
+      +"<div class='footer'>"
+      +"<span>"+p.lat.toFixed(5)+", "+p.lng.toFixed(5)+"</span>"
+      +"<span>"+p.tipo+"</span>"
+      +"<span>"+p.fecha+"</span>"
+      +"</div></div></body></html>";
+    var win=window.open("","_blank");
+    if(win){win.document.write(html);win.document.close();}
+    else{toast("Permite ventanas emergentes para generar PDF");}
+  }
 
   document.getElementById("btn-edit-detail").addEventListener("click",function(){
     var id=document.getElementById("btn-edit-detail").dataset.id;
