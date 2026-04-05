@@ -532,14 +532,21 @@ function qcConsultar(){
     }, 8000).then(function(x){return x?x.json():[];}).catch(function(){return [];});
   }));
 
-  var qcTimeout = setTimeout(function(){
-    document.getElementById("qc-btn").textContent="CONSULTAR";
-    document.getElementById("qc-btn").disabled=false;
-    toast("Tiempo de espera agotado, intenta de nuevo");
-  }, 15000);
+  // Mostrar población primero sin esperar DENUE
+  pInegi.then(function(inegi){
+    if(inegi&&inegi.pob){
+      document.getElementById("qc-pob").textContent=(inegi.pob/1000).toFixed(1)+"K";
+      document.getElementById("qc-viv").textContent=inegi.viv.toLocaleString();
+      document.getElementById("qc-rest").textContent="...";
+      document.getElementById("qc-tot").textContent="...";
+      document.getElementById("qc-coords").textContent=lat.toFixed(5)+", "+lng.toFixed(5)+" · Radio "+r+"m · Censo 2020 INEGI";
+      document.getElementById("qc-result").style.display="block";
+    }
+  });
 
   Promise.all([pInegi, pDenue]).then(function(res){
-    clearTimeout(qcTimeout);
+    btn.textContent="CONSULTAR";
+    btn.disabled=false;
     var inegi = res[0];
     var denue = res[1];
     
