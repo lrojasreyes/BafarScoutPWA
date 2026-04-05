@@ -233,6 +233,7 @@ textarea{resize:none;min-height:80px}
           </div>
         </div>
         <button class="btn" id="btn-edit-detail" style="margin-bottom:8px">✏️ EDITAR PROSPECTO</button>
+        <button class="btn" id="btn-share-detail" style="margin-bottom:8px;background:rgba(34,209,138,.15);border-color:#22d18a;color:#22d18a">📤 COMPARTIR</button>
         <div style="height:20px"></div>
       </div>
     </div>
@@ -432,17 +433,13 @@ textarea{resize:none;min-height:80px}
             <div style="font-size:28px;font-weight:800;color:#22d18a" id="qc-viv">-</div>
           </div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
           <div style="background:#162035;border-radius:10px;padding:14px;text-align:center">
             <div style="font-size:10px;color:#6a7590;text-transform:uppercase;margin-bottom:4px">Restaurantes</div>
             <div style="font-size:24px;font-weight:800;color:#f0c050" id="qc-rest">-</div>
           </div>
           <div style="background:#162035;border-radius:10px;padding:14px;text-align:center">
-            <div style="font-size:10px;color:#6a7590;text-transform:uppercase;margin-bottom:4px">DENUEs</div>
-            <div style="font-size:24px;font-weight:800;color:#f0c050" id="qc-com">-</div>
-          </div>
-          <div style="background:#162035;border-radius:10px;padding:14px;text-align:center">
-            <div style="font-size:10px;color:#6a7590;text-transform:uppercase;margin-bottom:4px">Total</div>
+            <div style="font-size:10px;color:#6a7590;text-transform:uppercase;margin-bottom:4px">DENUEs Total</div>
             <div style="font-size:24px;font-weight:800;color:#f0c050" id="qc-tot">-</div>
           </div>
         </div>
@@ -459,7 +456,7 @@ textarea{resize:none;min-height:80px}
     <div class="ni" data-page="list"><div class="ic">📋</div><div class="lb">Prospectos</div></div>
     <div class="ni" data-page="consulta"><div class="ic">🔍</div><div class="lb">Consulta</div></div>
     <div class="fabw"><button class="fab" id="bfab">+</button></div>
-    <div class="ni" id="n-detail" style="opacity:.3;pointer-events:none"><div class="ic">📍</div><div class="lb">Detalle</div></div>
+
     <div class="ni" data-page="cfg"><div class="ic">⚙️</div><div class="lb">Config</div></div>
   </nav>
 </div>
@@ -1352,6 +1349,49 @@ function initUI(){
   });
 
   document.getElementById("btn-back-detail").addEventListener("click",function(){go("list");});
+  document.getElementById("btn-share-detail").addEventListener("click",function(){
+    var id=document.getElementById("btn-edit-detail").dataset.id;
+    var p=PS.find(function(x){return x.id===id;});
+    if(!p)return;
+    var texto="📍 *"+p.nombre+"*
+";
+    texto+="📌 "+p.direccion+"
+";
+    texto+=(p.ciudad?p.ciudad+", ":"")+p.estado+"
+
+";
+    if(p.inegi&&p.inegi.pob){
+      texto+="👥 Población: "+(p.inegi.pob/1000).toFixed(1)+"K habitantes
+";
+      texto+="🏠 Viviendas: "+p.inegi.viv.toLocaleString()+"
+
+";
+    }
+    if(p.denue){
+      texto+="🍽️ Restaurantes: "+p.denue.rest+"
+";
+      texto+="🏪 DENUEs Total: "+p.denue.tot+"
+";
+      if(p.denue.desglose){
+        texto+="
+Desglose por giro:
+";
+        var dg=p.denue.desglose;
+        Object.keys(dg).sort(function(a,b){return dg[b]-dg[a];}).forEach(function(g){
+          texto+="  • "+g+": "+dg[g]+"
+";
+        });
+      }
+    }
+    texto+="
+📊 Radio: "+RADIO+"m | Fuente: DENUE INEGI + Censo 2020";
+    if(navigator.share){
+      navigator.share({title:p.nombre,text:texto}).catch(function(){});
+    } else {
+      navigator.clipboard.writeText(texto).then(function(){toast("Copiado al portapapeles");});
+    }
+  });
+
   document.getElementById("btn-edit-detail").addEventListener("click",function(){
     var id=document.getElementById("btn-edit-detail").dataset.id;
     ep(id);
