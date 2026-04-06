@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="BAFAR Scout">
+<meta name="apple-mobile-web-app-title" content="PIGER">
 <meta name="theme-color" content="#070c1a">
-<title>BAFAR Scout</title>
+<title>Plataforma de Inteligencia Geoespacial para Expansión Retail</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -96,7 +96,7 @@ textarea{resize:none;min-height:80px}
 <div id="login-screen">
   <div style="text-align:center;margin-bottom:32px">
     <div style="width:72px;height:72px;background:#e8a020;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:800;color:#000;margin:0 auto 16px">B</div>
-    <div style="font-size:28px;font-weight:800">BAFAR Scout</div>
+    <div style="font-size:28px;font-weight:800">Plataforma de Inteligencia Geoespacial para Expansión Retail</div>
     <div style="font-size:14px;color:#6a7590;margin-top:4px">Gerencia de Expansion</div>
   </div>
   <div style="width:100%;max-width:360px">
@@ -115,7 +115,7 @@ textarea{resize:none;min-height:80px}
 
 <div id="loading-screen" style="position:fixed;inset:0;background:#070c1a;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9998;gap:20px">
   <div style="width:72px;height:72px;background:#e8a020;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:800;color:#000">B</div>
-  <div style="font-size:22px;font-weight:800;color:#e8ecf4">BAFAR Scout</div>
+  <div style="font-size:22px;font-weight:800;color:#e8ecf4">Plataforma de Inteligencia Geoespacial para Expansión Retail</div>
   <div style="display:flex;align-items:center;gap:10px;margin-top:8px">
     <div class="spin"></div>
     <span style="font-size:13px;color:#6a7590">Cargando prospectos...</span>
@@ -356,7 +356,7 @@ textarea{resize:none;min-height:80px}
     <div class="page" id="p-cfg">
       <div style="margin-bottom:16px">
         <div style="font-size:22px;font-weight:800">Configuracion</div>
-        <div style="font-size:13px;color:#6a7590">BAFAR Scout v2.0</div>
+        <div style="font-size:13px;color:#6a7590">PIGER v1.0</div>
       </div>
       <div style="background:linear-gradient(135deg,#162035,#0e1628);border:1px solid rgba(232,160,32,.2);border-radius:14px;padding:16px;margin-bottom:12px">
         <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#6a7590;margin-bottom:8px">Usuario activo</div>
@@ -1244,7 +1244,7 @@ function initUI(){
     var tot=document.getElementById("qc-tot").textContent;
     var coords=document.getElementById("qc-coords").textContent;
     var nl="\n";
-    var texto="🔍 *Consulta Rápida BAFAR Scout*"+nl+nl;
+    var texto="🔍 *Consulta Rápida PIGER*"+nl+nl;
     texto+="📍 "+coords+nl+nl;
     texto+="👥 Población: "+pob+" habitantes"+nl;
     texto+="🏠 Viviendas: "+viv+nl+nl;
@@ -1260,7 +1260,7 @@ function initUI(){
     }
     texto+=nl+"📊 Fuente: DENUE INEGI + Censo 2020 INEGI";
     if(navigator.share){
-      navigator.share({title:"Consulta BAFAR Scout",text:texto}).catch(function(){});
+      navigator.share({title:"Consulta PIGER",text:texto}).catch(function(){});
     } else {
       navigator.clipboard.writeText(texto).then(function(){toast("Copiado al portapapeles");});
     }
@@ -1542,7 +1542,7 @@ function initUI(){
       +"<div class='footer'>"
       +"<span>"+p.lat.toFixed(5)+", "+p.lng.toFixed(5)+"</span>"
       +"<span>"+p.tipo+" &bull; "+p.fecha+"</span>"
-      +"<span>BAFAR Scout &bull; Censo 2020 INEGI</span>"
+      +"<span>PIGER &bull; Censo 2020 INEGI</span>"
       +"</div></div></body></html>";
     var win=window.open("","_blank");
     if(win){win.document.write(html);win.document.close();}
