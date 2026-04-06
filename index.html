@@ -793,7 +793,7 @@ function go(p,skipRf){
   if(n)n.classList.add("on");
   if(p==="list")rl();
   if(p==="new"&&!skipRf)rf();
-  if(p==="dash"){ud();setTimeout(function(){initMapaCalor();actualizarMapaCalor();},100);}
+  if(p==="dash"){ud();setTimeout(function(){initMapaCalor();actualizarMapaCalor();if(_mapaCalor)_mapaCalor.invalidateSize();},300);}
   if(p==="cfg"){var e=document.getElementById("ec");if(e)e.textContent=PS.length+" prospectos";}
 }
 
