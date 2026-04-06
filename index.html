@@ -1094,11 +1094,13 @@ function openDetail(id){
     document.getElementById("det-viv").textContent=p.inegi&&p.inegi.viv?p.inegi.viv.toLocaleString():"-";
     document.getElementById("det-pob").textContent=p.inegi&&p.inegi.pob?(p.inegi.pob/1000).toFixed(1)+"K":"-";
     var desgEl=document.getElementById("det-desglose");
-    if(desgEl&&p.denue.desglose){
+    if(desgEl&&p.denue.desglose&&Object.keys(p.denue.desglose).length>0){
       var dg=p.denue.desglose;
       desgEl.innerHTML=Object.keys(dg).sort(function(a,b){return dg[b]-dg[a];}).map(function(g){
         return "<div style='display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04)'><span style='font-size:13px;color:#e8ecf4'>"+g+"</span><span style='font-size:14px;font-weight:700;color:#f0c050'>"+dg[g]+"</span></div>";
       }).join("");
+    } else if(desgEl){
+      desgEl.innerHTML="<div style='font-size:12px;color:#6a7590;text-align:center;padding:10px'>Sin desglose disponible</div>";
     }
   } else {
     document.getElementById("det-denue-sec").style.display="none";
