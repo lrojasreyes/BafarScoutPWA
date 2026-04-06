@@ -1347,6 +1347,14 @@ function initUI(){
     if(e.key==="Enter")qcConsultar();
   });
 
+  // Mapa de calor en consulta rápida
+  document.getElementById("qc-heat-btn").addEventListener("click",function(){
+    var coords=qcParseInput(document.getElementById("qc-input").value);
+    if(!coords){toast("Ingresa coordenadas primero");return;}
+    var p={nombre:"Consulta Rapida",lat:coords.lat,lng:coords.lng,ciudad:"",estado:""};
+    abrirMapaCalorDENUE(p);
+  });
+
   // Compartir consulta rápida
   document.getElementById("qc-share-btn").addEventListener("click",function(){
     var pob=document.getElementById("qc-pob").textContent;
