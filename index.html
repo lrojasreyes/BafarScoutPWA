@@ -527,7 +527,7 @@ function qcConsultar(){
   }, 8000).then(function(x){return x?x.json():{};}).catch(function(){return {};});
 
   // Consultar DENUE
-  var SCIAN_REST=["restaurantes","abarrotes","carniceria","minisuper"];
+  var SCIAN_REST=["restaurantes","carniceria","minisuper"];
   var pDenue = Promise.all(SCIAN_REST.map(function(scian){
     return fetchTimeout("/api/denue",{
       method:"POST",
@@ -567,7 +567,7 @@ function qcConsultar(){
         var excluir=["farmacia","oxxo","papeleria","herbalife","jugos","panaderia","tortilleria","rosticeria","mcdonald","burger king","starbucks","dominos","subway","kfc","pizza hut","vips","toks","helado","nieve","raspado"];
         if(!nombre||n.indexOf("sin nombre")>=0)return;
         if(excluir.some(function(t){return n.indexOf(t)>=0||a.indexOf(t)>=0;}))return;
-        var giro=esCom?(n.indexOf("carnic")>=0?"Carniceria":n.indexOf("cremeria")>=0||n.indexOf("lacteo")>=0?"Tenderos o Cremerias":"Minisuper"):"Restaurante";
+        var giro=esCom?(n.indexOf("carnic")>=0?"Carniceria":n.indexOf("cremeria")>=0||n.indexOf("lacteo")>=0?"Tenderos o Cremerias":"Comercio"):"Restaurante";
         if(!esCom){
           if(n.indexOf("taco")>=0) giro="Taqueria";
           else if(n.indexOf("fonda")>=0||n.indexOf("cocina")>=0) giro="Fondas o Cocinas";
@@ -857,7 +857,7 @@ function showD(){
   }
   Promise.all([
     proxyDENUE("restaurantes",8000),
-    proxyDENUE("abarrotes",5000),
+    
     proxyDENUE("carniceria",5000),
     proxyDENUE("minisuper",5000)
   ]).then(function(res){
@@ -873,7 +873,7 @@ function showD(){
         var excluir=["farmacia","oxxo","papeleria","herbalife","jugos","panaderia","tortilleria","rosticeria","mcdonald","burger king","starbucks","dominos","subway","kfc","pizza hut","vips","toks","helado","nieve","raspado"];
         if(!nombre||n.indexOf("sin nombre")>=0) return;
         if(excluir.some(function(t){return n.indexOf(t)>=0||a.indexOf(t)>=0;})) return;
-        var giro=esCom?(n.indexOf("carnic")>=0?"Carniceria":n.indexOf("cremeria")>=0||n.indexOf("lacteo")>=0?"Tenderos o Cremerias":"Minisuper"):"Restaurante";
+        var giro=esCom?(n.indexOf("carnic")>=0?"Carniceria":n.indexOf("cremeria")>=0||n.indexOf("lacteo")>=0?"Tenderos o Cremerias":"Comercio"):"Restaurante";
         if(!esCom){
           if(n.indexOf("taco")>=0) giro="Taqueria";
           else if(n.indexOf("fonda")>=0||n.indexOf("cocina")>=0) giro="Fondas o Cocinas";
