@@ -89,6 +89,9 @@ textarea{resize:none;min-height:80px}
 .sync-ok{background:rgba(34,209,138,.12);color:#22d18a}
 .sync-pending{background:rgba(232,160,32,.12);color:#e8a020}
 </style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
 </head>
 <body>
 
@@ -147,6 +150,10 @@ textarea{resize:none;min-height:80px}
         <div class="stat"><div style="font-size:10px;text-transform:uppercase;color:#6a7590;margin-bottom:6px">Pob. prom.</div><div style="font-size:26px;font-weight:800;color:#e8a020" id="d-p">-</div></div>
         <div class="stat"><div style="font-size:10px;text-transform:uppercase;color:#6a7590;margin-bottom:6px">Descartados</div><div style="font-size:26px;font-weight:800;color:#f05060" id="d-d">0</div></div>
         <div class="stat"><div style="font-size:10px;text-transform:uppercase;color:#6a7590;margin-bottom:6px">Rest. prom.</div><div style="font-size:26px;font-weight:800;color:#3a8fff" id="d-r">-</div></div>
+      </div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#6a7590;margin-bottom:10px;margin-top:16px">Mapa de Calor</div>
+      <div style="border-radius:12px;overflow:hidden;margin-bottom:16px;border:1px solid rgba(255,255,255,.07)">
+        <div id="mapa-calor" style="height:280px;width:100%;background:#0e1628"></div>
       </div>
       <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#6a7590;margin-bottom:10px">Recientes</div>
       <div id="d-l"></div>
@@ -606,6 +613,53 @@ function qcConsultar(){
   });
 }
 
+var _mapaCalor=null;
+var _heatLayer=null;
+
+function initMapaCalor(){
+  if(_mapaCalor) return;
+  var centro=PS.length>0?[PS[0].lat,PS[0].lng]:[19.4326,-99.1332];
+  _mapaCalor=L.map("mapa-calor",{zoomControl:true,scrollWheelZoom:false}).setView(centro,6);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
+    attribution:"© OSM",maxZoom:18
+  }).addTo(_mapaCalor);
+  actualizarMapaCalor();
+}
+
+function actualizarMapaCalor(){
+  if(!_mapaCalor||!PS.length) return;
+
+  // Puntos de calor basados en DENUEs + población
+  var puntos=PS.filter(function(p){return p.lat&&p.lng;}).map(function(p){
+    var intensidad=0;
+    if(p.denue&&p.denue.tot) intensidad+=Math.min(p.denue.tot/100,1);
+    if(p.inegi&&p.inegi.pob) intensidad+=Math.min(p.inegi.pob/50000,1);
+    return [p.lat,p.lng,intensidad];
+  });
+
+  if(_heatLayer) _mapaCalor.removeLayer(_heatLayer);
+  _heatLayer=L.heatLayer(puntos,{
+    radius:40,blur:25,maxZoom:12,
+    gradient:{0.0:"#3a8fff",0.3:"#22d18a",0.6:"#f0c050",1.0:"#f05060"}
+  }).addTo(_mapaCalor);
+
+  // Marcadores por prospecto
+  PS.filter(function(p){return p.lat&&p.lng;}).forEach(function(p){
+    var color=p.status==="viable"?"#22d18a":p.status==="descartado"?"#f05060":"#e8a020";
+    var marker=L.circleMarker([p.lat,p.lng],{
+      radius:6,fillColor:color,color:"white",weight:1.5,fillOpacity:0.9
+    }).addTo(_mapaCalor);
+    marker.bindPopup("<b>"+p.nombre+"</b><br>"+(p.ciudad||"")+"<br>Pob: "+(p.inegi&&p.inegi.pob?(p.inegi.pob/1000).toFixed(1)+"K":"-")+"<br>DENUEs: "+(p.denue?p.denue.tot:"-"));
+  });
+
+  // Centrar en prospectos
+  if(PS.length>0){
+    var lats=PS.map(function(p){return p.lat;});
+    var lngs=PS.map(function(p){return p.lng;});
+    _mapaCalor.fitBounds([[Math.min.apply(null,lats),Math.min.apply(null,lngs)],[Math.max.apply(null,lats),Math.max.apply(null,lngs)]],{padding:[20,20]});
+  }
+}
+
 function setSyncStatus(ok){
   var el=document.getElementById("sync-status");
   el.textContent=ok?"✓ Sync":"⟳ Sync";
@@ -739,7 +793,7 @@ function go(p,skipRf){
   if(n)n.classList.add("on");
   if(p==="list")rl();
   if(p==="new"&&!skipRf)rf();
-  if(p==="dash")ud();
+  if(p==="dash"){ud();setTimeout(function(){initMapaCalor();actualizarMapaCalor();},100);}
   if(p==="cfg"){var e=document.getElementById("ec");if(e)e.textContent=PS.length+" prospectos";}
 }
 
