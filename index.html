@@ -241,6 +241,7 @@ textarea{resize:none;min-height:80px}
         </div>
         <button class="btn" id="btn-edit-detail" style="margin-bottom:8px">✏️ EDITAR PROSPECTO</button>
         <button class="btn" id="btn-share-detail" style="margin-bottom:8px;background:rgba(34,209,138,.15);border-color:#22d18a;color:#22d18a">📤 COMPARTIR</button>
+        <button class="btn" id="btn-heatmap-detail" style="margin-bottom:8px;background:rgba(240,192,80,.15);border-color:#f0c050;color:#f0c050">🔥 MAPA DE CALOR DENUE</button>
         <div style="height:20px"></div>
       </div>
     </div>
@@ -658,6 +659,59 @@ function actualizarMapaCalor(){
     var lngs=PS.map(function(p){return p.lng;});
     _mapaCalor.fitBounds([[Math.min.apply(null,lats),Math.min.apply(null,lngs)],[Math.max.apply(null,lats),Math.max.apply(null,lngs)]],{padding:[20,20]});
   }
+}
+
+function abrirMapaCalorDENUE(p){
+  var r=RADIO;
+  var lat=p.lat; var lng=p.lng;
+  var win=window.open("","_blank","width=800,height=600");
+  var html="<!DOCTYPE html><html><head><meta charset='UTF-8'>"
+    +"<title>Mapa de Calor DENUE - "+p.nombre+"</title>"
+    +"<link rel='stylesheet' href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'/>"  
+    +"<script src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'><\/script>"
+    +"<script src='https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js'><\/script>"
+    +"<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;background:#0a0f1e;color:white}#mapa{height:calc(100vh - 100px)}.header{background:#003087;padding:12px 16px;display:flex;justify-content:space-between;align-items:center}.footer{background:#0e1628;padding:8px 16px;display:flex;gap:16px;font-size:11px;color:#6a7590}.leyenda{display:flex;align-items:center;gap:6px}.dot{width:10px;height:10px;border-radius:50%}#loading{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;z-index:999;background:rgba(0,0,0,.7);padding:20px;border-radius:10px}</style>"
+    +"</head><body>"
+    +"<div class='header'>"
+    +"<div><div style='font-size:15px;font-weight:800'>🔥 "+p.nombre+"</div><div style='font-size:11px;color:rgba(255,255,255,.6)'>Mapa de calor DENUE &bull; Radio "+r+"m</div></div>"
+    +"<button onclick='window.close()' style='background:rgba(255,255,255,.1);border:none;color:white;padding:6px 12px;border-radius:6px;cursor:pointer'>&larr; Cerrar</button>"
+    +"</div>"
+    +"<div style='position:relative'><div id='loading'><div style='font-size:24px;margin-bottom:8px'>⏳</div><div>Cargando DENUEs...</div></div><div id='mapa'></div></div>"
+    +"<div class='footer'>"
+    +"<div class='leyenda'><div class='dot' style='background:#3a8fff'></div>Baja densidad</div>"
+    +"<div class='leyenda'><div class='dot' style='background:#22d18a'></div>Media</div>"
+    +"<div class='leyenda'><div class='dot' style='background:#f0c050'></div>Alta</div>"
+    +"<div class='leyenda'><div class='dot' style='background:#f05060'></div>Muy alta</div>"
+    +"<div style='margin-left:auto'>📍 "+lat.toFixed(5)+", "+lng.toFixed(5)+"</div>"
+    +"</div>"
+    +"<script>"
+    +"var map=L.map('mapa').setView(["+lat+","+lng+"],15);"
+    +"L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'OSM',maxZoom:18}).addTo(map);"
+    +"L.circle(["+lat+","+lng+"],{radius:"+r+",color:'#3a8fff',fillColor:'rgba(58,143,255,.08)',fillOpacity:1,weight:2}).addTo(map);"
+    +"L.circleMarker(["+lat+","+lng+"],{radius:8,fillColor:'#e8a020',color:'white',weight:2,fillOpacity:1}).addTo(map).bindPopup('<b>"+p.nombre+"</b>').openPopup();"
+    +"var SCIANS=['restaurantes','carniceria','cremeria'];"
+    +"var TOKEN='0e4c4af9-a631-4f6d-8c35-2d2eb7314785';"
+    +"var todos=[];var pendiente=SCIANS.length;"
+    +"SCIANS.forEach(function(scian){"
+    +"fetch('https://bafar-expansion-mx.vercel.app/api/denue',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lat:"+lat+",lng:"+lng+",radio:"+r+",scian:scian,token:TOKEN})})"
+    +".then(function(res){return res.json();})"
+    +".then(function(data){if(Array.isArray(data))todos=todos.concat(data);pendiente--;if(pendiente===0)renderHeat();})"
+    +".catch(function(){pendiente--;if(pendiente===0)renderHeat();});"
+    +"});"
+    +"function renderHeat(){"
+    +"document.getElementById('loading').style.display='none';"
+    +"var puntos=todos.filter(function(e){return e.Latitud&&e.Longitud;}).map(function(e){return[parseFloat(e.Latitud),parseFloat(e.Longitud),0.8];});"
+    +"if(puntos.length>0){"
+    +"L.heatLayer(puntos,{radius:25,blur:15,maxZoom:16,gradient:{0.0:'#3a8fff',0.4:'#22d18a',0.7:'#f0c050',1.0:'#f05060'}}).addTo(map);"
+    +"todos.forEach(function(e){if(!e.Latitud||!e.Longitud)return;"
+    +"L.circleMarker([parseFloat(e.Latitud),parseFloat(e.Longitud)],{radius:4,fillColor:'#f0c050',color:'rgba(0,0,0,.3)',weight:1,fillOpacity:0.8}).addTo(map)"
+    +".bindPopup('<b>'+(e.Nombre||'Sin nombre')+'</b><br><small>'+(e.Clase_actividad||'')+'</small>');});"
+    +"} else {"
+    +"document.getElementById('loading').innerHTML='<div>📭</div><div>Sin DENUEs en este radio</div>';"
+    +"document.getElementById('loading').style.display='block';"
+    +"}}<\/script></body></html>";
+  if(win){win.document.write(html);win.document.close();}
+  else{toast("Permite ventanas emergentes");}
 }
 
 function setSyncStatus(ok){
@@ -1604,6 +1658,12 @@ function initUI(){
     if(win){win.document.write(html);win.document.close();}
     else{toast("Permite ventanas emergentes para generar PDF");}
   }
+
+  document.getElementById("btn-heatmap-detail").addEventListener("click",function(){
+    var id=document.getElementById("btn-edit-detail").dataset.id;
+    var p=PS.find(function(x){return x.id===id;});
+    if(p)abrirMapaCalorDENUE(p);
+  });
 
   document.getElementById("btn-edit-detail").addEventListener("click",function(){
     var id=document.getElementById("btn-edit-detail").dataset.id;
