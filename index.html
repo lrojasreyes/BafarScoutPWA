@@ -205,6 +205,27 @@ textarea{resize:none;min-height:80px}
             </div>
           </div>
         </div>
+        <div class="sec" style="margin-bottom:12px;display:none" id="det-proyeccion-sec">
+          <div class="sh"><span style="font-size:18px">📦</span><span style="font-size:14px;font-weight:700;color:#e8a020">Proyección de ventas BAFAR</span></div>
+          <div class="sb">
+            <div id="det-proy-loading" style="font-size:12px;color:#6a7590;text-align:center;padding:10px">Calculando proyección...</div>
+            <div id="det-proy-info" style="display:none">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+                <div style="font-size:10px;text-transform:uppercase;color:#6a7590">Potencial de zona</div>
+                <div style="font-size:18px;font-weight:800" id="det-proy-potencial">-</div>
+              </div>
+              <div class="r2" style="margin-bottom:8px">
+                <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">Proyección referencial</div><div style="font-size:20px;font-weight:800;color:#22d18a" id="det-proy-ref">-</div></div>
+                <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">Rango estimado</div><div style="font-size:13px;font-weight:700;color:#6a7590" id="det-proy-rango">-</div></div>
+              </div>
+              <div class="r2" style="margin-bottom:8px">
+                <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">Venta institucional</div><div style="font-size:16px;font-weight:700;color:#f0c050" id="det-proy-inst">-</div></div>
+                <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">Venta ocasión</div><div style="font-size:16px;font-weight:700;color:#e8a020" id="det-proy-ocas">-</div></div>
+              </div>
+              <div style="font-size:10px;color:#6a7590;font-style:italic" id="det-proy-base"></div>
+            </div>
+          </div>
+        </div>
         <div class="sec" style="margin-bottom:12px" id="det-sucursal-sec">
           <div class="sh"><span style="font-size:18px">🏪</span><span style="font-size:14px;font-weight:700;color:#e8a020">Sucursal BAFAR más cercana</span></div>
           <div class="sb">
@@ -752,6 +773,64 @@ function cargarSucursales(cb){
   }).catch(function(){cb([]);});
 }
 
+function calcularProyeccionBafar(lat,lng,pobProspecto,vivProspecto,girosProspecto,cb){
+  cargarSucursales(function(suc){
+    if(!suc||!suc.length){cb(null);return;}
+    var scored=[];
+    suc.forEach(function(s){
+      if(!s.latitud||!s.longitud||!s.venta_kg)return;
+      var distKm=haversineKm(lat,lng,s.latitud,s.longitud);
+      if(distKm>300)return;
+      var pesoGeo=1/(1+distKm*0.1);
+      var pesoDem=1;
+      if(pobProspecto&&s.poblacion&&s.poblacion>0){
+        var ratioPob=Math.min(pobProspecto,s.poblacion)/Math.max(pobProspecto,s.poblacion);
+        pesoDem=0.5+0.5*ratioPob;
+      }
+      scored.push({s:s,dist:distKm,score:pesoGeo*pesoDem});
+    });
+    scored.sort(function(a,b){return b.score-a.score;});
+    var top5=scored.slice(0,5);
+    if(!top5.length){cb(null);return;}
+    var totalScore=top5.reduce(function(acc,x){return acc+x.score;},0);
+    var ventaPonderada=top5.reduce(function(acc,x){return acc+x.s.venta_kg*x.score;},0)/totalScore;
+    var ventas=top5.map(function(x){return x.s.venta_kg;});
+    var ventaMin=Math.min.apply(null,ventas);
+    var ventaMax=Math.max.apply(null,ventas);
+    var ratioInst=top5.reduce(function(acc,x){return acc+(x.s.ratio_institucional||0.673)*x.score;},0)/totalScore;
+    var potencial="MEDIO";
+    if(ventaPonderada>70000)potencial="ALTO";
+    else if(ventaPonderada>45000)potencial="MEDIO-ALTO";
+    else if(ventaPonderada<25000)potencial="BAJO";
+    else if(ventaPonderada<35000)potencial="MEDIO-BAJO";
+    cb({ventaRef:ventaPonderada,ventaMin:ventaMin,ventaMax:ventaMax,ratioInst:ratioInst,potencial:potencial,basadas:top5.length});
+  });
+}
+
+function mostrarProyeccion(lat,lng,pob,viv,giros){
+  var sec=document.getElementById("det-proyeccion-sec");
+  if(sec)sec.style.display="block";
+  var loading=document.getElementById("det-proy-loading");
+  var info=document.getElementById("det-proy-info");
+  if(loading)loading.style.display="block";
+  if(info)info.style.display="none";
+  calcularProyeccionBafar(lat,lng,pob,viv,giros,function(r){
+    if(loading)loading.style.display="none";
+    if(!r)return;
+    if(info)info.style.display="block";
+    var instKg=r.ventaRef*r.ratioInst;
+    var ocasKg=r.ventaRef*(1-r.ratioInst);
+    var colorPot=r.potencial.indexOf("ALTO")>=0?"#22d18a":r.potencial.indexOf("BAJO")>=0?"#f05060":"#e8a020";
+    document.getElementById("det-proy-potencial").textContent=r.potencial;
+    document.getElementById("det-proy-potencial").style.color=colorPot;
+    document.getElementById("det-proy-ref").textContent="~"+(r.ventaRef/1000).toFixed(1)+" ton/mes";
+    document.getElementById("det-proy-rango").textContent=(r.ventaMin/1000).toFixed(1)+" — "+(r.ventaMax/1000).toFixed(1)+" ton/mes";
+    document.getElementById("det-proy-inst").textContent=(instKg/1000).toFixed(1)+" ton ("+(r.ratioInst*100).toFixed(0)+"%)"
+    document.getElementById("det-proy-ocas").textContent=(ocasKg/1000).toFixed(1)+" ton ("+((1-r.ratioInst)*100).toFixed(0)+"%)"
+    document.getElementById("det-proy-base").textContent="Basado en "+r.basadas+" sucursales similares en operación";
+  });
+}
+
 function mostrarSucursalCercana(lat,lng){
   var loading=document.getElementById("det-sucursal-loading");
   var info=document.getElementById("det-sucursal-info");
@@ -1277,6 +1356,10 @@ function openDetail(id){
     document.getElementById("det-rest").textContent=p.denue.rest||0;
     document.getElementById("det-com").textContent=p.denue.tot||0;
     if(p.lat&&p.lng)mostrarSucursalCercana(p.lat,p.lng);
+    var _pob=p.inegi&&p.inegi.pob?p.inegi.pob:null;
+    var _viv=p.inegi&&p.inegi.viv?p.inegi.viv:null;
+    var _giros=p.denue&&p.denue.tot?p.denue.tot:null;
+    if(p.lat&&p.lng)mostrarProyeccion(p.lat,p.lng,_pob,_viv,_giros);
     document.getElementById("det-viv").textContent=p.inegi&&p.inegi.viv?p.inegi.viv.toLocaleString():"-";
     document.getElementById("det-pob").textContent=p.inegi&&p.inegi.pob?(p.inegi.pob/1000).toFixed(1)+"K":"-";
     var desgEl=document.getElementById("det-desglose");
