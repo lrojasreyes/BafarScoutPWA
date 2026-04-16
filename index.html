@@ -205,6 +205,25 @@ textarea{resize:none;min-height:80px}
             </div>
           </div>
         </div>
+        <div class="sec" style="margin-bottom:12px" id="det-sucursal-sec">
+          <div class="sh"><span style="font-size:18px">🏪</span><span style="font-size:14px;font-weight:700;color:#e8a020">Sucursal BAFAR más cercana</span></div>
+          <div class="sb">
+            <div id="det-sucursal-loading" style="font-size:12px;color:#6a7590;text-align:center;padding:10px">Calculando...</div>
+            <div id="det-sucursal-info" style="display:none">
+              <div style="font-size:15px;font-weight:800;color:#e8ecf4;margin-bottom:6px" id="det-suc-nombre">-</div>
+              <div class="r2" style="margin-bottom:6px">
+                <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">Distancia</div><div style="font-size:20px;font-weight:800;color:#3a8fff" id="det-suc-dist">-</div></div>
+                <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">Venta real/mes</div><div style="font-size:20px;font-weight:800;color:#22d18a" id="det-suc-venta">-</div></div>
+              </div>
+              <div class="r2">
+                <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">Venta institucional</div><div style="font-size:16px;font-weight:700;color:#f0c050" id="det-suc-inst">-</div></div>
+                <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">Venta ocasión</div><div style="font-size:16px;font-weight:700;color:#e8a020" id="det-suc-ocas">-</div></div>
+              </div>
+              <div style="margin-top:8px;font-size:11px;color:#6a7590" id="det-suc-zona"></div>
+            </div>
+            <div id="det-sucursal-error" style="display:none;font-size:12px;color:#6a7590;text-align:center;padding:10px">Sin datos disponibles</div>
+          </div>
+        </div>
         <div class="sec" style="margin-bottom:12px" id="det-renta-sec">
           <div class="sh"><span style="font-size:18px">💰</span><span style="font-size:14px;font-weight:700;color:#e8a020">Rentas comerciales</span></div>
           <div class="sb">
@@ -715,6 +734,63 @@ function abrirMapaCalorDENUE(p){
   else{toast("Permite ventanas emergentes");}
 }
 
+function haversineKm(lat1,lon1,lat2,lon2){
+  var R=6371,dLat=(lat2-lat1)*Math.PI/180,dLon=(lon2-lon1)*Math.PI/180;
+  var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+
+var _sucursalesCache=null;
+
+function cargarSucursales(cb){
+  if(_sucursalesCache){cb(_sucursalesCache);return;}
+  fetch("https://pjacmizmjsjwxtoldpvr.supabase.co/rest/v1/sucursales_bafar?select=nombre,latitud,longitud,venta_kg,venta_kg_institucional,venta_kg_consumo,ratio_institucional,zona_operaciones,tipo_tienda&limit=400",{
+    headers:{"apikey":"sb_publishable_zy_iwqAnOgx0N8xElowU8A_CwpJ71_K","Authorization":"Bearer sb_publishable_zy_iwqAnOgx0N8xElowU8A_CwpJ71_K"}
+  }).then(function(r){return r.json();}).then(function(data){
+    _sucursalesCache=Array.isArray(data)?data:[];
+    cb(_sucursalesCache);
+  }).catch(function(){cb([]);});
+}
+
+function mostrarSucursalCercana(lat,lng){
+  var loading=document.getElementById("det-sucursal-loading");
+  var info=document.getElementById("det-sucursal-info");
+  var err=document.getElementById("det-sucursal-error");
+  if(loading)loading.style.display="block";
+  if(info)info.style.display="none";
+  if(err)err.style.display="none";
+
+  cargarSucursales(function(suc){
+    if(!suc||!suc.length){
+      if(loading)loading.style.display="none";
+      if(err)err.style.display="block";
+      return;
+    }
+    var mejor=null,mejorDist=999999;
+    suc.forEach(function(s){
+      if(!s.latitud||!s.longitud)return;
+      var d=haversineKm(lat,lng,s.latitud,s.longitud);
+      if(d<mejorDist){mejorDist=d;mejor=s;}
+    });
+    if(loading)loading.style.display="none";
+    if(!mejor){if(err)err.style.display="block";return;}
+    if(info)info.style.display="block";
+    var distStr=mejorDist<1?(mejorDist*1000).toFixed(0)+"m":mejorDist.toFixed(1)+"km";
+    var ventaKg=mejor.venta_kg||0;
+    var ventaTon=(ventaKg/1000).toFixed(1);
+    var instKg=mejor.venta_kg_institucional||0;
+    var ocasKg=mejor.venta_kg_consumo||0;
+    var instPct=ventaKg>0?(instKg/ventaKg*100).toFixed(0):0;
+    var ocasPct=ventaKg>0?(ocasKg/ventaKg*100).toFixed(0):0;
+    document.getElementById("det-suc-nombre").textContent=mejor.nombre||"-";
+    document.getElementById("det-suc-dist").textContent=distStr;
+    document.getElementById("det-suc-venta").textContent=(ventaKg/1000).toFixed(1)+" ton/mes";
+    document.getElementById("det-suc-inst").textContent=(instKg/1000).toFixed(1)+" ton ("+instPct+"%)";
+    document.getElementById("det-suc-ocas").textContent=(ocasKg/1000).toFixed(1)+" ton ("+ocasPct+"%)";
+    document.getElementById("det-suc-zona").textContent=mejor.zona_operaciones||"";
+  });
+}
+
 function setSyncStatus(ok){
   var el=document.getElementById("sync-status");
   el.textContent=ok?"✓ Sync":"⟳ Sync";
@@ -1200,6 +1276,7 @@ function openDetail(id){
     document.getElementById("det-denue-sec").style.display="block";
     document.getElementById("det-rest").textContent=p.denue.rest||0;
     document.getElementById("det-com").textContent=p.denue.tot||0;
+    if(p.lat&&p.lng)mostrarSucursalCercana(p.lat,p.lng);
     document.getElementById("det-viv").textContent=p.inegi&&p.inegi.viv?p.inegi.viv.toLocaleString():"-";
     document.getElementById("det-pob").textContent=p.inegi&&p.inegi.pob?(p.inegi.pob/1000).toFixed(1)+"K":"-";
     var desgEl=document.getElementById("det-desglose");
