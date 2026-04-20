@@ -1572,7 +1572,7 @@ function initUI(){
     GD={lat:lat,lng:lng,acc:0};
     document.getElementById("gt").textContent="Ubicacion cargada";
     document.getElementById("gc").textContent=lat.toFixed(5)+", "+lng.toFixed(5);
-    document.getElementById("gi").textContent="&#128205;";
+    document.getElementById("gi").textContent="📍";
     document.getElementById("gb").style.borderColor="#22d18a";
     document.getElementById("coords-input").value="";
     fetch("https://nominatim.openstreetmap.org/reverse?lat="+lat+"&lon="+lng+"&format=json")
