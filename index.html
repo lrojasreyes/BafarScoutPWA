@@ -8,6 +8,8 @@
 <meta name="theme-color" content="#070c1a">
 <title>Plataforma de Inteligencia Geoespacial para Expansión Retail</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body,html{height:100%;background:#070c1a;color:#e8ecf4;font-family:sans-serif;overflow:hidden}
@@ -758,7 +760,22 @@ function abrirMapaCalorDENUE(p){
     +"} else {"
     +"document.getElementById('loading').innerHTML='<div>📭</div><div>Sin DENUEs en este radio</div>';"
     +"document.getElementById('loading').style.display='block';"
-    +"}}<\/script></body></html>";
+    +"}}<\/script>"
+      +"<script src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'><\/script>"
+      +"<script src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'><\/script>"
+      +"<script>function exportarPDF(){"
+      +"var btn=document.getElementById('pdf-btn');if(btn){btn.textContent='Generando...';btn.disabled=true;}"
+      +"html2canvas(document.querySelector('.ficha'),{scale:2,useCORS:true,backgroundColor:'#ffffff'}).then(function(canvas){"
+      +"var imgData=canvas.toDataURL('image/jpeg',0.95);"
+      +"var pdf=new window.jspdf.jsPDF({orientation:'portrait',unit:'mm',format:'a4'});"
+      +"var pdfW=pdf.internal.pageSize.getWidth();"
+      +"var pdfH=(canvas.height*pdfW)/canvas.width;"
+      +"if(pdfH>297){var ratio=297/pdfH;pdf.addImage(imgData,'JPEG',0,0,pdfW*ratio,297);}"
+      +"else{pdf.addImage(imgData,'JPEG',0,0,pdfW,pdfH);}"
+      +"pdf.save('ficha-bafar.pdf');"
+      +"if(btn){btn.textContent='Guardar como PDF';btn.disabled=false;}"
+      +"}).catch(function(e){console.error(e);if(btn){btn.textContent='Guardar como PDF';btn.disabled=false;}});"
+      +"}<\/script><\/body><\/html>";
   if(win){win.document.write(html);win.document.close();}
   else{toast("Permite ventanas emergentes");}
 }
@@ -1837,7 +1854,7 @@ function initUI(){
       +"</style></head><body><div class='ficha'>"
       +"<div class='no-print' style='display:flex;gap:8px;margin-bottom:10px'>"
       +"<button onclick='window.close()' style='flex:1;padding:9px;background:#1a1a2e;border:1.5px solid rgba(255,255,255,.15);border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;color:#e8ecf4'>&larr; Cerrar</button>"
-      +"<button onclick='window.print()' style='flex:2;padding:9px;background:#003087;border:none;border-radius:7px;font-size:12px;font-weight:800;cursor:pointer;color:white'>Guardar como PDF</button>"
+      +"<button id='pdf-btn' onclick='exportarPDF()' style='flex:2;padding:9px;background:#003087;border:none;border-radius:7px;font-size:12px;font-weight:800;cursor:pointer;color:white'>Guardar como PDF</button>"
       +"</div>"
       +"<div class='header'>"
       +"<div style='display:flex;align-items:center;gap:10px'>"
