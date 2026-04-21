@@ -19,14 +19,16 @@ export default async function handler(req, res) {
     doc.setFontSize(9);doc.setFont("helvetica","normal");doc.setTextColor(...gris);
     doc.text((p.direccion||"")+(p.ciudad?" · "+p.ciudad:"")+(p.estado?", "+p.estado:""),10,42,{maxWidth:W-20});
     // Agregar foto si existe
+    let y=50;
     if(p.fotoB64){
       try{
         const fotoData = p.fotoB64.split(',')[1]||p.fotoB64;
         const ext = p.fotoB64.includes('png')?'PNG':'JPEG';
         doc.addImage(fotoData, ext, 10, 50, 88, 58, undefined, 'FAST');
+        y=112;
       }catch(e){console.error('foto error:',e.message);}
     }
-    const y=112,c1=10,c2=110,cW=88;
+    const c1=10,c2=110,cW=88;
     doc.setFillColor(248,249,250);doc.roundedRect(c1,y,cW,65,2,2,"F");
     doc.setFontSize(7);doc.setFont("helvetica","bold");doc.setTextColor(...gris);
     doc.text("DENUE · RADIO "+(p.radio||1000)+"M",c1+3,y+5);
@@ -60,6 +62,32 @@ export default async function handler(req, res) {
     doc.text((p.lat||0).toFixed(5)+", "+(p.lng||0).toFixed(5),c2+5,y+66);
     doc.setFontSize(7);doc.setFont("helvetica","normal");doc.setTextColor(58,143,255);
     doc.text("maps.google.com/?q="+(p.lat||0).toFixed(5)+","+(p.lng||0).toFixed(5),c2+5,y+70);
+    // PROYECCIÓN
+    if(p.proyRef){
+      const py=y+78;
+      doc.setFillColor(248,249,250);doc.roundedRect(c1,py,cW,42,2,2,"F");
+      doc.setDrawColor(229,231,235);doc.roundedRect(c1,py,cW,42,2,2,"S");
+      doc.setFontSize(7);doc.setFont("helvetica","bold");doc.setTextColor(...gris);
+      doc.text("PROYECCION DE VENTAS",c1+3,py+5);
+      const potColor=p.proyPot&&p.proyPot.indexOf("ALTO")>=0?verde:p.proyPot&&p.proyPot.indexOf("BAJO")>=0?[239,68,68]:dorado;
+      doc.setFontSize(9);doc.setFont("helvetica","bold");doc.setTextColor(...potColor);
+      doc.text(p.proyPot||"MEDIO",c1+cW-3,py+5,{align:"right"});
+      doc.setFillColor(255,255,255);
+      doc.roundedRect(c1+2,py+8,40,12,1,1,"F");doc.roundedRect(c1+46,py+8,40,12,1,1,"F");
+      doc.setFontSize(6);doc.setTextColor(...gris);
+      doc.text("REFERENCIAL",c1+22,py+11,{align:"center"});doc.text("RANGO",c1+66,py+11,{align:"center"});
+      doc.setFontSize(10);doc.setFont("helvetica","bold");doc.setTextColor(...verde);
+      doc.text(p.proyRef||"-",c1+22,py+18,{align:"center"});
+      doc.setFontSize(7);doc.setTextColor(...gris);doc.text(p.proyRango||"-",c1+66,py+16,{align:"center",maxWidth:38});
+      doc.setFillColor(255,255,255);
+      doc.roundedRect(c1+2,py+22,40,12,1,1,"F");doc.roundedRect(c1+46,py+22,40,12,1,1,"F");
+      doc.setFontSize(6);doc.setTextColor(...gris);
+      doc.text("INSTITUCIONAL",c1+22,py+25,{align:"center"});doc.text("OCASION",c1+66,py+25,{align:"center"});
+      doc.setFontSize(9);doc.setFont("helvetica","bold");doc.setTextColor(240,192,80);
+      doc.text(p.proyInst||"-",c1+22,py+31,{align:"center"});
+      doc.setTextColor(...dorado);doc.text(p.proyOcas||"-",c1+66,py+31,{align:"center"});
+    }
+
     if(p.sucNombre&&p.sucNombre!=="-"){
       const sy=y+78;
       doc.setFillColor(248,249,250);doc.roundedRect(c2,sy,cW,35,2,2,"F");
