@@ -26,10 +26,10 @@ export default async function handler(req, res) {
     doc.setFillColor(248,249,250);doc.roundedRect(c1,y1,cW,dgH,2,2,"F");doc.setDrawColor(229,231,235);doc.roundedRect(c1,y1,cW,dgH,2,2,"S");
     doc.setFontSize(7);doc.setFont("helvetica","bold");doc.setTextColor(...gris);doc.text("DENUE RADIO "+(p.radio||1000)+"M",c1+3,y1+5);
     doc.setDrawColor(...dorado);doc.line(c1+3,y1+6.5,c1+cW-3,y1+6.5);
-    doc.setFillColor(...blanco);doc.roundedRect(c1+2,y1+8,42,11,1,1,"F");doc.roundedRect(c1+48,y1+8,42,11,1,1,"F");
-    doc.setFontSize(6);doc.setTextColor(...gris);doc.text("RESTAURANTES",c1+23,y1+11,{align:"center"});doc.text("DENUES TOTAL",c1+69,y1+11,{align:"center"});
-    doc.setFontSize(13);doc.setFont("helvetica","bold");doc.setTextColor(...dorado);
-    doc.text(String(p.denue?p.denue.rest||0:0),c1+23,y1+18,{align:"center"});doc.text(String(p.denue?p.denue.tot||0:0),c1+69,y1+18,{align:"center"});
+    doc.setFillColor(...blanco);doc.roundedRect(c1+cW/2-25,y1+7,50,13,1,1,"F");
+    doc.setFontSize(6);doc.setTextColor(...gris);doc.text("DENUEs TOTAL",c1+cW/2,y1+11,{align:"center"});
+    doc.setFontSize(16);doc.setFont("helvetica","bold");doc.setTextColor(...dorado);
+    doc.text(String(p.denue?p.denue.tot||0:0),c1+cW/2,y1+19,{align:"center"});
     let gy=y1+24;
     Object.keys(dg).sort((a,b)=>dg[b]-dg[a]).forEach(g=>{
       doc.setFontSize(7);doc.setFont("helvetica","normal");doc.setTextColor(55,65,81);doc.text(g,c1+3,gy);
