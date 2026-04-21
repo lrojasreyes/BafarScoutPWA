@@ -1,115 +1,113 @@
 const { jsPDF } = require("jspdf");
 
 export default async function handler(req, res) {
-  if(req.method==="OPTIONS"){res.setHeader("Access-Control-Allow-Origin","*");res.setHeader("Access-Control-Allow-Methods","POST,OPTIONS");res.status(200).end();return;}
+  if(req.method==="OPTIONS"){res.setHeader("Access-Control-Allow-Origin","*");res.setHeader("Access-Control-Allow-Methods","POST,OPTIONS");res.setHeader("Access-Control-Allow-Headers","Content-Type");res.status(200).end();return;}
   if(req.method!=="POST"){res.status(405).end();return;}
   try {
     const p = req.body;
     const doc = new jsPDF({orientation:"portrait",unit:"mm",format:"a4"});
-    const W=210;
-    const azul=[0,48,135],dorado=[232,160,32],verde=[34,209,138],gris=[106,117,144],negro=[26,26,46];
-    doc.setFillColor(...azul);doc.roundedRect(10,10,W-20,18,3,3,"F");
-    doc.setTextColor(255,255,255);doc.setFontSize(14);doc.setFont("helvetica","bold");
-    doc.text("EXPANSIÓN BAFAR",20,21);
-    doc.setFontSize(8);doc.setFont("helvetica","normal");doc.text("Ficha de Prospecto",20,26);
+    const W=210,M=12;
+    const azul=[0,48,135],dorado=[232,160,32],verde=[34,209,138],gris=[106,117,144],negro=[26,26,46],blanco=[255,255,255];
+    doc.setFillColor(...azul);doc.roundedRect(M,8,W-M*2,16,3,3,"F");
+    doc.setTextColor(...blanco);doc.setFontSize(13);doc.setFont("helvetica","bold");doc.text("EXPANSION BAFAR",M+4,17);
+    doc.setFontSize(7);doc.setFont("helvetica","normal");doc.text("Ficha de Prospecto",M+4,22);
     const sL=p.status==="viable"?"VIABLE":p.status==="descartado"?"DESCARTADO":"PROSPECTO";
     const sC=p.status==="viable"?verde:p.status==="descartado"?[239,68,68]:[58,143,255];
-    doc.setTextColor(...sC);doc.setFontSize(8);doc.setFont("helvetica","bold");doc.text(sL,W-20,21,{align:"right"});
-    doc.setTextColor(...negro);doc.setFontSize(16);doc.setFont("helvetica","bold");doc.text(p.nombre||"Sin nombre",10,36);
-    doc.setFontSize(9);doc.setFont("helvetica","normal");doc.setTextColor(...gris);
-    doc.text((p.direccion||"")+(p.ciudad?" · "+p.ciudad:"")+(p.estado?", "+p.estado:""),10,42,{maxWidth:W-20});
-    // Agregar foto si existe
-    let y=50;
+    doc.setTextColor(...sC);doc.setFontSize(8);doc.setFont("helvetica","bold");doc.text(sL,W-M-2,17,{align:"right"});
+    doc.setTextColor(...negro);doc.setFontSize(14);doc.setFont("helvetica","bold");doc.text(p.nombre||"Sin nombre",M,32);
+    doc.setFontSize(8);doc.setFont("helvetica","normal");doc.setTextColor(...gris);
+    const dir=(p.direccion||"")+(p.ciudad?" · "+p.ciudad:"")+(p.estado?", "+p.estado:"");
+    doc.text(dir,M,37,{maxWidth:W-M*2});
+    const c1=M,c2=M+95,cW=90;
+    let y1=42,y2=42;
+    const dg=p.denue&&p.denue.desglose?p.denue.desglose:{};
+    const dgRows=Math.min(Object.keys(dg).length,8);
+    const dgH=dgRows*5+22;
+    doc.setFillColor(248,249,250);doc.roundedRect(c1,y1,cW,dgH,2,2,"F");doc.setDrawColor(229,231,235);doc.roundedRect(c1,y1,cW,dgH,2,2,"S");
+    doc.setFontSize(7);doc.setFont("helvetica","bold");doc.setTextColor(...gris);doc.text("DENUE RADIO "+(p.radio||1000)+"M",c1+3,y1+5);
+    doc.setDrawColor(...dorado);doc.line(c1+3,y1+6.5,c1+cW-3,y1+6.5);
+    doc.setFillColor(...blanco);doc.roundedRect(c1+2,y1+8,42,11,1,1,"F");doc.roundedRect(c1+48,y1+8,42,11,1,1,"F");
+    doc.setFontSize(6);doc.setTextColor(...gris);doc.text("RESTAURANTES",c1+23,y1+11,{align:"center"});doc.text("DENUES TOTAL",c1+69,y1+11,{align:"center"});
+    doc.setFontSize(13);doc.setFont("helvetica","bold");doc.setTextColor(...dorado);
+    doc.text(String(p.denue?p.denue.rest||0:0),c1+23,y1+18,{align:"center"});doc.text(String(p.denue?p.denue.tot||0:0),c1+69,y1+18,{align:"center"});
+    let gy=y1+24;
+    Object.keys(dg).sort((a,b)=>dg[b]-dg[a]).slice(0,8).forEach(g=>{
+      doc.setFontSize(7);doc.setFont("helvetica","normal");doc.setTextColor(55,65,81);doc.text(g,c1+3,gy);
+      doc.setFont("helvetica","bold");doc.setTextColor(...dorado);doc.text(String(dg[g]),c1+cW-3,gy,{align:"right"});gy+=5;
+    });
+    y1+=dgH+4;
+    if(p.proyRef){
+      const pyH=44;
+      doc.setFillColor(248,249,250);doc.roundedRect(c1,y1,cW,pyH,2,2,"F");doc.setDrawColor(229,231,235);doc.roundedRect(c1,y1,cW,pyH,2,2,"S");
+      doc.setFontSize(7);doc.setFont("helvetica","bold");doc.setTextColor(...gris);doc.text("PROYECCION DE VENTAS",c1+3,y1+5);
+      const potColor=p.proyPot&&p.proyPot.indexOf("ALTO")>=0?verde:p.proyPot&&p.proyPot.indexOf("BAJO")>=0?[239,68,68]:dorado;
+      doc.setFontSize(9);doc.setTextColor(...potColor);doc.text(p.proyPot||"MEDIO",c1+cW-3,y1+5,{align:"right"});
+      doc.setDrawColor(...dorado);doc.line(c1+3,y1+6.5,c1+cW-3,y1+6.5);
+      doc.setFillColor(...blanco);doc.roundedRect(c1+2,y1+8,42,13,1,1,"F");doc.roundedRect(c1+48,y1+8,42,13,1,1,"F");
+      doc.setFontSize(6);doc.setTextColor(...gris);doc.text("REFERENCIAL",c1+23,y1+11,{align:"center"});doc.text("RANGO",c1+69,y1+11,{align:"center"});
+      doc.setFontSize(10);doc.setFont("helvetica","bold");doc.setTextColor(...verde);doc.text(p.proyRef||"-",c1+23,y1+19,{align:"center"});
+      doc.setFontSize(7);doc.setTextColor(...gris);doc.text(p.proyRango||"-",c1+69,y1+16,{align:"center",maxWidth:40});
+      doc.setFillColor(...blanco);doc.roundedRect(c1+2,y1+23,42,12,1,1,"F");doc.roundedRect(c1+48,y1+23,42,12,1,1,"F");
+      doc.setFontSize(6);doc.setTextColor(...gris);doc.text("INSTITUCIONAL",c1+23,y1+26,{align:"center"});doc.text("OCASION",c1+69,y1+26,{align:"center"});
+      doc.setFontSize(9);doc.setFont("helvetica","bold");doc.setTextColor(240,192,80);doc.text(p.proyInst||"-",c1+23,y1+32,{align:"center"});
+      doc.setTextColor(...dorado);doc.text(p.proyOcas||"-",c1+69,y1+32,{align:"center"});
+      doc.setFontSize(7);doc.setFont("helvetica","oblique");doc.setTextColor(...gris);doc.text(p.proyBase||"",c1+3,y1+40,{maxWidth:cW-6});
+      y1+=pyH+4;
+    }
+    if(p.sucNombre&&p.sucNombre!=="-"){
+      const syH=34;
+      doc.setFillColor(248,249,250);doc.roundedRect(c1,y1,cW,syH,2,2,"F");doc.setDrawColor(229,231,235);doc.roundedRect(c1,y1,cW,syH,2,2,"S");
+      doc.setFontSize(7);doc.setFont("helvetica","bold");doc.setTextColor(...gris);doc.text("SUCURSAL MAS CERCANA",c1+3,y1+5);
+      doc.setDrawColor(...dorado);doc.line(c1+3,y1+6.5,c1+cW-3,y1+6.5);
+      doc.setFontSize(9);doc.setFont("helvetica","bold");doc.setTextColor(...negro);doc.text(p.sucNombre,c1+3,y1+13);
+      doc.setFillColor(...blanco);doc.roundedRect(c1+2,y1+15,42,12,1,1,"F");doc.roundedRect(c1+48,y1+15,42,12,1,1,"F");
+      doc.setFontSize(6);doc.setTextColor(...gris);doc.text("DISTANCIA",c1+23,y1+18,{align:"center"});doc.text("VENTA REAL",c1+69,y1+18,{align:"center"});
+      doc.setFontSize(11);doc.setFont("helvetica","bold");doc.setTextColor(58,143,255);doc.text(p.sucDist||"-",c1+23,y1+24,{align:"center"});
+      doc.setTextColor(...verde);doc.text(p.sucVenta||"-",c1+69,y1+24,{align:"center"});
+      doc.setFontSize(7);doc.setFont("helvetica","normal");doc.setTextColor(...gris);doc.text(p.sucZona||"",c1+3,y1+31);
+      y1+=syH+4;
+    }
     if(p.fotoB64){
       try{
-        const fotoData = p.fotoB64.split(',')[1]||p.fotoB64;
-        const ext = p.fotoB64.includes('png')?'PNG':'JPEG';
-        doc.addImage(fotoData, ext, 10, 50, 88, 58, undefined, 'FAST');
-        y=112;
-      }catch(e){console.error('foto error:',e.message);}
+        const fotoData=p.fotoB64.split(',')[1]||p.fotoB64;
+        const ext=p.fotoB64.includes('png')?'PNG':'JPEG';
+        doc.addImage(fotoData,ext,c2,y2,cW,55,undefined,'FAST');y2+=59;
+      }catch(e){console.error('foto:',e.message);}
     }
-    const c1=10,c2=110,cW=88;
-    doc.setFillColor(248,249,250);doc.roundedRect(c1,y,cW,65,2,2,"F");
-    doc.setFontSize(7);doc.setFont("helvetica","bold");doc.setTextColor(...gris);
-    doc.text("DENUE · RADIO "+(p.radio||1000)+"M",c1+3,y+5);
-    doc.setFillColor(255,255,255);doc.roundedRect(c1+2,y+8,40,12,1,1,"F");doc.roundedRect(c1+46,y+8,40,12,1,1,"F");
-    doc.setFontSize(7);doc.setTextColor(...gris);doc.text("RESTAURANTES",c1+22,y+11,{align:"center"});doc.text("DENUES TOTAL",c1+66,y+11,{align:"center"});
-    doc.setFontSize(14);doc.setFont("helvetica","bold");doc.setTextColor(...dorado);
-    doc.text(String(p.denue?p.denue.rest||0:0),c1+22,y+18,{align:"center"});doc.text(String(p.denue?p.denue.tot||0:0),c1+66,y+18,{align:"center"});
-    const dg=p.denue&&p.denue.desglose?p.denue.desglose:{};
-    let gy=y+24;
-    Object.keys(dg).sort((a,b)=>dg[b]-dg[a]).slice(0,6).forEach(g=>{
-      doc.setFontSize(8);doc.setFont("helvetica","normal");doc.setTextColor(55,65,81);doc.text(g,c1+3,gy);
-      doc.setFont("helvetica","bold");doc.setTextColor(...dorado);doc.text(String(dg[g]),c1+cW-3,gy,{align:"right"});gy+=6;
-    });
-    doc.setFillColor(248,249,250);doc.roundedRect(c2,y,cW,75,2,2,"F");
-    doc.setFontSize(7);doc.setFont("helvetica","bold");doc.setTextColor(...gris);doc.text("DATOS GENERALES",c2+3,y+5);
     const kpis=[];
-    if(p.inegi&&p.inegi.pob)kpis.push({l:"POBLACIÓN",v:(p.inegi.pob/1000).toFixed(1)+"K",c:[58,143,255]});
+    if(p.inegi&&p.inegi.pob)kpis.push({l:"POBLACION",v:(p.inegi.pob/1000).toFixed(1)+"K",c:[58,143,255]});
     if(p.inegi&&p.inegi.viv)kpis.push({l:"VIVIENDAS",v:p.inegi.viv.toLocaleString(),c:verde});
     if(p.precio)kpis.push({l:"RENTA/MES",v:"$"+parseFloat(p.precio).toLocaleString(),c:verde});
-    if(p.m2Terreno)kpis.push({l:"SUPERFICIE",v:p.m2Terreno+"m²",c:negro});
+    if(p.m2Terreno)kpis.push({l:"SUPERFICIE",v:p.m2Terreno+"m2",c:negro});
     if(p.frente&&p.fondo)kpis.push({l:"FRENTE x FONDO",v:p.frente+"m x "+p.fondo+"m",c:negro});
+    const kRows=Math.ceil(kpis.length/2);
+    const dgH2=kRows*15+14;
+    doc.setFillColor(248,249,250);doc.roundedRect(c2,y2,cW,dgH2,2,2,"F");doc.setDrawColor(229,231,235);doc.roundedRect(c2,y2,cW,dgH2,2,2,"S");
+    doc.setFontSize(7);doc.setFont("helvetica","bold");doc.setTextColor(...gris);doc.text("DATOS GENERALES",c2+3,y2+5);
+    doc.setDrawColor(...dorado);doc.line(c2+3,y2+6.5,c2+cW-3,y2+6.5);
     kpis.forEach((k,i)=>{
-      const kx=c2+2+(i%2)*44,ky=y+8+Math.floor(i/2)*16;
-      doc.setFillColor(255,255,255);doc.roundedRect(kx,ky,42,13,1,1,"F");
+      const kx=c2+2+(i%2)*46,ky=y2+8+Math.floor(i/2)*15;
+      doc.setFillColor(...blanco);doc.roundedRect(kx,ky,42,12,1,1,"F");
       doc.setFontSize(6);doc.setFont("helvetica","normal");doc.setTextColor(...gris);doc.text(k.l,kx+21,ky+4,{align:"center"});
-      doc.setFontSize(10);doc.setFont("helvetica","bold");doc.setTextColor(...k.c);doc.text(k.v,kx+21,ky+10,{align:"center"});
+      doc.setFontSize(9);doc.setFont("helvetica","bold");doc.setTextColor(...k.c);doc.text(k.v,kx+21,ky+10,{align:"center"});
     });
-    doc.setFillColor(255,255,255);doc.roundedRect(c2+2,y+56,cW-4,16,1,1,"F");
-    doc.setFontSize(6);doc.setFont("helvetica","bold");doc.setTextColor(...gris);doc.text("GPS",c2+5,y+61);
-    doc.setFontSize(8);doc.setFont("helvetica","bold");doc.setTextColor(55,65,81);
-    doc.text((p.lat||0).toFixed(5)+", "+(p.lng||0).toFixed(5),c2+5,y+66);
-    doc.setFontSize(7);doc.setFont("helvetica","normal");doc.setTextColor(58,143,255);
-    doc.text("maps.google.com/?q="+(p.lat||0).toFixed(5)+","+(p.lng||0).toFixed(5),c2+5,y+70);
-    // PROYECCIÓN
-    if(p.proyRef){
-      const py=y+78;
-      doc.setFillColor(248,249,250);doc.roundedRect(c1,py,cW,42,2,2,"F");
-      doc.setDrawColor(229,231,235);doc.roundedRect(c1,py,cW,42,2,2,"S");
-      doc.setFontSize(7);doc.setFont("helvetica","bold");doc.setTextColor(...gris);
-      doc.text("PROYECCION DE VENTAS",c1+3,py+5);
-      const potColor=p.proyPot&&p.proyPot.indexOf("ALTO")>=0?verde:p.proyPot&&p.proyPot.indexOf("BAJO")>=0?[239,68,68]:dorado;
-      doc.setFontSize(9);doc.setFont("helvetica","bold");doc.setTextColor(...potColor);
-      doc.text(p.proyPot||"MEDIO",c1+cW-3,py+5,{align:"right"});
-      doc.setFillColor(255,255,255);
-      doc.roundedRect(c1+2,py+8,40,12,1,1,"F");doc.roundedRect(c1+46,py+8,40,12,1,1,"F");
-      doc.setFontSize(6);doc.setTextColor(...gris);
-      doc.text("REFERENCIAL",c1+22,py+11,{align:"center"});doc.text("RANGO",c1+66,py+11,{align:"center"});
-      doc.setFontSize(10);doc.setFont("helvetica","bold");doc.setTextColor(...verde);
-      doc.text(p.proyRef||"-",c1+22,py+18,{align:"center"});
-      doc.setFontSize(7);doc.setTextColor(...gris);doc.text(p.proyRango||"-",c1+66,py+16,{align:"center",maxWidth:38});
-      doc.setFillColor(255,255,255);
-      doc.roundedRect(c1+2,py+22,40,12,1,1,"F");doc.roundedRect(c1+46,py+22,40,12,1,1,"F");
-      doc.setFontSize(6);doc.setTextColor(...gris);
-      doc.text("INSTITUCIONAL",c1+22,py+25,{align:"center"});doc.text("OCASION",c1+66,py+25,{align:"center"});
-      doc.setFontSize(9);doc.setFont("helvetica","bold");doc.setTextColor(240,192,80);
-      doc.text(p.proyInst||"-",c1+22,py+31,{align:"center"});
-      doc.setTextColor(...dorado);doc.text(p.proyOcas||"-",c1+66,py+31,{align:"center"});
+    y2+=dgH2+4;
+    doc.setFillColor(...blanco);doc.roundedRect(c2,y2,cW,16,1,1,"F");doc.setDrawColor(229,231,235);doc.roundedRect(c2,y2,cW,16,1,1,"S");
+    doc.setFontSize(6);doc.setFont("helvetica","bold");doc.setTextColor(...gris);doc.text("GPS",c2+3,y2+5);
+    doc.setFontSize(8);doc.setFont("helvetica","bold");doc.setTextColor(55,65,81);doc.text((p.lat||0).toFixed(5)+", "+(p.lng||0).toFixed(5),c2+3,y2+10);
+    doc.setFontSize(6);doc.setFont("helvetica","normal");doc.setTextColor(58,143,255);doc.text("maps.google.com/?q="+(p.lat||0).toFixed(5)+","+(p.lng||0).toFixed(5),c2+3,y2+14);
+    y2+=20;
+    const yFinal=Math.max(y1,y2)+4;
+    if(p.notas&&yFinal<265){
+      doc.setFillColor(248,249,250);doc.roundedRect(M,yFinal,W-M*2,12,2,2,"F");
+      doc.setFontSize(8);doc.setFont("helvetica","bold");doc.setTextColor(...negro);doc.text("Notas: "+p.notas,M+3,yFinal+8,{maxWidth:W-M*2-6});
     }
-
-    if(p.sucNombre&&p.sucNombre!=="-"){
-      const sy=y+78;
-      doc.setFillColor(248,249,250);doc.roundedRect(c2,sy,cW,35,2,2,"F");
-      doc.setFontSize(7);doc.setFont("helvetica","bold");doc.setTextColor(...gris);doc.text("SUCURSAL MÁS CERCANA",c2+3,sy+5);
-      doc.setFontSize(9);doc.setFont("helvetica","bold");doc.setTextColor(...negro);doc.text(p.sucNombre,c2+3,sy+12);
-      doc.setFillColor(255,255,255);doc.roundedRect(c2+2,sy+14,40,12,1,1,"F");doc.roundedRect(c2+46,sy+14,40,12,1,1,"F");
-      doc.setFontSize(6);doc.setTextColor(...gris);doc.text("DISTANCIA",c2+22,sy+17,{align:"center"});doc.text("VENTA REAL",c2+66,sy+17,{align:"center"});
-      doc.setFontSize(11);doc.setFont("helvetica","bold");doc.setTextColor(58,143,255);doc.text(p.sucDist||"-",c2+22,sy+23,{align:"center"});
-      doc.setTextColor(...verde);doc.text(p.sucVenta||"-",c2+66,sy+23,{align:"center"});
-    }
-    if(p.notas){doc.setFillColor(248,249,250);doc.roundedRect(10,220,W-20,12,2,2,"F");doc.setFontSize(8);doc.setFont("helvetica","bold");doc.setTextColor(...negro);doc.text("Notas: "+p.notas,13,228,{maxWidth:W-26});}
-    doc.setFillColor(...azul);doc.rect(0,282,W+10,15,"F");
-    doc.setFontSize(7);doc.setFont("helvetica","normal");doc.setTextColor(255,255,255);
-    doc.text((p.lat||0).toFixed(5)+", "+(p.lng||0).toFixed(5),13,288);
-    doc.text("PIGER · Censo 2020 INEGI",W-13,288,{align:"right"});
-    const pdfBuffer = Buffer.from(doc.output("arraybuffer"));
-    res.setHeader("Content-Type","application/pdf");
-    res.setHeader("Content-Disposition","attachment; filename=ficha-bafar.pdf");
-    res.setHeader("Access-Control-Allow-Origin","*");
-    res.status(200).send(pdfBuffer);
-  } catch(e){
-    res.setHeader("Access-Control-Allow-Origin","*");
-    res.status(500).json({error:e.message});
-  }
+    doc.setFillColor(...azul);doc.rect(0,283,W+5,15,"F");
+    doc.setFontSize(7);doc.setFont("helvetica","normal");doc.setTextColor(...blanco);
+    doc.text((p.lat||0).toFixed(5)+", "+(p.lng||0).toFixed(5),M,289);
+    doc.text((p.tipo||"")+" · "+(p.fecha||""),W/2,289,{align:"center"});
+    doc.text("PIGER · Censo 2020 INEGI",W-M,289,{align:"right"});
+    const pdfBuffer=Buffer.from(doc.output("arraybuffer"));
+    res.setHeader("Content-Type","application/pdf");res.setHeader("Content-Disposition",'attachment; filename="ficha-bafar.pdf"');res.setHeader("Access-Control-Allow-Origin","*");res.status(200).send(pdfBuffer);
+  } catch(e){res.setHeader("Access-Control-Allow-Origin","*");res.status(500).json({error:e.message});}
 }
