@@ -1891,9 +1891,37 @@ function initUI(){
       +"<span>"+p.tipo+" &bull; "+p.fecha+"</span>"
       +"<span>PIGER &bull; Censo 2020 INEGI</span>"
       +"</div></div></body></html>";
-    var win=window.open("","_blank");
-    if(win){win.document.write(html);win.document.close();}
-    else{toast("Permite ventanas emergentes para generar PDF");}
+    // Crear iframe oculto para renderizar la ficha
+    var iframe=document.createElement("iframe");
+    iframe.style.cssText="position:fixed;top:-9999px;left:-9999px;width:794px;height:1123px;border:none;z-index:-1";
+    document.body.appendChild(iframe);
+    iframe.contentDocument.open();
+    iframe.contentDocument.write(html);
+    iframe.contentDocument.close();
+    toast("Generando PDF...");
+    setTimeout(function(){
+      var fichaEl=iframe.contentDocument.querySelector(".ficha");
+      if(!fichaEl){toast("Error al generar PDF");document.body.removeChild(iframe);return;}
+      html2canvas(fichaEl,{
+        scale:2,useCORS:true,backgroundColor:"#ffffff",
+        logging:false,
+        width:fichaEl.scrollWidth,
+        height:fichaEl.scrollHeight
+      }).then(function(canvas){
+        var imgData=canvas.toDataURL("image/jpeg",0.92);
+        var pdf=new window.jspdf.jsPDF({orientation:"portrait",unit:"mm",format:"a4"});
+        var pdfW=pdf.internal.pageSize.getWidth();
+        var pdfH=(canvas.height*pdfW)/canvas.width;
+        if(pdfH>297){pdf.addImage(imgData,"JPEG",0,0,pdfW,297);}
+        else{pdf.addImage(imgData,"JPEG",0,0,pdfW,pdfH);}
+        pdf.save("ficha-bafar-"+p.nombre.replace(/\s+/g,"-")+".pdf");
+        document.body.removeChild(iframe);
+        toast("PDF guardado");
+      }).catch(function(e){
+        toast("Error: "+e.message);
+        document.body.removeChild(iframe);
+      });
+    },1500);
   }
 
   document.getElementById("btn-heatmap-detail").addEventListener("click",function(){
