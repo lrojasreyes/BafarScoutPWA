@@ -67,11 +67,15 @@ export default async function handler(req, res) {
       doc.setFontSize(7);doc.setFont("helvetica","normal");doc.setTextColor(...gris);doc.text(p.sucZona||"",c1+3,y1+31);
       y1+=syH+4;
     }
-    if(p.fotoB64){
+    // Alinear columna derecha con izquierda si no hay foto
+    if(!p.fotoB64){ y2=42; }
+    if(p.fotoUrl){
       try{
-        const fotoData=p.fotoB64.split(',')[1]||p.fotoB64;
-        const ext=p.fotoB64.includes('png')?'PNG':'JPEG';
-        doc.addImage(fotoData,ext,c2,y2,cW,55,undefined,'FAST');y2+=59;
+        const fotoResp=await fetch(p.fotoUrl);
+        const fotoArrBuf=await fotoResp.arrayBuffer();
+        const fotoB64=Buffer.from(fotoArrBuf).toString('base64');
+        const ext=p.fotoUrl.toLowerCase().includes('png')?'PNG':'JPEG';
+        doc.addImage(fotoB64,ext,c2,y2,cW,55,undefined,'FAST');y2+=59;
       }catch(e){console.error('foto:',e.message);}
     }
     const kpis=[];

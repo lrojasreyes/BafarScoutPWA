@@ -896,11 +896,11 @@ function descargarPDF(p){
     sucNombre:document.getElementById("det-suc-nombre")?document.getElementById("det-suc-nombre").textContent:null,
     sucDist:document.getElementById("det-suc-dist")?document.getElementById("det-suc-dist").textContent:null,
     sucVenta:document.getElementById("det-suc-venta")?document.getElementById("det-suc-venta").textContent:null,
-    sucZona:document.getElementById("det-suc-zona")?document.getElementById("det-suc-zona").textContent:null
+    sucZona:document.getElementById("det-suc-zona")?document.getElementById("det-suc-zona").textContent:null,
+    fotoUrl:p.fotos&&p.fotos.frente?p.fotos.frente:(p.fotos&&p.fotos.lateral?p.fotos.lateral:null)
   };
-  enviarPDF(null);
-  function enviarPDF(fotoB64){
-    datos.fotoB64 = fotoB64;
+  enviarPDF();
+  function enviarPDF(){
     fetch("/api/pdf",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(datos)})
     .then(function(r){
       if(!r.ok)throw new Error("Error "+r.status);
