@@ -18,7 +18,15 @@ export default async function handler(req, res) {
     doc.setTextColor(...negro);doc.setFontSize(16);doc.setFont("helvetica","bold");doc.text(p.nombre||"Sin nombre",10,36);
     doc.setFontSize(9);doc.setFont("helvetica","normal");doc.setTextColor(...gris);
     doc.text((p.direccion||"")+(p.ciudad?" · "+p.ciudad:"")+(p.estado?", "+p.estado:""),10,42,{maxWidth:W-20});
-    const y=50,c1=10,c2=110,cW=88;
+    // Agregar foto si existe
+    if(p.fotoB64){
+      try{
+        const fotoData = p.fotoB64.split(',')[1]||p.fotoB64;
+        const ext = p.fotoB64.includes('png')?'PNG':'JPEG';
+        doc.addImage(fotoData, ext, 10, 50, 88, 58, undefined, 'FAST');
+      }catch(e){console.error('foto error:',e.message);}
+    }
+    const y=112,c1=10,c2=110,cW=88;
     doc.setFillColor(248,249,250);doc.roundedRect(c1,y,cW,65,2,2,"F");
     doc.setFontSize(7);doc.setFont("helvetica","bold");doc.setTextColor(...gris);
     doc.text("DENUE · RADIO "+(p.radio||1000)+"M",c1+3,y+5);
