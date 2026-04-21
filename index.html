@@ -8,8 +8,6 @@
 <meta name="theme-color" content="#070c1a">
 <title>Plataforma de Inteligencia Geoespacial para Expansión Retail</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body,html{height:100%;background:#070c1a;color:#e8ecf4;font-family:sans-serif;overflow:hidden}
@@ -760,25 +758,7 @@ function abrirMapaCalorDENUE(p){
     +"} else {"
     +"document.getElementById('loading').innerHTML='<div>📭</div><div>Sin DENUEs en este radio</div>';"
     +"document.getElementById('loading').style.display='block';"
-    +"}}<\/script>"
-      +"<script src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'><\/script>"
-      +"<script src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'><\/script>"
-      +"<script>"
-      +"function exportarPDF(){"
-      +"var btn=document.getElementById('pdf-btn');"
-      +"if(btn){btn.textContent='Generando...';btn.disabled=true;}"
-      +"if(typeof html2canvas==='undefined'||typeof window.jspdf==='undefined'){setTimeout(exportarPDF,500);return;}"
-      +"html2canvas(document.querySelector('.ficha'),{scale:2,useCORS:true,backgroundColor:'#ffffff',logging:false}).then(function(canvas){"
-      +"var imgData=canvas.toDataURL('image/jpeg',0.92);"
-      +"var pdf=new window.jspdf.jsPDF({orientation:'portrait',unit:'mm',format:'a4'});"
-      +"var pdfW=pdf.internal.pageSize.getWidth();"
-      +"var pdfH=(canvas.height*pdfW)/canvas.width;"
-      +"if(pdfH>297){pdf.addImage(imgData,'JPEG',0,0,pdfW,297);}"
-      +"else{pdf.addImage(imgData,'JPEG',0,0,pdfW,pdfH);}"
-      +"pdf.save('ficha-bafar.pdf');"
-      +"if(btn){btn.textContent='Guardar como PDF';btn.disabled=false;}"
-      +"}).catch(function(e){alert('Error: '+e.message);if(btn){btn.textContent='Guardar como PDF';btn.disabled=false;}});"
-      +"}<\/script><\/body><\/html>";
+    +"}}<\/script></body></html>";
   if(win){win.document.write(html);win.document.close();}
   else{toast("Permite ventanas emergentes");}
 }
@@ -1843,7 +1823,7 @@ function initUI(){
     var html="<!DOCTYPE html><html><head><meta charset='UTF-8'><title>Ficha: "+p.nombre+"</title>"
       +"<style>*{box-sizing:border-box;margin:0;padding:0}"
       +"body{font-family:Arial,sans-serif;background:#f0f2f5;padding:12px;color:#111}"
-      +"@media print{body{background:white;padding:0}.no-print{display:none}@page{margin:6mm;size:A4}}*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}"
+      +"@media print{body{background:white;padding:0}.no-print{display:none}@page{margin:6mm;size:A4}}"
       +".ficha{max-width:720px;margin:0 auto;background:white;padding:16px}"
       +".header{background:#003087;color:white;padding:10px 14px;border-radius:7px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}"
       +".badge{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;border:1.5px solid "+statusColor+";color:"+statusColor+"}"
@@ -1857,7 +1837,7 @@ function initUI(){
       +"</style></head><body><div class='ficha'>"
       +"<div class='no-print' style='display:flex;gap:8px;margin-bottom:10px'>"
       +"<button onclick='window.close()' style='flex:1;padding:9px;background:#1a1a2e;border:1.5px solid rgba(255,255,255,.15);border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;color:#e8ecf4'>&larr; Cerrar</button>"
-      +"<button id='pdf-btn' onclick='exportarPDF()' style='flex:2;padding:9px;background:#003087;border:none;border-radius:7px;font-size:12px;font-weight:800;cursor:pointer;color:white'>Guardar como PDF</button>"
+      +"<button onclick='window.print()' style='flex:2;padding:9px;background:#003087;border:none;border-radius:7px;font-size:12px;font-weight:800;cursor:pointer;color:white'>Guardar como PDF</button>"
       +"</div>"
       +"<div class='header'>"
       +"<div style='display:flex;align-items:center;gap:10px'>"
@@ -1891,37 +1871,9 @@ function initUI(){
       +"<span>"+p.tipo+" &bull; "+p.fecha+"</span>"
       +"<span>PIGER &bull; Censo 2020 INEGI</span>"
       +"</div></div></body></html>";
-    // Crear iframe oculto para renderizar la ficha
-    var iframe=document.createElement("iframe");
-    iframe.style.cssText="position:fixed;top:-9999px;left:-9999px;width:794px;height:1123px;border:none;z-index:-1";
-    document.body.appendChild(iframe);
-    iframe.contentDocument.open();
-    iframe.contentDocument.write(html);
-    iframe.contentDocument.close();
-    toast("Generando PDF...");
-    setTimeout(function(){
-      var fichaEl=iframe.contentDocument.querySelector(".ficha");
-      if(!fichaEl){toast("Error al generar PDF");document.body.removeChild(iframe);return;}
-      html2canvas(fichaEl,{
-        scale:2,useCORS:true,backgroundColor:"#ffffff",
-        logging:false,
-        width:fichaEl.scrollWidth,
-        height:fichaEl.scrollHeight
-      }).then(function(canvas){
-        var imgData=canvas.toDataURL("image/jpeg",0.92);
-        var pdf=new window.jspdf.jsPDF({orientation:"portrait",unit:"mm",format:"a4"});
-        var pdfW=pdf.internal.pageSize.getWidth();
-        var pdfH=(canvas.height*pdfW)/canvas.width;
-        if(pdfH>297){pdf.addImage(imgData,"JPEG",0,0,pdfW,297);}
-        else{pdf.addImage(imgData,"JPEG",0,0,pdfW,pdfH);}
-        pdf.save("ficha-bafar-"+p.nombre.replace(/\s+/g,"-")+".pdf");
-        document.body.removeChild(iframe);
-        toast("PDF guardado");
-      }).catch(function(e){
-        toast("Error: "+e.message);
-        document.body.removeChild(iframe);
-      });
-    },1500);
+    var win=window.open("","_blank");
+    if(win){win.document.write(html);win.document.close();}
+    else{toast("Permite ventanas emergentes para generar PDF");}
   }
 
   document.getElementById("btn-heatmap-detail").addEventListener("click",function(){
