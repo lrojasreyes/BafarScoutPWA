@@ -21,7 +21,7 @@ export default async function handler(req, res) {
     const c1=M,c2=M+95,cW=90;
     let y1=42,y2=42;
     const dg=p.denue&&p.denue.desglose?p.denue.desglose:{};
-    const dgRows=Math.min(Object.keys(dg).length,8);
+    const dgRows=Object.keys(dg).length;
     const dgH=dgRows*5+22;
     doc.setFillColor(248,249,250);doc.roundedRect(c1,y1,cW,dgH,2,2,"F");doc.setDrawColor(229,231,235);doc.roundedRect(c1,y1,cW,dgH,2,2,"S");
     doc.setFontSize(7);doc.setFont("helvetica","bold");doc.setTextColor(...gris);doc.text("DENUE RADIO "+(p.radio||1000)+"M",c1+3,y1+5);
@@ -31,7 +31,7 @@ export default async function handler(req, res) {
     doc.setFontSize(13);doc.setFont("helvetica","bold");doc.setTextColor(...dorado);
     doc.text(String(p.denue?p.denue.rest||0:0),c1+23,y1+18,{align:"center"});doc.text(String(p.denue?p.denue.tot||0:0),c1+69,y1+18,{align:"center"});
     let gy=y1+24;
-    Object.keys(dg).sort((a,b)=>dg[b]-dg[a]).slice(0,8).forEach(g=>{
+    Object.keys(dg).sort((a,b)=>dg[b]-dg[a]).forEach(g=>{
       doc.setFontSize(7);doc.setFont("helvetica","normal");doc.setTextColor(55,65,81);doc.text(g,c1+3,gy);
       doc.setFont("helvetica","bold");doc.setTextColor(...dorado);doc.text(String(dg[g]),c1+cW-3,gy,{align:"right"});gy+=5;
     });
