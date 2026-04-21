@@ -192,8 +192,8 @@ textarea{resize:none;min-height:80px}
           <div class="sh"><span style="font-size:18px">📊</span><span style="font-size:14px;font-weight:700;color:#e8a020">DENUE / INEGI</span></div>
           <div class="sb">
             <div class="r2">
-              <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">Restaurantes</div><div style="font-size:22px;font-weight:800;color:#f0c050" id="det-rest">-</div></div>
-              <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">DENUEs</div><div style="font-size:22px;font-weight:800;color:#f0c050" id="det-com">-</div></div>
+              <div></div>
+              <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">DENUEs Total</div><div style="font-size:22px;font-weight:800;color:#f0c050" id="det-com">-</div></div>
             </div>
             <div class="r2">
               <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">Viviendas</div><div style="font-size:22px;font-weight:800;color:#22d18a" id="det-viv">-</div></div>
@@ -281,6 +281,7 @@ textarea{resize:none;min-height:80px}
         </div>
         <button class="btn" id="btn-edit-detail" style="margin-bottom:8px">✏️ EDITAR PROSPECTO</button>
         <button class="btn" id="btn-share-detail" style="margin-bottom:8px;background:rgba(34,209,138,.15);border-color:#22d18a;color:#22d18a">📤 COMPARTIR</button>
+        <button class="btn" id="btn-pdf-detail" style="margin-bottom:8px;background:rgba(0,48,135,.3);border-color:#3a8fff;color:#3a8fff">⬇️ DESCARGAR PDF</button>
         <button class="btn" id="btn-heatmap-detail" style="margin-bottom:8px;background:rgba(240,192,80,.15);border-color:#f0c050;color:#f0c050">🔥 MAPA DE CALOR DENUE</button>
         <div style="height:20px"></div>
       </div>
@@ -493,12 +494,11 @@ textarea{resize:none;min-height:80px}
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
           <div style="background:#162035;border-radius:10px;padding:14px;text-align:center">
-            <div style="font-size:10px;color:#6a7590;text-transform:uppercase;margin-bottom:4px">Restaurantes</div>
+            <div style="font-size:10px;color:#6a7590;text-transform:uppercase;margin-bottom:4px">DENUEs Total</div>
             <div style="font-size:24px;font-weight:800;color:#f0c050" id="qc-rest">-</div>
           </div>
           <div style="background:#162035;border-radius:10px;padding:14px;text-align:center">
-            <div style="font-size:10px;color:#6a7590;text-transform:uppercase;margin-bottom:4px">DENUEs Total</div>
-            <div style="font-size:24px;font-weight:800;color:#f0c050" id="qc-tot">-</div>
+            
           </div>
         </div>
         <div id="qc-desglose" style="background:#162035;border-radius:10px;padding:14px">
@@ -507,6 +507,7 @@ textarea{resize:none;min-height:80px}
         </div>
         <div style="margin-top:8px;font-size:11px;color:#6a7590;text-align:center" id="qc-coords"></div>
         <button id="qc-share-btn" style="width:100%;padding:12px;background:rgba(34,209,138,.15);border:1.5px solid #22d18a;border-radius:10px;color:#22d18a;font-weight:700;font-size:14px;cursor:pointer;margin-top:10px">📤 COMPARTIR CONSULTA</button>
+        <button id="qc-pdf-btn" style="width:100%;padding:12px;background:rgba(0,48,135,.3);border:1.5px solid #3a8fff;border-radius:10px;color:#3a8fff;font-weight:700;font-size:14px;cursor:pointer;margin-top:10px">⬇️ DESCARGAR PDF</button>
         <button id="qc-heat-btn" style="width:100%;padding:12px;background:rgba(240,192,80,.15);border:1.5px solid #f0c050;border-radius:10px;color:#f0c050;font-weight:700;font-size:14px;cursor:pointer;margin-top:10px">🔥 MAPA DE CALOR DENUE</button>
       </div>
     </div>
@@ -876,6 +877,41 @@ function mostrarSucursalCercana(lat,lng){
     document.getElementById("det-suc-ocas").textContent=(ocasKg/1000).toFixed(1)+" ton ("+ocasPct+"%)";
     document.getElementById("det-suc-zona").textContent=mejor.zona_operaciones||"";
   });
+}
+
+function descargarPDF(datos){
+  toast("Generando PDF...");
+  fetch("/api/pdf",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(datos)})
+    .then(function(r){if(!r.ok)throw new Error("Error "+r.status);return r.blob();})
+    .then(function(blob){
+      var url=URL.createObjectURL(blob);
+      var a=document.createElement("a");
+      a.href=url;
+      a.download="ficha-bafar-"+(datos.nombre||"prospecto").replace(/\s+/g,"-")+".pdf";
+      document.body.appendChild(a);a.click();document.body.removeChild(a);
+      URL.revokeObjectURL(url);toast("PDF descargado");
+    }).catch(function(e){toast("Error: "+e.message);});
+}
+
+function getDatosProspecto(p){
+  return {
+    nombre:p.nombre,direccion:p.direccion,ciudad:p.ciudad,estado:p.estado,
+    lat:p.lat,lng:p.lng,tipo:p.tipo,fecha:p.fecha,status:p.status,
+    operacion:p.operacion,precio:p.precio,m2Terreno:p.m2Terreno,
+    frente:p.frente,fondo:p.fondo,notas:p.notas,radio:RADIO,
+    denue:p.denue,inegi:p.inegi,
+    fotoUrl:p.fotos&&p.fotos.frente?p.fotos.frente:null,
+    proyRef:document.getElementById("det-proy-ref")?document.getElementById("det-proy-ref").textContent:null,
+    proyRango:document.getElementById("det-proy-rango")?document.getElementById("det-proy-rango").textContent:null,
+    proyPot:document.getElementById("det-proy-potencial")?document.getElementById("det-proy-potencial").textContent:null,
+    proyInst:document.getElementById("det-proy-inst")?document.getElementById("det-proy-inst").textContent:null,
+    proyOcas:document.getElementById("det-proy-ocas")?document.getElementById("det-proy-ocas").textContent:null,
+    proyBase:document.getElementById("det-proy-base")?document.getElementById("det-proy-base").textContent:null,
+    sucNombre:document.getElementById("det-suc-nombre")?document.getElementById("det-suc-nombre").textContent:null,
+    sucDist:document.getElementById("det-suc-dist")?document.getElementById("det-suc-dist").textContent:null,
+    sucVenta:document.getElementById("det-suc-venta")?document.getElementById("det-suc-venta").textContent:null,
+    sucZona:document.getElementById("det-suc-zona")?document.getElementById("det-suc-zona").textContent:null
+  };
 }
 
 function setSyncStatus(ok){
@@ -1361,7 +1397,6 @@ function openDetail(id){
   else supEl.style.display="none";
   if(p.denue){
     document.getElementById("det-denue-sec").style.display="block";
-    document.getElementById("det-rest").textContent=p.denue.rest||0;
     document.getElementById("det-com").textContent=p.denue.tot||0;
     if(p.lat&&p.lng)mostrarSucursalCercana(p.lat,p.lng);
     var _pob=p.inegi&&p.inegi.pob?p.inegi.pob:null;
@@ -1521,6 +1556,28 @@ function initUI(){
     if(!coords){toast("Ingresa coordenadas primero");return;}
     var p={nombre:"Consulta Rapida",lat:coords.lat,lng:coords.lng,ciudad:"",estado:""};
     abrirMapaCalorDENUE(p);
+  });
+
+  document.getElementById("qc-pdf-btn").addEventListener("click",function(){
+    var coords=qcParseInput(document.getElementById("qc-input").value);
+    if(!coords){toast("Ingresa coordenadas primero");return;}
+    var denue={tot:parseInt(document.getElementById("qc-rest").textContent)||0,rest:0,desglose:{}};
+    var desgEl=document.getElementById("qc-desglose-list");
+    if(desgEl){
+      desgEl.querySelectorAll("div").forEach(function(d){
+        var spans=d.querySelectorAll("span");
+        if(spans.length>=2){denue.desglose[spans[0].textContent]=parseInt(spans[1].textContent)||0;}
+      });
+    }
+    var pobEl=document.getElementById("qc-pob");
+    var vivEl=document.getElementById("qc-viv");
+    var datos={
+      nombre:"Consulta Rapida",lat:coords.lat,lng:coords.lng,
+      tipo:"Consulta",fecha:new Date().toISOString().split("T")[0],
+      status:"prospecto",radio:RADIO,denue:denue,
+      inegi:{pob:pobEl?parseFloat(pobEl.textContent)*1000:0,viv:vivEl?parseInt(vivEl.textContent.replace(/,/g,""))||0:0}
+    };
+    descargarPDF(datos);
   });
 
   // Compartir consulta rápida
@@ -1875,6 +1932,12 @@ function initUI(){
     if(win){win.document.write(html);win.document.close();}
     else{toast("Permite ventanas emergentes para generar PDF");}
   }
+
+  document.getElementById("btn-pdf-detail").addEventListener("click",function(){
+    var id=document.getElementById("btn-edit-detail").dataset.id;
+    var p=PS.find(function(x){return x.id===id;});
+    if(p)descargarPDF(getDatosProspecto(p));
+  });
 
   document.getElementById("btn-heatmap-detail").addEventListener("click",function(){
     var id=document.getElementById("btn-edit-detail").dataset.id;
