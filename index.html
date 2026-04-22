@@ -776,7 +776,7 @@ function cargarSucursales(cb){
   fetch("https://pjacmizmjsjwxtoldpvr.supabase.co/rest/v1/sucursales_bafar?select=nombre,latitud,longitud,venta_kg,venta_kg_institucional,venta_kg_consumo,ratio_institucional,zona_operaciones,tipo_tienda&limit=400",{
     headers:{"apikey":"sb_publishable_zy_iwqAnOgx0N8xElowU8A_CwpJ71_K","Authorization":"Bearer sb_publishable_zy_iwqAnOgx0N8xElowU8A_CwpJ71_K"}
   }).then(function(r){return r.json();}).then(function(data){
-    _sucursalesCache=Array.isArray(data)?data:[];
+    _sucursalesCache=Array.isArray(data)?data.filter(function(s){return s.venta_kg&&s.venta_kg>0;}):[];
     cb(_sucursalesCache);
   }).catch(function(){cb([]);});
 }
