@@ -847,6 +847,65 @@ function mostrarSucursalCercana(lat,lng){
   if(info)info.style.display="none";
   if(err)err.style.display="none";
 
+  // Cargar TODAS las sucursales (con y sin venta)
+  fetch("https://pjacmizmjsjwxtoldpvr.supabase.co/rest/v1/sucursales_bafar?select=nombre,latitud,longitud,venta_kg,venta_kg_institucional,venta_kg_consumo,ratio_institucional,zona_operaciones,tipo_tienda&limit=400",{
+    headers:{"apikey":"sb_publishable_zy_iwqAnOgx0N8xElowU8A_CwpJ71_K","Authorization":"Bearer sb_publishable_zy_iwqAnOgx0N8xElowU8A_CwpJ71_K"}
+  }).then(function(r){return r.json();}).then(function(suc){
+    if(!suc||!suc.length){
+      if(loading)loading.style.display="none";
+      if(err)err.style.display="block";return;
+    }
+
+    // Ordenar todas por distancia
+    var conDist=suc.filter(function(s){return s.latitud&&s.longitud;}).map(function(s){
+      return {s:s,dist:haversineKm(lat,lng,s.latitud,s.longitud)};
+    }).sort(function(a,b){return a.dist-b.dist;});
+
+    // La mas cercana (puede ser reciente apertura)
+    var cercana=conDist[0];
+    // La mas cercana CON venta real
+    var conVenta=conDist.find(function(x){return x.s.venta_kg&&x.s.venta_kg>0;});
+
+    if(loading)loading.style.display="none";
+    if(!cercana){if(err)err.style.display="block";return;}
+    if(info)info.style.display="block";
+
+    var esNueva=!cercana.s.venta_kg||cercana.s.venta_kg<=0;
+    var mostrar=esNueva&&conVenta?conVenta:cercana;
+    var distStr=mostrar.dist<1?(mostrar.dist*1000).toFixed(0)+"m":mostrar.dist.toFixed(1)+"km";
+    var ventaKg=mostrar.s.venta_kg||0;
+    var instKg=mostrar.s.venta_kg_institucional||0;
+    var ocasKg=mostrar.s.venta_kg_consumo||0;
+    var instPct=ventaKg>0?(instKg/ventaKg*100).toFixed(0):0;
+    var ocasPct=ventaKg>0?(ocasKg/ventaKg*100).toFixed(0):0;
+
+    // Mostrar nombre con nota si hay una mas cercana de reciente apertura
+    var nombreMostrar=mostrar.s.nombre||"-";
+    if(esNueva&&conVenta&&mostrar!==cercana){
+      nombreMostrar=mostrar.s.nombre+" *";
+    }
+
+    document.getElementById("det-suc-nombre").textContent=nombreMostrar;
+    document.getElementById("det-suc-dist").textContent=distStr;
+    document.getElementById("det-suc-venta").textContent=(ventaKg/1000).toFixed(1)+" ton/mes";
+    document.getElementById("det-suc-inst").textContent=(instKg/1000).toFixed(1)+" ton ("+instPct+"%)";
+    document.getElementById("det-suc-ocas").textContent=(ocasKg/1000).toFixed(1)+" ton ("+ocasPct+"%)";
+
+    // Zona con nota de reciente apertura si aplica
+    var zonaText=mostrar.s.zona_operaciones||"";
+    if(esNueva&&conVenta&&mostrar!==cercana){
+      zonaText="* "+cercana.s.nombre+" es la más cercana — reciente apertura, sin datos de venta";
+    }
+    document.getElementById("det-suc-zona").textContent=zonaText;
+  }).catch(function(){if(loading)loading.style.display="none";if(err)err.style.display="block";});
+}nction mostrarSucursalCercana(lat,lng){
+  var loading=document.getElementById("det-sucursal-loading");
+  var info=document.getElementById("det-sucursal-info");
+  var err=document.getElementById("det-sucursal-error");
+  if(loading)loading.style.display="block";
+  if(info)info.style.display="none";
+  if(err)err.style.display="none";
+
   cargarSucursales(function(suc){
     if(!suc||!suc.length){
       if(loading)loading.style.display="none";
