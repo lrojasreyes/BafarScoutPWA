@@ -1160,6 +1160,8 @@ function geo(){
   }).catch(function(){});
 }
 
+async function getCompetencia(lat,lng,radioM){var SUPA="https://pjacmizmjsjwxtoldpvr.supabase.co";var KEY="sb_publishable_zy_iwqAnOgx0N8xElowU8A_CwpJ71_K";var grado=radioM/111320;try{var r=await fetch(SUPA+"/rest/v1/competencia_carnicerias?select=cadena,sucursal,estado,lat,lng",{headers:{apikey:KEY,Authorization:"Bearer "+KEY}});var data=await r.json();if(Array.isArray(data)==false)return[];return data.filter(function(c){var dl=c.lat-lat,dg=(c.lng-lng)*Math.cos(lat*Math.PI/180);return Math.sqrt(dl*dl+dg*dg)<=grado;});}catch(e){return[]}}
+
 function showD(){
   document.getElementById("dsec").style.display="block";
   document.getElementById("dc").innerHTML="<div style='padding:20px;display:flex;align-items:center;gap:12px'><div class='spin'></div><span style='color:#6a7590;font-size:13px'>Consultando DENUE "+RADIO+"m...</span></div>";
@@ -1411,6 +1413,7 @@ function openDetail(id){
   var supEl=document.getElementById("det-superficie");
   if(fr&&fo){supEl.style.display="block";supEl.textContent="Superficie: "+(fr*fo).toFixed(1)+" m²";}
   else supEl.style.display="none";
+  if(p.competencia&&p.competencia.length>0){var cH="<div style=margin-bottom:10px><b style=color:#003087>Competencia ("+p.competencia.length+")</b>"+p.competencia.map(function(c){return "<div>* "+c.cadena+" - "+c.sucursal+"</div>";}).join("")+"</div>";var det=document.getElementById("p-det");if(det){var ins=det.querySelector("div");if(ins)ins.insertAdjacentHTML("afterbegin",cH);}}
   if(p.denue){
     document.getElementById("det-denue-sec").style.display="block";
     document.getElementById("det-rest").textContent=p.denue.rest||0;
