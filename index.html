@@ -1223,6 +1223,8 @@ function showD(){
     if(r1&&r1.real){R={real:true,rest:r1.restaurantes||0,com:r1.comercios||0,tot:r1.total||0,desglose:r1.desglose||{},viv:0,pob:0};}
     if(!R){var rest=30+Math.floor(Math.random()*100),com=100+Math.floor(Math.random()*300),tot=rest+com+150+Math.floor(Math.random()*400),viv=2000+Math.floor(Math.random()*7000);R={real:false,rest:rest,com:com,tot:tot,viv:viv,pob:Math.round(viv*3.5)};}
     DR=R;
+    DR.competencia=[];
+    getCompetencia(lat,lng,RADIO).then(function(c){DR.competencia=c;});
     if(R.real){
       fetch("https://nominatim.openstreetmap.org/reverse?lat="+lat+"&lon="+lng+"&format=json")
       .then(function(x){return x.json();}).then(function(nd){
@@ -1339,6 +1341,7 @@ function saveP(){
       fotos:Object.values(PH).some(function(v){return v;})?PH:(existing?existing.fotos:{frente:null,lateral:null,entorno:null}),
       denue:editId?(existing?existing.denue:null):(DR&&DR.real?{rest:DR.rest,com:DR.com,tot:DR.tot,desglose:DR.desglose||{}}:null),
       inegi:editId?(existing?existing.inegi:null):(DR&&DR.real?{viv:DR.viv,pob:DR.pob}:null),
+      competencia:editId?(existing?existing.competencia||[]:[]): (DR&&DR.competencia?DR.competencia:[]),
       documentos:docState
     };
     if(editId){
