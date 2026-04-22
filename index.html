@@ -776,7 +776,7 @@ function cargarSucursales(cb){
   fetch("https://pjacmizmjsjwxtoldpvr.supabase.co/rest/v1/sucursales_bafar?select=nombre,latitud,longitud,venta_kg,venta_kg_institucional,venta_kg_consumo,ratio_institucional,zona_operaciones,tipo_tienda&limit=400",{
     headers:{"apikey":"sb_publishable_zy_iwqAnOgx0N8xElowU8A_CwpJ71_K","Authorization":"Bearer sb_publishable_zy_iwqAnOgx0N8xElowU8A_CwpJ71_K"}
   }).then(function(r){return r.json();}).then(function(data){
-    _sucursalesCache=Array.isArray(data)?data.filter(function(s){return s.venta_kg&&s.venta_kg>0;}):[];
+    _sucursalesCache=Array.isArray(data)?data:[];
     cb(_sucursalesCache);
   }).catch(function(){cb([]);});
 }
@@ -846,94 +846,38 @@ function mostrarSucursalCercana(lat,lng){
   if(loading)loading.style.display="block";
   if(info)info.style.display="none";
   if(err)err.style.display="none";
-
-  // Cargar TODAS las sucursales (con y sin venta)
-  fetch("https://pjacmizmjsjwxtoldpvr.supabase.co/rest/v1/sucursales_bafar?select=nombre,latitud,longitud,venta_kg,venta_kg_institucional,venta_kg_consumo,ratio_institucional,zona_operaciones,tipo_tienda&limit=400",{
-    headers:{"apikey":"sb_publishable_zy_iwqAnOgx0N8xElowU8A_CwpJ71_K","Authorization":"Bearer sb_publishable_zy_iwqAnOgx0N8xElowU8A_CwpJ71_K"}
-  }).then(function(r){return r.json();}).then(function(suc){
-    if(!suc||!suc.length){
+  cargarSucursales(function(){
+    fetch("https://pjacmizmjsjwxtoldpvr.supabase.co/rest/v1/sucursales_bafar?select=nombre,latitud,longitud,venta_kg,venta_kg_institucional,venta_kg_consumo,zona_operaciones&limit=400",{
+      headers:{"apikey":"sb_publishable_zy_iwqAnOgx0N8xElowU8A_CwpJ71_K","Authorization":"Bearer sb_publishable_zy_iwqAnOgx0N8xElowU8A_CwpJ71_K"}
+    }).then(function(r){return r.json();}).then(function(todas){
       if(loading)loading.style.display="none";
-      if(err)err.style.display="block";return;
-    }
-
-    // Ordenar todas por distancia
-    var conDist=suc.filter(function(s){return s.latitud&&s.longitud;}).map(function(s){
-      return {s:s,dist:haversineKm(lat,lng,s.latitud,s.longitud)};
-    }).sort(function(a,b){return a.dist-b.dist;});
-
-    // La mas cercana (puede ser reciente apertura)
-    var cercana=conDist[0];
-    // La mas cercana CON venta real
-    var conVenta=conDist.find(function(x){return x.s.venta_kg&&x.s.venta_kg>0;});
-
-    if(loading)loading.style.display="none";
-    if(!cercana){if(err)err.style.display="block";return;}
-    if(info)info.style.display="block";
-
-    var esNueva=!cercana.s.venta_kg||cercana.s.venta_kg<=0;
-    var mostrar=esNueva&&conVenta?conVenta:cercana;
-    var distStr=mostrar.dist<1?(mostrar.dist*1000).toFixed(0)+"m":mostrar.dist.toFixed(1)+"km";
-    var ventaKg=mostrar.s.venta_kg||0;
-    var instKg=mostrar.s.venta_kg_institucional||0;
-    var ocasKg=mostrar.s.venta_kg_consumo||0;
-    var instPct=ventaKg>0?(instKg/ventaKg*100).toFixed(0):0;
-    var ocasPct=ventaKg>0?(ocasKg/ventaKg*100).toFixed(0):0;
-
-    // Mostrar nombre con nota si hay una mas cercana de reciente apertura
-    var nombreMostrar=mostrar.s.nombre||"-";
-    if(esNueva&&conVenta&&mostrar!==cercana){
-      nombreMostrar=mostrar.s.nombre+" *";
-    }
-
-    document.getElementById("det-suc-nombre").textContent=nombreMostrar;
-    document.getElementById("det-suc-dist").textContent=distStr;
-    document.getElementById("det-suc-venta").textContent=(ventaKg/1000).toFixed(1)+" ton/mes";
-    document.getElementById("det-suc-inst").textContent=(instKg/1000).toFixed(1)+" ton ("+instPct+"%)";
-    document.getElementById("det-suc-ocas").textContent=(ocasKg/1000).toFixed(1)+" ton ("+ocasPct+"%)";
-
-    // Zona con nota de reciente apertura si aplica
-    var zonaText=mostrar.s.zona_operaciones||"";
-    if(esNueva&&conVenta&&mostrar!==cercana){
-      zonaText="* "+cercana.s.nombre+" es la más cercana — reciente apertura, sin datos de venta";
-    }
-    document.getElementById("det-suc-zona").textContent=zonaText;
-  }).catch(function(){if(loading)loading.style.display="none";if(err)err.style.display="block";});
-}nction mostrarSucursalCercana(lat,lng){
-  var loading=document.getElementById("det-sucursal-loading");
-  var info=document.getElementById("det-sucursal-info");
-  var err=document.getElementById("det-sucursal-error");
-  if(loading)loading.style.display="block";
-  if(info)info.style.display="none";
-  if(err)err.style.display="none";
-
-  cargarSucursales(function(suc){
-    if(!suc||!suc.length){
-      if(loading)loading.style.display="none";
-      if(err)err.style.display="block";
-      return;
-    }
-    var mejor=null,mejorDist=999999;
-    suc.forEach(function(s){
-      if(!s.latitud||!s.longitud)return;
-      var d=haversineKm(lat,lng,s.latitud,s.longitud);
-      if(d<mejorDist){mejorDist=d;mejor=s;}
-    });
-    if(loading)loading.style.display="none";
-    if(!mejor){if(err)err.style.display="block";return;}
-    if(info)info.style.display="block";
-    var distStr=mejorDist<1?(mejorDist*1000).toFixed(0)+"m":mejorDist.toFixed(1)+"km";
-    var ventaKg=mejor.venta_kg||0;
-    var ventaTon=(ventaKg/1000).toFixed(1);
-    var instKg=mejor.venta_kg_institucional||0;
-    var ocasKg=mejor.venta_kg_consumo||0;
-    var instPct=ventaKg>0?(instKg/ventaKg*100).toFixed(0):0;
-    var ocasPct=ventaKg>0?(ocasKg/ventaKg*100).toFixed(0):0;
-    document.getElementById("det-suc-nombre").textContent=mejor.nombre||"-";
-    document.getElementById("det-suc-dist").textContent=distStr;
-    document.getElementById("det-suc-venta").textContent=(ventaKg/1000).toFixed(1)+" ton/mes";
-    document.getElementById("det-suc-inst").textContent=(instKg/1000).toFixed(1)+" ton ("+instPct+"%)";
-    document.getElementById("det-suc-ocas").textContent=(ocasKg/1000).toFixed(1)+" ton ("+ocasPct+"%)";
-    document.getElementById("det-suc-zona").textContent=mejor.zona_operaciones||"";
+      if(!todas||!todas.length){if(err)err.style.display="block";return;}
+      var ordenadas=todas.filter(function(s){return s.latitud&&s.longitud;}).map(function(s){
+        return {s:s,dist:haversineKm(lat,lng,parseFloat(s.latitud),parseFloat(s.longitud))};
+      }).sort(function(a,b){return a.dist-b.dist;});
+      var cercana=ordenadas[0];
+      var conVenta=ordenadas.find(function(x){return x.s.venta_kg&&parseFloat(x.s.venta_kg)>0;});
+      if(!cercana){if(err)err.style.display="block";return;}
+      if(info)info.style.display="block";
+      var esNueva=!cercana.s.venta_kg||parseFloat(cercana.s.venta_kg)<=0;
+      var usar=esNueva&&conVenta?conVenta:cercana;
+      var distStr=usar.dist<1?(usar.dist*1000).toFixed(0)+"m":usar.dist.toFixed(1)+"km";
+      var vkg=parseFloat(usar.s.venta_kg)||0;
+      var ikg=parseFloat(usar.s.venta_kg_institucional)||0;
+      var okg=parseFloat(usar.s.venta_kg_consumo)||0;
+      var ipct=vkg>0?Math.round(ikg/vkg*100):0;
+      var opct=vkg>0?Math.round(okg/vkg*100):0;
+      document.getElementById("det-suc-nombre").textContent=usar.s.nombre||"-";
+      document.getElementById("det-suc-dist").textContent=distStr;
+      document.getElementById("det-suc-venta").textContent=(vkg/1000).toFixed(1)+" ton/mes";
+      document.getElementById("det-suc-inst").textContent=(ikg/1000).toFixed(1)+" ton ("+ipct+"%)";
+      document.getElementById("det-suc-ocas").textContent=(okg/1000).toFixed(1)+" ton ("+opct+"%)";
+      var zona=usar.s.zona_operaciones||"";
+      if(esNueva&&conVenta&&usar!==cercana){
+        zona=cercana.s.nombre+" — Reciente apertura, sin datos de venta aún";
+      }
+      document.getElementById("det-suc-zona").textContent=zona;
+    }).catch(function(){if(loading)loading.style.display="none";if(err)err.style.display="block";});
   });
 }
 
