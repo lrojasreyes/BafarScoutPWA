@@ -57,7 +57,8 @@ export default async function handler(req, res) {
   const passwordTemporal = generarPasswordTemporal();
 
   // Crear usuario via Admin API (no requiere cuota de invitaciones)
-  const cr = await fetch(`${SURL}/auth/v1/admin/users`, {
+  console.log('[invite] v2 — llamando /auth/v1/admin/users para:', email);
+  const response = await fetch(`${SURL}/auth/v1/admin/users`, {
     method: "POST",
     headers: {
       apikey: serviceKey,
@@ -72,27 +73,19 @@ export default async function handler(req, res) {
     })
   });
 
-  console.log("[invite] createUser status:", cr.status);
-  const crBody = await cr.text();
-  console.log("[invite] createUser body:", crBody);
+  const body = await response.json().catch(() => ({}));
+  console.log('[invite] status:', response.status);
+  console.log('[invite] body:', JSON.stringify(body));
 
-  if (!cr.ok) {
-    let err;
-    try { err = JSON.parse(crBody); } catch(e) { err = {}; }
-    // Si el usuario ya existe, buscar su id para actualizar perfiles
-    if (cr.status === 422 || (err.msg||err.message||"").toLowerCase().includes("already")) {
+  if (!response.ok) {
+    if (response.status === 422 || (body.msg||body.message||"").toLowerCase().includes("already")) {
       res.status(400).json({ error: "El usuario ya existe con ese email" }); return;
     }
-    res.status(400).json({ error: err.msg || err.message || "Error al crear usuario" }); return;
-  }
-
-  let nuevoUsuario;
-  try { nuevoUsuario = JSON.parse(crBody); } catch(e) {
-    res.status(500).json({ error: "Respuesta inesperada de Supabase" }); return;
+    res.status(400).json({ error: body.msg || body.message || "Error al crear usuario (status "+response.status+")" }); return;
   }
 
   // Insertar/actualizar en perfiles
-  if (nuevoUsuario.id) {
+  if (body.id) {
     await fetch(`${SURL}/rest/v1/perfiles`, {
       method: "POST",
       headers: {
@@ -101,7 +94,7 @@ export default async function handler(req, res) {
         "Content-Type": "application/json",
         Prefer: "resolution=merge-duplicates"
       },
-      body: JSON.stringify({ user_id: nuevoUsuario.id, email, rol, activo: true })
+      body: JSON.stringify({ user_id: body.id, email, rol, activo: true })
     });
   }
 
