@@ -830,10 +830,10 @@ function initMapaGlobal(lista,em){
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
       attribution:"© OpenStreetMap",maxZoom:18
     }).addTo(_mapaGlobal);
-    _mapaGlobal.on('popupopen',function(e){
-      var btn=e.popup.getElement().querySelector('.btn-ficha-pdf-global');
+    _mapaGlobal.on('popupopen',function(){
+      var btn=document.querySelector('.btn-ficha-pdf-global');
       if(btn) btn.addEventListener('click',function(){
-        generarFichaPDFGlobal(this.dataset.id);
+        window.generarFichaPDFGlobal(this.dataset.id);
       });
     });
   }
@@ -883,11 +883,11 @@ function actualizarMapaGlobal(lista,em){
   _mapaGlobal.fitBounds([[Math.min.apply(null,lats),Math.min.apply(null,lngs)],[Math.max.apply(null,lats),Math.max.apply(null,lngs)]],{padding:[30,30]});
 }
 
-function generarFichaPDFGlobal(id){
+window.generarFichaPDFGlobal=function(id){
   var p=window._DIR_IDX&&window._DIR_IDX[id];
   if(!p){toast("Prospecto no encontrado");return;}
   generarFichaPDF(p);
-}
+};
 
 function abrirMapaCalorDENUE(p){
   var r=RADIO;
@@ -1263,6 +1263,10 @@ function cargarUsuariosAdmin(){
     fetch("/api/admin-users",{headers:{"Authorization":"Bearer "+token}})
       .then(function(r){return r.json();})
       .then(function(usuarios){
+        if(usuarios&&usuarios.error){
+          document.getElementById("admin-users-list").innerHTML="<div style='color:#f05060;padding:20px'>Error: "+usuarios.error+"</div>";
+          return;
+        }
         if(!Array.isArray(usuarios)||!usuarios.length){
           document.getElementById("admin-users-list").innerHTML="<div style='text-align:center;padding:40px;color:#6a7590'>Sin usuarios registrados</div>";
           return;

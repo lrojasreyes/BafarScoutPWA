@@ -1,17 +1,28 @@
 const SURL = "https://pjacmizmjsjwxtoldpvr.supabase.co";
 
+function decodeJWT(token) {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+    const payload = Buffer.from(parts[1].replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString();
+    return JSON.parse(payload);
+  } catch(e) { return null; }
+}
+
 async function verificarAdmin(token, serviceKey) {
-  const ur = await fetch(`${SURL}/auth/v1/user`, {
-    headers: { apikey: serviceKey, Authorization: `Bearer ${token}` }
-  });
-  if (!ur.ok) return null;
-  const user = await ur.json();
-  const pr = await fetch(`${SURL}/rest/v1/perfiles?user_id=eq.${user.id}&select=rol,activo`, {
+  const claims = decodeJWT(token);
+  if (!claims || !claims.sub) return null;
+  const userId = claims.sub;
+
+  const pr = await fetch(`${SURL}/rest/v1/perfiles?user_id=eq.${userId}&select=rol,activo`, {
     headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` }
   });
-  const [perfil] = await pr.json();
+  if (!pr.ok) return null;
+  const rows = await pr.json();
+  if (!Array.isArray(rows)) return null;
+  const [perfil] = rows;
   if (!perfil || perfil.rol !== "admin" || !perfil.activo) return null;
-  return user;
+  return { id: userId };
 }
 
 export default async function handler(req, res) {
@@ -32,7 +43,7 @@ export default async function handler(req, res) {
       headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` }
     });
     const usuarios = await r.json();
-    res.status(200).json(usuarios);
+    res.status(200).json(Array.isArray(usuarios) ? usuarios : []);
     return;
   }
 
