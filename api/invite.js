@@ -3,16 +3,10 @@ const SURL = "https://pjacmizmjsjwxtoldpvr.supabase.co";
 function decodeJWT(token) {
   try {
     const parts = token.split('.');
-    if (parts.length !== 3) {
-      console.log("[invite] JWT no tiene 3 partes:", parts.length);
-      return null;
-    }
+    if (parts.length !== 3) return null;
     const b64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
     const padded = b64 + '='.repeat((4 - b64.length % 4) % 4);
-    const payload = Buffer.from(padded, 'base64').toString('utf8');
-    const parsed = JSON.parse(payload);
-    console.log("[invite] JWT decoded sub:", parsed.sub, "email:", parsed.email);
-    return parsed;
+    return JSON.parse(Buffer.from(padded, 'base64').toString('utf8'));
   } catch(e) {
     console.log("[invite] Error decodificando JWT:", e.message);
     return null;
@@ -27,17 +21,17 @@ export default async function handler(req, res) {
   if (req.method !== "POST") { res.status(405).end(); return; }
 
   const serviceKey = process.env.SUPABASE_SERVICE_KEY;
-  console.log("[invite] SUPABASE_SERVICE_KEY presente:", !!serviceKey);
+  console.log("[invite] serviceKey presente:", !!serviceKey);
   if (!serviceKey) { res.status(500).json({ error: "SUPABASE_SERVICE_KEY no configurada en Vercel" }); return; }
 
   const token = (req.headers.authorization || "").replace("Bearer ", "");
   const claims = decodeJWT(token);
-  if (!claims || !claims.sub) { res.status(401).json({ error: "Token inválido" }); return; }
+  if (!claims || !claims.email) { res.status(401).json({ error: "Token inválido" }); return; }
 
-  const userId = claims.sub;
-  const url = `${SURL}/rest/v1/perfiles?user_id=eq.${userId}&select=rol,activo`;
-  console.log("[invite] Consultando perfiles:", url);
+  const email = claims.email;
+  console.log("[invite] Verificando admin para email:", email);
 
+  const url = `${SURL}/rest/v1/perfiles?email=eq.${encodeURIComponent(email)}&select=rol,activo`;
   const pr = await fetch(url, {
     headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` }
   });
@@ -54,8 +48,8 @@ export default async function handler(req, res) {
     res.status(403).json({ error: "Solo administradores pueden invitar usuarios" }); return;
   }
 
-  const { email, rol = "usuario" } = req.body;
-  if (!email) { res.status(400).json({ error: "Email requerido" }); return; }
+  const { email: emailInvitado, rol = "usuario" } = req.body;
+  if (!emailInvitado) { res.status(400).json({ error: "Email requerido" }); return; }
   if (!["admin","director","usuario"].includes(rol)) {
     res.status(400).json({ error: "Rol invalido" }); return;
   }
@@ -67,7 +61,7 @@ export default async function handler(req, res) {
       Authorization: `Bearer ${serviceKey}`,
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ email })
+    body: JSON.stringify({ email: emailInvitado })
   });
 
   if (!ir.ok) {
@@ -85,9 +79,9 @@ export default async function handler(req, res) {
         "Content-Type": "application/json",
         Prefer: "resolution=merge-duplicates"
       },
-      body: JSON.stringify({ user_id: invited.id, email, rol, activo: true })
+      body: JSON.stringify({ user_id: invited.id, email: emailInvitado, rol, activo: true })
     });
   }
 
-  res.status(200).json({ ok: true, email });
+  res.status(200).json({ ok: true, email: emailInvitado });
 }
