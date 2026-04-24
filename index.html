@@ -1854,18 +1854,7 @@ function initUI(){
   }
 
   function generarFichaPDF(p){
-    var dg=p.denue&&p.denue.desglose?p.denue.desglose:{};
-    var dgItems=Object.keys(dg).sort(function(a,b){return dg[b]-dg[a];});
-    var dgHTML=dgItems.map(function(g){return "<tr><td style='padding:3px 6px;border-bottom:1px solid #f0f0f0;font-size:11px;color:#374151'>"+g+"</td><td style='padding:3px 6px;border-bottom:1px solid #f0f0f0;font-weight:700;text-align:right;font-size:11px'>"+dg[g]+"</td></tr>";}).join("");
-    var foto1=p.fotos&&p.fotos.frente?p.fotos.frente:null;
-    var foto2=p.fotos&&p.fotos.lateral?p.fotos.lateral:null;
-    var foto3=p.fotos&&p.fotos.entorno?p.fotos.entorno:null;
-    var gmapsUrl="https://www.google.com/maps?q="+p.lat+","+p.lng+"&z=16";
-    var statusLabel=p.status==="viable"?"VIABLE":p.status==="descartado"?"DESCARTADO":"PROSPECTO";
-    var statusColor=p.status==="viable"?"#22d18a":p.status==="descartado"?"#ef4444":"#3a8fff";
-    var rentaZonaVal="-";
-    try{var rr=RENTAS_CACHE[p.ciudad]||null;if(!rr&&p.ciudad){var ck=Object.keys(RENTAS_CACHE).find(function(k){return k.toLowerCase().includes(p.ciudad.toLowerCase());});if(ck)rr=RENTAS_CACHE[ck];}if(rr){var rv2=getRentaValores(rr,p.tipo,p.operacion);if(rv2&&rv2.zona)rentaZonaVal="$"+rv2.zona+"/m\u00b2";}}catch(e){}
-    var fotoSrc=foto1||foto2||foto3;
+    var fotoSrc=p.fotos&&p.fotos.frente?p.fotos.frente:p.fotos&&p.fotos.lateral?p.fotos.lateral:p.fotos&&p.fotos.entorno?p.fotos.entorno:null;
     var proyRef=document.getElementById("det-proy-ref")?document.getElementById("det-proy-ref").textContent:null;
     var proyRango=document.getElementById("det-proy-rango")?document.getElementById("det-proy-rango").textContent:null;
     var proyPot=document.getElementById("det-proy-potencial")?document.getElementById("det-proy-potencial").textContent:null;
@@ -1878,62 +1867,27 @@ function initUI(){
     var sucInst=document.getElementById("det-suc-inst")?document.getElementById("det-suc-inst").textContent:null;
     var sucOcas=document.getElementById("det-suc-ocas")?document.getElementById("det-suc-ocas").textContent:null;
     var sucZona=document.getElementById("det-suc-zona")?document.getElementById("det-suc-zona").textContent:null;
-    var colorPot=proyPot&&proyPot.indexOf("ALTO")>=0?"#22d18a":proyPot&&proyPot.indexOf("BAJO")>=0?"#ef4444":"#e8a020";
-    var html="<!DOCTYPE html><html><head><meta charset='UTF-8'><title>Ficha: "+p.nombre+"</title>"
-      +"<style>*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}"
-      +"body{font-family:Arial,sans-serif;background:#f0f2f5;padding:12px;color:#111}"
-      +"@media print{*{-webkit-print-color-adjust:exact;print-color-adjust:exact}body{background:white;padding:0}.no-print{display:none}@page{margin:6mm;size:A4}}"
-      +".ficha{max-width:720px;margin:0 auto;background:white;padding:16px}"
-      +".header{background:#003087;color:white;padding:10px 14px;border-radius:7px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}"
-      +".badge{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;border:1.5px solid "+statusColor+";color:"+statusColor+"}"
-      +".bloque{background:#f8f9fa;border-radius:7px;padding:8px;border:1px solid #e5e7eb;margin-bottom:6px}"
-      +".sec{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#6b7280;margin-bottom:5px;padding-bottom:3px;border-bottom:2px solid #e5e7eb}"
-      +".kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:5px}"
-      +".kpi{background:white;border-radius:5px;padding:5px;text-align:center;border:1px solid #e5e7eb}"
-      +".kl{font-size:7px;text-transform:uppercase;color:#9ca3af;letter-spacing:1px}"
-      +".kv{font-size:15px;font-weight:800}"
-      +".footer{margin-top:8px;padding-top:6px;border-top:1px solid #f0f0f0;font-size:9px;color:#9ca3af;display:flex;justify-content:space-between}"
-      +"</style></head><body><div class='ficha'>"
-      +"<div class='no-print' style='display:flex;gap:8px;margin-bottom:10px'>"
-      +"<button onclick='window.close()' style='flex:1;padding:9px;background:#1a1a2e;border:1.5px solid rgba(255,255,255,.15);border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;color:#e8ecf4'>&larr; Cerrar</button>"
-      +"<button onclick='window.print()' style='flex:2;padding:9px;background:#003087;border:none;border-radius:7px;font-size:12px;font-weight:800;cursor:pointer;color:white'>Guardar como PDF</button>"
-      +"</div>"
-      +"<div class='header'>"
-      +"<div style='display:flex;align-items:center;gap:10px'>"
-      +"<img src='"+_LOGO_BAFAR+"' style='height:32px;width:auto'>"
-      +"<div><div style='font-size:15px;font-weight:900;color:white;letter-spacing:1px'>EXPANSI\u00d3N BAFAR</div>"
-      +"<div style='font-size:9px;color:rgba(255,255,255,.6)'>Ficha de Prospecto</div></div></div>"
-      +"<span class='badge'>"+statusLabel+"</span></div>"
-      +"<div style='font-size:17px;font-weight:800;margin-bottom:2px'>"+p.nombre+"</div>"
-      +"<div style='font-size:11px;color:#6a7590;margin-bottom:8px'>"+p.direccion+" &bull; "+(p.ciudad||"")+(p.estado?", "+p.estado:"")+"</div>"
-      +"<div style='display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px'>"
-      +"<div>"
-      +(fotoSrc?"<img src='"+fotoSrc+"' style='width:100%;height:150px;object-fit:cover;border-radius:8px;margin-bottom:6px'>":"<div style='width:100%;height:150px;background:#f0f2f5;border-radius:8px;margin-bottom:6px'></div>")
-      +(proyRef?"<div class='bloque'><div class='sec'>Proyecci\u00f3n de ventas</div><div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:4px'><span style='font-size:8px;color:#9ca3af'>POTENCIAL</span><span style='font-size:13px;font-weight:800;color:"+colorPot+"'>"+proyPot+"</span></div><div class='kpi-grid'><div class='kpi'><div class='kl'>Referencial</div><div class='kv' style='color:#22d18a;font-size:12px'>"+proyRef+"</div></div><div class='kpi'><div class='kl'>Rango</div><div class='kv' style='color:#6b7280;font-size:9px;padding-top:3px'>"+proyRango+"</div></div><div class='kpi'><div class='kl'>Institucional</div><div class='kv' style='color:#f59e0b;font-size:10px'>"+proyInst+"</div></div><div class='kpi'><div class='kl'>Ocasi\u00f3n</div><div class='kv' style='color:#e8a020;font-size:10px'>"+proyOcas+"</div></div></div><div style='font-size:8px;color:#9ca3af;font-style:italic'>"+proyBase+"</div></div>":"")
-      +(sucNombre&&sucNombre!=="-"?"<div class='bloque'><div class='sec'>Sucursal m\u00e1s cercana</div><div style='font-size:12px;font-weight:800;color:#111;margin-bottom:4px'>"+sucNombre+"</div><div class='kpi-grid'><div class='kpi'><div class='kl'>Distancia</div><div class='kv' style='color:#3a8fff;font-size:13px'>"+sucDist+"</div></div><div class='kpi'><div class='kl'>Venta real</div><div class='kv' style='color:#22d18a;font-size:12px'>"+sucVenta+"</div></div><div class='kpi'><div class='kl'>Institucional</div><div class='kv' style='color:#f59e0b;font-size:10px'>"+sucInst+"</div></div><div class='kpi'><div class='kl'>Ocasi\u00f3n</div><div class='kv' style='color:#e8a020;font-size:10px'>"+sucOcas+"</div></div></div><div style='font-size:8px;color:#9ca3af'>"+sucZona+"</div></div>":"")
-      +"</div>"
-      +"<div>"
-      +"<div class='bloque'><div class='sec'>DENUE &bull; Radio "+RADIO+"m</div><div class='kpi-grid'><div class='kpi'><div class='kl'>DENUEs Total</div><div class='kv' style='color:#f59e0b'>"+(p.denue?p.denue.tot||0:0)+"</div></div></div>"+(dgHTML?"<table style='width:100%;border-collapse:collapse'>"+dgHTML+"</table>":"")+"</div>"
-      +"<div class='bloque'><div class='sec'>Datos Generales</div><div class='kpi-grid'>"
-      +(p.inegi&&p.inegi.pob?"<div class='kpi'><div class='kl'>Poblaci\u00f3n</div><div class='kv' style='color:#3a8fff'>"+(p.inegi.pob/1000).toFixed(1)+"K</div></div>":"")
-      +(p.inegi&&p.inegi.viv?"<div class='kpi'><div class='kl'>Viviendas</div><div class='kv' style='color:#22d18a'>"+p.inegi.viv.toLocaleString()+"</div></div>":"")
-      +(p.precio?"<div class='kpi'><div class='kl'>"+(p.operacion==="venta"?"Precio":"Renta/mes")+"</div><div class='kv' style='color:#22d18a;font-size:12px'>$"+parseFloat(p.precio).toLocaleString()+"</div></div>":"")
-      +(rentaZonaVal&&rentaZonaVal!=="-"?"<div class='kpi'><div class='kl'>Renta zona</div><div class='kv' style='font-size:11px;color:#6366f1'>"+rentaZonaVal+"</div></div>":"")
-      +(p.m2Terreno?"<div class='kpi'><div class='kl'>Superficie</div><div class='kv' style='font-size:13px'>"+p.m2Terreno+"m\u00b2</div></div>":"")
-      +(p.frente&&p.fondo?"<div class='kpi'><div class='kl'>Frente x Fondo</div><div class='kv' style='font-size:10px'>"+p.frente+"m x "+p.fondo+"m</div></div>":"")
-      +"</div><div style='padding:6px;background:white;border-radius:6px;border:1px solid #e5e7eb;margin-top:5px'><div style='font-size:8px;color:#9ca3af;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px'>GPS</div><div style='font-size:10px;font-weight:600;color:#374151;margin-bottom:2px'>"+p.lat.toFixed(5)+", "+p.lng.toFixed(5)+"</div><div style='font-size:8px;word-break:break-all;color:#3a8fff'>"+gmapsUrl+"</div></div></div>"
-      +"</div>"
-      +"</div>"
-      +(p.notas?"<div style='font-size:11px;color:#374151;padding:7px;background:#f8f9fa;border-radius:6px;margin-bottom:6px'><b>Notas:</b> "+p.notas+"</div>":"")
-      +"<div class='footer'>"
-      +"<span>"+p.lat.toFixed(5)+", "+p.lng.toFixed(5)+"</span>"
-      +"<span>"+p.tipo+" &bull; "+p.fecha+"</span>"
-      +"<span>PIGER &bull; Censo 2020 INEGI</span>"
-      +"</div></div></body></html>";
-    var blob=new Blob([html],{type:"text/html;charset=utf-8"});
-    var blobUrl=URL.createObjectURL(blob);
-    var win=window.open(blobUrl,"_blank");
-    if(!win){URL.revokeObjectURL(blobUrl);toast("Permite ventanas emergentes para generar PDF");}
+    var payload=Object.assign({},p,{
+      radio:typeof RADIO!=="undefined"?RADIO:1000,
+      fotoUrl:fotoSrc||null,
+      proyRef:proyRef||null,proyRango:proyRango||null,proyPot:proyPot||null,
+      proyInst:proyInst||null,proyOcas:proyOcas||null,proyBase:proyBase||null,
+      sucNombre:sucNombre||null,sucDist:sucDist||null,sucVenta:sucVenta||null,
+      sucInst:sucInst||null,sucOcas:sucOcas||null,sucZona:sucZona||null
+    });
+    toast("Generando PDF…");
+    fetch("/api/pdf",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)})
+      .then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.blob();})
+      .then(function(pdfBlob){
+        var url=URL.createObjectURL(pdfBlob);
+        var a=document.createElement("a");
+        a.href=url;
+        a.download="ficha-"+(p.nombre||"bafar").replace(/[\s\/\\]/g,"-")+".pdf";
+        document.body.appendChild(a);a.click();document.body.removeChild(a);
+        setTimeout(function(){URL.revokeObjectURL(url);},1000);
+        toast("PDF descargado ✓");
+      })
+      .catch(function(e){toast("Error al generar PDF: "+e.message);});
   }
 
   document.getElementById("btn-heatmap-detail").addEventListener("click",function(){
