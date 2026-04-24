@@ -1102,7 +1102,7 @@ document.addEventListener("DOMContentLoaded",function(){
   });
 
   sb.auth.onAuthStateChange(function(event,session){
-    if(session){currentUser=session.user;cargarPerfil();}
+    if(session){currentUser=session.user;showApp();}
     else{currentUser=null;currentRol=null;showLogin();}
   });
 
@@ -1159,23 +1159,31 @@ function cargarPerfil(){
           return;
         }
         currentRol=res.data.rol||"usuario";
+        mostrarApp();
       } else {
+        // Sin perfil todavía — crearlo con rol='usuario' para no bloquear el acceso
         currentRol="usuario";
+        sb.from("perfiles").insert({
+          user_id:currentUser.id,
+          email:currentUser.email,
+          rol:"usuario",
+          activo:true
+        }).then(function(){mostrarApp();}).catch(function(){mostrarApp();});
       }
-      document.getElementById("app").style.display="flex";
-      var cfgEmail=document.getElementById("cfg-email");
-      if(cfgEmail)cfgEmail.textContent=currentUser.email;
-      actualizarVistaRol();
-      loadFromSupabase();
     })
     .catch(function(){
       currentRol="usuario";
-      document.getElementById("app").style.display="flex";
-      var cfgEmail=document.getElementById("cfg-email");
-      if(cfgEmail)cfgEmail.textContent=currentUser.email;
-      actualizarVistaRol();
-      loadFromSupabase();
+      mostrarApp();
     });
+}
+
+function mostrarApp(){
+  document.getElementById("login-screen").style.display="none";
+  document.getElementById("app").style.display="flex";
+  var cfgEmail=document.getElementById("cfg-email");
+  if(cfgEmail)cfgEmail.textContent=currentUser.email;
+  actualizarVistaRol();
+  loadFromSupabase();
 }
 
 function actualizarVistaRol(){
