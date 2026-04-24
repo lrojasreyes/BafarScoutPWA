@@ -3,10 +3,20 @@ const SURL = "https://pjacmizmjsjwxtoldpvr.supabase.co";
 function decodeJWT(token) {
   try {
     const parts = token.split('.');
-    if (parts.length !== 3) return null;
-    const payload = Buffer.from(parts[1].replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString();
-    return JSON.parse(payload);
-  } catch(e) { return null; }
+    if (parts.length !== 3) {
+      console.log("[invite] JWT no tiene 3 partes:", parts.length);
+      return null;
+    }
+    const b64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    const padded = b64 + '='.repeat((4 - b64.length % 4) % 4);
+    const payload = Buffer.from(padded, 'base64').toString('utf8');
+    const parsed = JSON.parse(payload);
+    console.log("[invite] JWT decoded sub:", parsed.sub, "email:", parsed.email);
+    return parsed;
+  } catch(e) {
+    console.log("[invite] Error decodificando JWT:", e.message);
+    return null;
+  }
 }
 
 export default async function handler(req, res) {
@@ -17,17 +27,29 @@ export default async function handler(req, res) {
   if (req.method !== "POST") { res.status(405).end(); return; }
 
   const serviceKey = process.env.SUPABASE_SERVICE_KEY;
+  console.log("[invite] SUPABASE_SERVICE_KEY presente:", !!serviceKey);
   if (!serviceKey) { res.status(500).json({ error: "SUPABASE_SERVICE_KEY no configurada en Vercel" }); return; }
 
   const token = (req.headers.authorization || "").replace("Bearer ", "");
   const claims = decodeJWT(token);
   if (!claims || !claims.sub) { res.status(401).json({ error: "Token inválido" }); return; }
 
-  const pr = await fetch(`${SURL}/rest/v1/perfiles?user_id=eq.${claims.sub}&select=rol,activo`, {
+  const userId = claims.sub;
+  const url = `${SURL}/rest/v1/perfiles?user_id=eq.${userId}&select=rol,activo`;
+  console.log("[invite] Consultando perfiles:", url);
+
+  const pr = await fetch(url, {
     headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` }
   });
-  const rows = await pr.json();
+
+  console.log("[invite] perfiles status:", pr.status);
+  const body = await pr.text();
+  console.log("[invite] perfiles body:", body);
+
+  const rows = pr.ok ? JSON.parse(body) : [];
   const [perfil] = Array.isArray(rows) ? rows : [];
+  console.log("[invite] perfil:", JSON.stringify(perfil));
+
   if (!perfil || perfil.rol !== "admin" || !perfil.activo) {
     res.status(403).json({ error: "Solo administradores pueden invitar usuarios" }); return;
   }

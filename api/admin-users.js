@@ -3,25 +3,68 @@ const SURL = "https://pjacmizmjsjwxtoldpvr.supabase.co";
 function decodeJWT(token) {
   try {
     const parts = token.split('.');
-    if (parts.length !== 3) return null;
-    const payload = Buffer.from(parts[1].replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString();
-    return JSON.parse(payload);
-  } catch(e) { return null; }
+    if (parts.length !== 3) {
+      console.log("[admin-users] JWT no tiene 3 partes:", parts.length);
+      return null;
+    }
+    // base64url → base64 con padding correcto
+    const b64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    const padded = b64 + '='.repeat((4 - b64.length % 4) % 4);
+    const payload = Buffer.from(padded, 'base64').toString('utf8');
+    const parsed = JSON.parse(payload);
+    console.log("[admin-users] JWT decoded sub:", parsed.sub, "email:", parsed.email);
+    return parsed;
+  } catch(e) {
+    console.log("[admin-users] Error decodificando JWT:", e.message);
+    return null;
+  }
 }
 
 async function verificarAdmin(token, serviceKey) {
   const claims = decodeJWT(token);
-  if (!claims || !claims.sub) return null;
+  if (!claims || !claims.sub) {
+    console.log("[admin-users] claims inválidos:", claims);
+    return null;
+  }
   const userId = claims.sub;
 
-  const pr = await fetch(`${SURL}/rest/v1/perfiles?user_id=eq.${userId}&select=rol,activo`, {
+  const url = `${SURL}/rest/v1/perfiles?user_id=eq.${userId}&select=rol,activo`;
+  console.log("[admin-users] Consultando perfiles URL:", url);
+  console.log("[admin-users] serviceKey presente:", !!serviceKey, "longitud:", serviceKey ? serviceKey.length : 0);
+
+  const pr = await fetch(url, {
     headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` }
   });
-  if (!pr.ok) return null;
-  const rows = await pr.json();
-  if (!Array.isArray(rows)) return null;
+
+  console.log("[admin-users] perfiles HTTP status:", pr.status);
+
+  const body = await pr.text();
+  console.log("[admin-users] perfiles respuesta raw:", body);
+
+  if (!pr.ok) {
+    console.log("[admin-users] perfiles query falló con status", pr.status);
+    return null;
+  }
+
+  let rows;
+  try { rows = JSON.parse(body); } catch(e) {
+    console.log("[admin-users] Error parseando JSON de perfiles:", e.message);
+    return null;
+  }
+
+  console.log("[admin-users] rows:", JSON.stringify(rows));
+
+  if (!Array.isArray(rows)) {
+    console.log("[admin-users] rows no es array:", typeof rows);
+    return null;
+  }
   const [perfil] = rows;
-  if (!perfil || perfil.rol !== "admin" || !perfil.activo) return null;
+  console.log("[admin-users] perfil encontrado:", JSON.stringify(perfil));
+
+  if (!perfil || perfil.rol !== "admin" || !perfil.activo) {
+    console.log("[admin-users] RECHAZADO - perfil:", perfil, "rol:", perfil?.rol, "activo:", perfil?.activo);
+    return null;
+  }
   return { id: userId };
 }
 
@@ -32,9 +75,12 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") { res.status(200).end(); return; }
 
   const serviceKey = process.env.SUPABASE_SERVICE_KEY;
+  console.log("[admin-users] SUPABASE_SERVICE_KEY presente:", !!serviceKey);
   if (!serviceKey) { res.status(500).json({ error: "SUPABASE_SERVICE_KEY no configurada en Vercel" }); return; }
 
   const token = (req.headers.authorization || "").replace("Bearer ", "");
+  console.log("[admin-users] token recibido (primeros 20 chars):", token.substring(0, 20));
+
   const admin = await verificarAdmin(token, serviceKey);
   if (!admin) { res.status(403).json({ error: "Acceso solo para administradores" }); return; }
 
