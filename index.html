@@ -1880,9 +1880,9 @@ function initUI(){
     var sucZona=document.getElementById("det-suc-zona")?document.getElementById("det-suc-zona").textContent:null;
     var colorPot=proyPot&&proyPot.indexOf("ALTO")>=0?"#22d18a":proyPot&&proyPot.indexOf("BAJO")>=0?"#ef4444":"#e8a020";
     var html="<!DOCTYPE html><html><head><meta charset='UTF-8'><title>Ficha: "+p.nombre+"</title>"
-      +"<style>*{box-sizing:border-box;margin:0;padding:0}"
+      +"<style>*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}"
       +"body{font-family:Arial,sans-serif;background:#f0f2f5;padding:12px;color:#111}"
-      +"@media print{body{background:white;padding:0}.no-print{display:none}@page{margin:6mm;size:A4}}"
+      +"@media print{*{-webkit-print-color-adjust:exact;print-color-adjust:exact}body{background:white;padding:0}.no-print{display:none}@page{margin:6mm;size:A4}}"
       +".ficha{max-width:720px;margin:0 auto;background:white;padding:16px}"
       +".header{background:#003087;color:white;padding:10px 14px;border-radius:7px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}"
       +".badge{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;border:1.5px solid "+statusColor+";color:"+statusColor+"}"
