@@ -553,9 +553,16 @@ textarea{resize:none;min-height:80px}
       <div class="stat"><div style="font-size:10px;text-transform:uppercase;color:#6a7590;margin-bottom:6px">Usuarios</div><div style="font-size:26px;font-weight:800;color:#e8a020" id="dir-usuarios">0</div></div>
       <div class="stat"><div style="font-size:10px;text-transform:uppercase;color:#6a7590;margin-bottom:6px">Descartados</div><div style="font-size:26px;font-weight:800;color:#f05060" id="dir-desc">0</div></div>
     </div>
+    <div style="display:flex;gap:6px;margin-bottom:10px">
+      <button id="dir-btn-lista" onclick="toggleVistaDirector('lista')" style="flex:1;padding:8px;background:rgba(58,143,255,.2);border:1.5px solid #3a8fff;border-radius:8px;color:#3a8fff;font-weight:700;font-size:13px;cursor:pointer">📋 Lista</button>
+      <button id="dir-btn-mapa" onclick="toggleVistaDirector('mapa')" style="flex:1;padding:8px;background:transparent;border:1.5px solid rgba(255,255,255,.1);border-radius:8px;color:#6a7590;font-weight:700;font-size:13px;cursor:pointer">🗺️ Mapa</button>
+    </div>
     <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
       <select id="dir-fil-usuario" style="flex:1;min-width:140px;padding:10px;background:#162035;border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#e8ecf4;font-size:13px"><option value="">Todos los usuarios</option></select>
       <input type="text" id="dir-fil-ciudad" placeholder="Filtrar por ciudad..." style="flex:1;min-width:120px;padding:10px;background:#162035;border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#e8ecf4;font-size:13px">
+    </div>
+    <div id="dir-mapa-container" style="display:none;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,.07);margin-bottom:10px">
+      <div id="dir-mapa" style="height:420px;width:100%;background:#0e1628"></div>
     </div>
     <div id="dir-list"><div style="text-align:center;padding:40px;color:#6a7590">Cargando...</div></div>
   </div>
@@ -739,6 +746,9 @@ function qcConsultar(){
 
 var _mapaCalor=null;
 var _heatLayer=null;
+var _mapaGlobal=null;
+var _heatLayerGlobal=null;
+var _markersGlobal=[];
 
 function initMapaCalor(){
   if(_mapaCalor) return;
@@ -782,6 +792,83 @@ function actualizarMapaCalor(){
     var lngs=PS.map(function(p){return p.lng;});
     _mapaCalor.fitBounds([[Math.min.apply(null,lats),Math.min.apply(null,lngs)],[Math.max.apply(null,lats),Math.max.apply(null,lngs)]],{padding:[20,20]});
   }
+}
+
+function toggleVistaDirector(modo){
+  var lista=document.getElementById("dir-list");
+  var mapa=document.getElementById("dir-mapa-container");
+  var btnL=document.getElementById("dir-btn-lista");
+  var btnM=document.getElementById("dir-btn-mapa");
+  var activo="rgba(58,143,255,.2)",activoBorder="#3a8fff",activoColor="#3a8fff";
+  var inactivo="transparent",inactivoBorder="rgba(255,255,255,.1)",inactivoColor="#6a7590";
+  if(modo==="mapa"){
+    if(lista)lista.style.display="none";
+    if(mapa)mapa.style.display="block";
+    if(btnL){btnL.style.background=inactivo;btnL.style.borderColor=inactivoBorder;btnL.style.color=inactivoColor;}
+    if(btnM){btnM.style.background=activo;btnM.style.borderColor=activoBorder;btnM.style.color=activoColor;}
+    if(window._DIR_DATA){
+      var uid=document.getElementById("dir-fil-usuario").value;
+      var ciudad=(document.getElementById("dir-fil-ciudad").value||"").toLowerCase();
+      var fil=window._DIR_DATA.todos.filter(function(p){
+        if(uid&&p.user_id!==uid)return false;
+        if(ciudad&&!(p.ciudad||"").toLowerCase().includes(ciudad))return false;
+        return true;
+      });
+      initMapaGlobal(fil,window._DIR_DATA.emailMap);
+    }
+  } else {
+    if(lista)lista.style.display="block";
+    if(mapa)mapa.style.display="none";
+    if(btnL){btnL.style.background=activo;btnL.style.borderColor=activoBorder;btnL.style.color=activoColor;}
+    if(btnM){btnM.style.background=inactivo;btnM.style.borderColor=inactivoBorder;btnM.style.color=inactivoColor;}
+  }
+}
+
+function initMapaGlobal(lista,em){
+  if(!_mapaGlobal){
+    _mapaGlobal=L.map("dir-mapa",{zoomControl:true,scrollWheelZoom:true}).setView([23.6345,-102.5528],5);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
+      attribution:"© OpenStreetMap",maxZoom:18
+    }).addTo(_mapaGlobal);
+  }
+  setTimeout(function(){_mapaGlobal.invalidateSize();},150);
+  actualizarMapaGlobal(lista,em);
+}
+
+function actualizarMapaGlobal(lista,em){
+  if(!_mapaGlobal) return;
+  if(_heatLayerGlobal){_mapaGlobal.removeLayer(_heatLayerGlobal);_heatLayerGlobal=null;}
+  _markersGlobal.forEach(function(m){_mapaGlobal.removeLayer(m);});
+  _markersGlobal=[];
+  var pts=lista.filter(function(p){return p.lat&&p.lng;});
+  if(!pts.length) return;
+  var calor=pts.map(function(p){
+    var v=0.5;
+    if(p.denue&&p.denue.tot) v+=Math.min(p.denue.tot/100,0.5);
+    return [p.lat,p.lng,v];
+  });
+  _heatLayerGlobal=L.heatLayer(calor,{
+    radius:40,blur:25,maxZoom:12,
+    gradient:{0.0:"#3a8fff",0.3:"#22d18a",0.6:"#f0c050",1.0:"#f05060"}
+  }).addTo(_mapaGlobal);
+  pts.forEach(function(p){
+    var email=em[p.user_id]||"Usuario";
+    var color=p.status==="viable"?"#22d18a":p.status==="descartado"?"#f05060":"#e8a020";
+    var m=L.circleMarker([p.lat,p.lng],{radius:7,fillColor:color,color:"#fff",weight:1.5,fillOpacity:0.9}).addTo(_mapaGlobal);
+    var fecha=p.fecha||(p.created_at?(p.created_at+"").substr(0,10):"");
+    m.bindPopup(
+      "<div style='min-width:160px'>"
+      +"<b style='font-size:13px'>"+(p.nombre||"Sin nombre")+"</b><br>"
+      +"<span style='color:#3a8fff;font-size:11px'>👤 "+email+"</span><br>"
+      +"<span style='color:#6a7590;font-size:11px'>📍 "+(p.ciudad||"")+(p.estado?", "+p.estado:"")+"</span><br>"
+      +(fecha?"<span style='color:#6a7590;font-size:11px'>📅 "+fecha+"</span>":"")
+      +"</div>"
+    );
+    _markersGlobal.push(m);
+  });
+  var lats=pts.map(function(p){return p.lat;});
+  var lngs=pts.map(function(p){return p.lng;});
+  _mapaGlobal.fitBounds([[Math.min.apply(null,lats),Math.min.apply(null,lngs)],[Math.max.apply(null,lats),Math.max.apply(null,lngs)]],{padding:[30,30]});
 }
 
 function abrirMapaCalorDENUE(p){
@@ -1147,6 +1234,8 @@ function filtrarVistaDirector(){
     return true;
   });
   renderVistaDirector(lista,window._DIR_DATA.emailMap);
+  var mc=document.getElementById("dir-mapa-container");
+  if(mc&&mc.style.display!=="none") actualizarMapaGlobal(lista,window._DIR_DATA.emailMap);
 }
 
 function cargarUsuariosAdmin(){
@@ -1298,7 +1387,7 @@ function go(p,skipRf){
   if(p==="new"&&!skipRf)rf();
   if(p==="dash"){ud();setTimeout(function(){initMapaCalor();actualizarMapaCalor();if(_mapaCalor)_mapaCalor.invalidateSize();},300);}
   if(p==="cfg"){var e=document.getElementById("ec");if(e)e.textContent=PS.length+" prospectos";}
-  if(p==="director")cargarVistaDirector();
+  if(p==="director"){cargarVistaDirector();setTimeout(function(){if(_mapaGlobal)_mapaGlobal.invalidateSize();},300);}
   if(p==="admin")cargarUsuariosAdmin();
 }
 
