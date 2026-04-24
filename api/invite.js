@@ -56,14 +56,22 @@ export default async function handler(req, res) {
 
   const passwordTemporal = generarPasswordTemporal();
 
+  // Diagnosticar qué key se está usando (anon vs service_role)
+  console.log('[invite] usando key (primeros 20):', serviceKey.substring(0, 20));
+  try {
+    const kp = JSON.parse(Buffer.from(serviceKey.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'), 'base64').toString());
+    console.log('[invite] rol de la key:', kp.role);  // debe ser "service_role", no "anon"
+  } catch(e) { console.log('[invite] no se pudo decodificar key'); }
+  console.log('[invite] headers enviados: Authorization y apikey presentes');
+
   // Crear usuario via Admin API (no requiere cuota de invitaciones)
   console.log('[invite] v2 — llamando /auth/v1/admin/users para:', email);
   const response = await fetch(`${SURL}/auth/v1/admin/users`, {
     method: "POST",
     headers: {
-      apikey: serviceKey,
-      Authorization: `Bearer ${serviceKey}`,
-      "Content-Type": "application/json"
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${serviceKey}`,
+      'apikey': `${serviceKey}`
     },
     body: JSON.stringify({
       email,
