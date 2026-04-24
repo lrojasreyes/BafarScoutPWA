@@ -1,3 +1,5 @@
+import { randomBytes } from 'crypto';
+
 const SURL = "https://pjacmizmjsjwxtoldpvr.supabase.co";
 
 function decodeJWT(token) {
@@ -13,6 +15,13 @@ function decodeJWT(token) {
   }
 }
 
+function generarPasswordTemporal() {
+  // 10 caracteres alfanuméricos sin ambigüedades (sin 0/O/l/I)
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+  const bytes = randomBytes(10);
+  return Array.from(bytes).map(b => chars[b % chars.length]).join('');
+}
+
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST,OPTIONS");
@@ -21,56 +30,69 @@ export default async function handler(req, res) {
   if (req.method !== "POST") { res.status(405).end(); return; }
 
   const serviceKey = process.env.SUPABASE_SERVICE_KEY;
-  console.log("[invite] serviceKey presente:", !!serviceKey);
   if (!serviceKey) { res.status(500).json({ error: "SUPABASE_SERVICE_KEY no configurada en Vercel" }); return; }
 
+  // Verificar que el caller es admin
   const token = (req.headers.authorization || "").replace("Bearer ", "");
   const claims = decodeJWT(token);
   if (!claims || !claims.email) { res.status(401).json({ error: "Token inválido" }); return; }
 
-  const email = claims.email;
-  console.log("[invite] Verificando admin para email:", email);
-
-  const url = `${SURL}/rest/v1/perfiles?email=eq.${encodeURIComponent(email)}&select=rol,activo`;
-  const pr = await fetch(url, {
+  const callerEmail = claims.email;
+  const prUrl = `${SURL}/rest/v1/perfiles?email=eq.${encodeURIComponent(callerEmail)}&select=rol,activo`;
+  const pr = await fetch(prUrl, {
     headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` }
   });
-
-  console.log("[invite] perfiles status:", pr.status);
-  const body = await pr.text();
-  console.log("[invite] perfiles body:", body);
-
-  const rows = pr.ok ? JSON.parse(body) : [];
-  const [perfil] = Array.isArray(rows) ? rows : [];
-  console.log("[invite] perfil:", JSON.stringify(perfil));
-
-  if (!perfil || perfil.rol !== "admin" || !perfil.activo) {
-    res.status(403).json({ error: "Solo administradores pueden invitar usuarios" }); return;
+  const prRows = pr.ok ? await pr.json() : [];
+  const [callerPerfil] = Array.isArray(prRows) ? prRows : [];
+  if (!callerPerfil || callerPerfil.rol !== "admin" || !callerPerfil.activo) {
+    res.status(403).json({ error: "Solo administradores pueden crear usuarios" }); return;
   }
 
-  const { email: emailInvitado, rol = "usuario" } = req.body;
-  if (!emailInvitado) { res.status(400).json({ error: "Email requerido" }); return; }
+  const { email, rol = "usuario" } = req.body;
+  if (!email) { res.status(400).json({ error: "Email requerido" }); return; }
   if (!["admin","director","usuario"].includes(rol)) {
     res.status(400).json({ error: "Rol invalido" }); return;
   }
 
-  const ir = await fetch(`${SURL}/auth/v1/invite`, {
+  const passwordTemporal = generarPasswordTemporal();
+
+  // Crear usuario via Admin API (no requiere cuota de invitaciones)
+  const cr = await fetch(`${SURL}/auth/v1/admin/users`, {
     method: "POST",
     headers: {
       apikey: serviceKey,
       Authorization: `Bearer ${serviceKey}`,
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ email: emailInvitado })
+    body: JSON.stringify({
+      email,
+      password: passwordTemporal,
+      email_confirm: true,
+      user_metadata: { rol, invitado: true }
+    })
   });
 
-  if (!ir.ok) {
-    const err = await ir.json();
-    res.status(400).json({ error: err.msg || err.message || "Error al enviar invitacion" }); return;
-  }
-  const invited = await ir.json();
+  console.log("[invite] createUser status:", cr.status);
+  const crBody = await cr.text();
+  console.log("[invite] createUser body:", crBody);
 
-  if (invited.id) {
+  if (!cr.ok) {
+    let err;
+    try { err = JSON.parse(crBody); } catch(e) { err = {}; }
+    // Si el usuario ya existe, buscar su id para actualizar perfiles
+    if (cr.status === 422 || (err.msg||err.message||"").toLowerCase().includes("already")) {
+      res.status(400).json({ error: "El usuario ya existe con ese email" }); return;
+    }
+    res.status(400).json({ error: err.msg || err.message || "Error al crear usuario" }); return;
+  }
+
+  let nuevoUsuario;
+  try { nuevoUsuario = JSON.parse(crBody); } catch(e) {
+    res.status(500).json({ error: "Respuesta inesperada de Supabase" }); return;
+  }
+
+  // Insertar/actualizar en perfiles
+  if (nuevoUsuario.id) {
     await fetch(`${SURL}/rest/v1/perfiles`, {
       method: "POST",
       headers: {
@@ -79,9 +101,9 @@ export default async function handler(req, res) {
         "Content-Type": "application/json",
         Prefer: "resolution=merge-duplicates"
       },
-      body: JSON.stringify({ user_id: invited.id, email: emailInvitado, rol, activo: true })
+      body: JSON.stringify({ user_id: nuevoUsuario.id, email, rol, activo: true })
     });
   }
 
-  res.status(200).json({ ok: true, email: emailInvitado });
+  res.status(200).json({ ok: true, email, passwordTemporal });
 }

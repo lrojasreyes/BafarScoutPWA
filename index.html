@@ -1333,10 +1333,14 @@ function enviarInvitacion(){
       .then(function(r){return r.json();})
       .then(function(d){
         if(d.ok){
-          toast("Invitacion enviada a "+email);
           document.getElementById("admin-invite-form").style.display="none";
           document.getElementById("admin-invite-email").value="";
           cargarUsuariosAdmin();
+          if(d.passwordTemporal){
+            alert("✅ Usuario creado: "+email+"\n\n🔑 Contraseña temporal:\n"+d.passwordTemporal+"\n\nComparte esta contraseña con el usuario.\nDeberá cambiarla al iniciar sesión.");
+          } else {
+            toast("Usuario creado: "+email);
+          }
         } else {
           toast("Error: "+(d.error||"desconocido"));
         }
