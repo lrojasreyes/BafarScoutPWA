@@ -999,8 +999,8 @@ function mostrarProyeccion(lat,lng,pob,viv,giros){
     if(loading)loading.style.display="none";
     if(!r)return;
     if(info)info.style.display="block";
-    var instKg=r.ventaRef*r.ratioInst;
-    var ocasKg=r.ventaRef*(1-r.ratioInst);
+    var instKg=Math.round(r.ventaRef*r.ratioInst);
+    var ocasKg=Math.round(r.ventaRef*(1-r.ratioInst));
     var colorPot=r.potencial.indexOf("ALTO")>=0?"#22d18a":r.potencial.indexOf("BAJO")>=0?"#f05060":"#e8a020";
     document.getElementById("det-proy-potencial").textContent=r.potencial;
     document.getElementById("det-proy-potencial").style.color=colorPot;
@@ -1009,6 +1009,11 @@ function mostrarProyeccion(lat,lng,pob,viv,giros){
     document.getElementById("det-proy-inst").textContent=(instKg/1000).toFixed(1)+" ton ("+(r.ratioInst*100).toFixed(0)+"%)"
     document.getElementById("det-proy-ocas").textContent=(ocasKg/1000).toFixed(1)+" ton ("+((1-r.ratioInst)*100).toFixed(0)+"%)"
     document.getElementById("det-proy-base").textContent="Basado en "+r.basadas+" sucursales similares en operación";
+    // Guardar en DR para persistir al salvar
+    if(!DR)DR={};
+    DR.proyeccion={referencial:Math.round(r.ventaRef),rango_min:Math.round(r.ventaMin),rango_max:Math.round(r.ventaMax),institucional:instKg,ocasion:ocasKg,nivel:r.potencial,modelo:r.basadas+" sucursales"};
+    // Actualizar el prospecto actual si ya existe
+    if(DR._prospecto_id){var idx=PS.findIndex(function(x){return x.id===DR._prospecto_id;});if(idx>=0){PS[idx].proyeccion=DR.proyeccion;syncToSupabase(PS[idx]);}}
   });
 }
 
@@ -1050,8 +1055,50 @@ function mostrarSucursalCercana(lat,lng){
         zona=cercana.s.nombre+" — Reciente apertura, sin datos de venta aún";
       }
       document.getElementById("det-suc-zona").textContent=zona;
+      // Guardar en DR para persistir al salvar
+      if(!DR)DR={};
+      DR.sucursal_cercana={nombre:usar.s.nombre||"",distancia:distStr,venta_real:vkg,venta_inst:ikg,venta_ocas:okg,region:zona};
+      if(DR._prospecto_id){var idx=PS.findIndex(function(x){return x.id===DR._prospecto_id;});if(idx>=0){PS[idx].sucursal_cercana=DR.sucursal_cercana;syncToSupabase(PS[idx]);}}
     }).catch(function(){if(loading)loading.style.display="none";if(err)err.style.display="block";});
   });
+}
+
+function mostrarProyeccionDesdeCache(proy){
+  var sec=document.getElementById("det-proyeccion-sec");
+  if(sec)sec.style.display="block";
+  var loading=document.getElementById("det-proy-loading");
+  var info=document.getElementById("det-proy-info");
+  if(loading)loading.style.display="none";
+  if(info)info.style.display="block";
+  var colorPot=proy.nivel&&proy.nivel.indexOf("ALTO")>=0?"#22d18a":proy.nivel&&proy.nivel.indexOf("BAJO")>=0?"#f05060":"#e8a020";
+  document.getElementById("det-proy-potencial").textContent=proy.nivel||"-";
+  document.getElementById("det-proy-potencial").style.color=colorPot;
+  document.getElementById("det-proy-ref").textContent="~"+(proy.referencial/1000).toFixed(1)+" ton/mes";
+  document.getElementById("det-proy-rango").textContent=(proy.rango_min/1000).toFixed(1)+" — "+(proy.rango_max/1000).toFixed(1)+" ton/mes";
+  var tot=(proy.institucional||0)+(proy.ocasion||0);
+  var ri=tot>0?(proy.institucional||0)/tot:0.673;
+  document.getElementById("det-proy-inst").textContent=((proy.institucional||0)/1000).toFixed(1)+" ton ("+(ri*100).toFixed(0)+"%)";
+  document.getElementById("det-proy-ocas").textContent=((proy.ocasion||0)/1000).toFixed(1)+" ton ("+((1-ri)*100).toFixed(0)+"%)";
+  document.getElementById("det-proy-base").textContent=proy.modelo||"";
+}
+
+function mostrarSucursalDesdeCache(suc){
+  var sec=document.getElementById("det-sucursal-sec");if(sec)sec.style.display="block";
+  var loading=document.getElementById("det-sucursal-loading");
+  var info=document.getElementById("det-sucursal-info");
+  var err=document.getElementById("det-sucursal-error");
+  if(loading)loading.style.display="none";
+  if(info)info.style.display="block";
+  if(err)err.style.display="none";
+  var vkg=suc.venta_real||0,ikg=suc.venta_inst||0,okg=suc.venta_ocas||0;
+  var ipct=vkg>0?Math.round(ikg/vkg*100):0;
+  var opct=vkg>0?Math.round(okg/vkg*100):0;
+  document.getElementById("det-suc-nombre").textContent=suc.nombre||"-";
+  document.getElementById("det-suc-dist").textContent=suc.distancia||"-";
+  document.getElementById("det-suc-venta").textContent=(vkg/1000).toFixed(1)+" ton/mes";
+  document.getElementById("det-suc-inst").textContent=(ikg/1000).toFixed(1)+" ton ("+ipct+"%)";
+  document.getElementById("det-suc-ocas").textContent=(okg/1000).toFixed(1)+" ton ("+opct+"%)";
+  document.getElementById("det-suc-zona").textContent=suc.region||"";
 }
 
 function verificarLoteCercano(lat,lng){
@@ -1369,7 +1416,8 @@ function loadFromSupabase(){
         m2Construccion:r.m2_construccion||"",frente:r.frente||"",fondo:r.fondo||"",
         dueno:r.dueno||"",tel:r.tel||"",precio:r.precio||"",operacion:r.operacion||"renta",notas:r.notas||"",
         lat:r.lat,lng:r.lng,status:r.status||"prospecto",fecha:r.fecha||"",
-        fotos:(r.fotos&&!Array.isArray(r.fotos))?r.fotos:{},denue:r.denue,inegi:r.inegi,documentos:r.documentos||{}
+        fotos:(r.fotos&&!Array.isArray(r.fotos))?r.fotos:{},denue:r.denue,inegi:r.inegi,documentos:r.documentos||{},
+        proyeccion:r.proyeccion||null,sucursal_cercana:r.sucursal_cercana||null
       };
     });
     setSyncStatus(true);
@@ -1389,6 +1437,7 @@ function syncToSupabase(p){
     dueno:p.dueno,tel:p.tel,precio:p.precio,operacion:p.operacion||"renta",notas:p.notas,fotos:p.fotos||[],
     lat:p.lat,lng:p.lng,status:p.status,fecha:p.fecha,
     denue:p.denue,inegi:p.inegi,documentos:p.documentos||{},
+    proyeccion:p.proyeccion||null,sucursal_cercana:p.sucursal_cercana||null,
     updated_at:new Date().toISOString()
   };
   sb.from("prospectos").upsert(row).then(function(res){
@@ -1694,6 +1743,8 @@ function saveP(){
       denue:editId?(existing?existing.denue:null):(DR&&DR.real?{rest:DR.rest,com:DR.com,tot:DR.tot,desglose:DR.desglose||{}}:null),
       inegi:editId?(existing?existing.inegi:null):(DR&&DR.real?{viv:DR.viv,pob:DR.pob}:null),
       competencia:editId?(existing?existing.competencia||[]:[]): (DR&&DR.competencia?DR.competencia:[]),
+      proyeccion:DR&&DR.proyeccion?DR.proyeccion:(existing?existing.proyeccion||null:null),
+      sucursal_cercana:DR&&DR.sucursal_cercana?DR.sucursal_cercana:(existing?existing.sucursal_cercana||null:null),
       documentos:docState
     };
     if(editId){
@@ -1773,12 +1824,22 @@ function openDetail(id){
     document.getElementById("det-denue-sec").style.display="block";
     document.getElementById("det-rest").textContent=p.denue.rest||0;
     document.getElementById("det-com").textContent=p.denue.tot||0;
-    if(p.lat&&p.lng)mostrarSucursalCercana(p.lat,p.lng);
+    if(p.lat&&p.lng){
+      if(p.sucursal_cercana)mostrarSucursalDesdeCache(p.sucursal_cercana);
+      else mostrarSucursalCercana(p.lat,p.lng);
+    }
     verificarLoteCercano(p.lat,p.lng);
     var _pob=p.inegi&&p.inegi.pob?p.inegi.pob:null;
     var _viv=p.inegi&&p.inegi.viv?p.inegi.viv:null;
     var _giros=p.denue&&p.denue.tot?p.denue.tot:null;
-    if(p.lat&&p.lng)mostrarProyeccion(p.lat,p.lng,_pob,_viv,_giros);
+    if(p.lat&&p.lng){
+      if(p.proyeccion)mostrarProyeccionDesdeCache(p.proyeccion);
+      else mostrarProyeccion(p.lat,p.lng,_pob,_viv,_giros);
+    }
+    // Exponer en DR para que generarFichaPDF pueda leer si se abre desde aquí
+    DR=DR||{};DR._prospecto_id=p.id;
+    if(p.proyeccion)DR.proyeccion=p.proyeccion;
+    if(p.sucursal_cercana)DR.sucursal_cercana=p.sucursal_cercana;
     document.getElementById("det-viv").textContent=p.inegi&&p.inegi.viv?p.inegi.viv.toLocaleString():"-";
     document.getElementById("det-pob").textContent=p.inegi&&p.inegi.pob?(p.inegi.pob/1000).toFixed(1)+"K":"-";
     var desgEl=document.getElementById("det-desglose");
@@ -2215,18 +2276,46 @@ function initUI(){
 
   function generarFichaPDF(p){
     var fotoSrc=p.fotos&&p.fotos.frente?p.fotos.frente:p.fotos&&p.fotos.lateral?p.fotos.lateral:p.fotos&&p.fotos.entorno?p.fotos.entorno:null;
-    var proyRef=document.getElementById("det-proy-ref")?document.getElementById("det-proy-ref").textContent:null;
-    var proyRango=document.getElementById("det-proy-rango")?document.getElementById("det-proy-rango").textContent:null;
-    var proyPot=document.getElementById("det-proy-potencial")?document.getElementById("det-proy-potencial").textContent:null;
-    var proyInst=document.getElementById("det-proy-inst")?document.getElementById("det-proy-inst").textContent:null;
-    var proyOcas=document.getElementById("det-proy-ocas")?document.getElementById("det-proy-ocas").textContent:null;
-    var proyBase=document.getElementById("det-proy-base")?document.getElementById("det-proy-base").textContent:null;
-    var sucNombre=document.getElementById("det-suc-nombre")?document.getElementById("det-suc-nombre").textContent:null;
-    var sucDist=document.getElementById("det-suc-dist")?document.getElementById("det-suc-dist").textContent:null;
-    var sucVenta=document.getElementById("det-suc-venta")?document.getElementById("det-suc-venta").textContent:null;
-    var sucInst=document.getElementById("det-suc-inst")?document.getElementById("det-suc-inst").textContent:null;
-    var sucOcas=document.getElementById("det-suc-ocas")?document.getElementById("det-suc-ocas").textContent:null;
-    var sucZona=document.getElementById("det-suc-zona")?document.getElementById("det-suc-zona").textContent:null;
+    // Usar datos guardados en el objeto prospecto; fallback al DOM solo si se abre desde vista detalle
+    var proyRef,proyRango,proyPot,proyInst,proyOcas,proyBase;
+    if(p.proyeccion){
+      var pr=p.proyeccion;
+      var tot=(pr.institucional||0)+(pr.ocasion||0);
+      var ri=tot>0?(pr.institucional||0)/tot:0.673;
+      proyRef="~"+(pr.referencial/1000).toFixed(1)+" ton/mes";
+      proyRango=(pr.rango_min/1000).toFixed(1)+" — "+(pr.rango_max/1000).toFixed(1)+" ton/mes";
+      proyPot=pr.nivel||null;
+      proyInst=((pr.institucional||0)/1000).toFixed(1)+" ton ("+(ri*100).toFixed(0)+"%)";
+      proyOcas=((pr.ocasion||0)/1000).toFixed(1)+" ton ("+((1-ri)*100).toFixed(0)+"%)";
+      proyBase=pr.modelo||null;
+    } else {
+      proyRef=document.getElementById("det-proy-ref")?document.getElementById("det-proy-ref").textContent:null;
+      proyRango=document.getElementById("det-proy-rango")?document.getElementById("det-proy-rango").textContent:null;
+      proyPot=document.getElementById("det-proy-potencial")?document.getElementById("det-proy-potencial").textContent:null;
+      proyInst=document.getElementById("det-proy-inst")?document.getElementById("det-proy-inst").textContent:null;
+      proyOcas=document.getElementById("det-proy-ocas")?document.getElementById("det-proy-ocas").textContent:null;
+      proyBase=document.getElementById("det-proy-base")?document.getElementById("det-proy-base").textContent:null;
+    }
+    var sucNombre,sucDist,sucVenta,sucInst,sucOcas,sucZona;
+    if(p.sucursal_cercana){
+      var sc=p.sucursal_cercana;
+      var vkg=sc.venta_real||0,ikg=sc.venta_inst||0,okg=sc.venta_ocas||0;
+      var ipct=vkg>0?Math.round(ikg/vkg*100):0;
+      var opct=vkg>0?Math.round(okg/vkg*100):0;
+      sucNombre=sc.nombre||null;
+      sucDist=sc.distancia||null;
+      sucVenta=(vkg/1000).toFixed(1)+" ton/mes";
+      sucInst=(ikg/1000).toFixed(1)+" ton ("+ipct+"%)";
+      sucOcas=(okg/1000).toFixed(1)+" ton ("+opct+"%)";
+      sucZona=sc.region||null;
+    } else {
+      sucNombre=document.getElementById("det-suc-nombre")?document.getElementById("det-suc-nombre").textContent:null;
+      sucDist=document.getElementById("det-suc-dist")?document.getElementById("det-suc-dist").textContent:null;
+      sucVenta=document.getElementById("det-suc-venta")?document.getElementById("det-suc-venta").textContent:null;
+      sucInst=document.getElementById("det-suc-inst")?document.getElementById("det-suc-inst").textContent:null;
+      sucOcas=document.getElementById("det-suc-ocas")?document.getElementById("det-suc-ocas").textContent:null;
+      sucZona=document.getElementById("det-suc-zona")?document.getElementById("det-suc-zona").textContent:null;
+    }
     var loteSec=document.getElementById("det-lote-sec");
     var loteActivo=loteSec&&loteSec.style.display==="block";
     var lotNombre=loteActivo?document.getElementById("det-lote-nombre").textContent:null;
