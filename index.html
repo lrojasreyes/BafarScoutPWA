@@ -851,17 +851,23 @@ function actualizarMapaGlobal(lista,em){
     radius:40,blur:25,maxZoom:12,
     gradient:{0.0:"#3a8fff",0.3:"#22d18a",0.6:"#f0c050",1.0:"#f05060"}
   }).addTo(_mapaGlobal);
+  window._DIR_IDX={};
   pts.forEach(function(p){
+    window._DIR_IDX[p.id]=p;
     var email=em[p.user_id]||"Usuario";
     var color=p.status==="viable"?"#22d18a":p.status==="descartado"?"#f05060":"#e8a020";
     var m=L.circleMarker([p.lat,p.lng],{radius:7,fillColor:color,color:"#fff",weight:1.5,fillOpacity:0.9}).addTo(_mapaGlobal);
     var fecha=p.fecha||(p.created_at?(p.created_at+"").substr(0,10):"");
     m.bindPopup(
-      "<div style='min-width:160px'>"
-      +"<b style='font-size:13px'>"+(p.nombre||"Sin nombre")+"</b><br>"
+      "<div style='min-width:180px;font-family:sans-serif'>"
+      +"<b style='font-size:13px;color:#1a1a2e'>"+(p.nombre||"Sin nombre")+"</b><br>"
       +"<span style='color:#3a8fff;font-size:11px'>👤 "+email+"</span><br>"
       +"<span style='color:#6a7590;font-size:11px'>📍 "+(p.ciudad||"")+(p.estado?", "+p.estado:"")+"</span><br>"
-      +(fecha?"<span style='color:#6a7590;font-size:11px'>📅 "+fecha+"</span>":"")
+      +(fecha?"<span style='color:#6a7590;font-size:11px'>📅 "+fecha+"</span><br>":"")
+      +"<button onclick=\"generarFichaPDFGlobal('"+p.id+"')\" "
+      +"style='margin-top:8px;width:100%;padding:7px 0;background:#003087;color:white;border:none;"
+      +"border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.5px'>"
+      +"📄 Ver Ficha PDF</button>"
       +"</div>"
     );
     _markersGlobal.push(m);
@@ -869,6 +875,12 @@ function actualizarMapaGlobal(lista,em){
   var lats=pts.map(function(p){return p.lat;});
   var lngs=pts.map(function(p){return p.lng;});
   _mapaGlobal.fitBounds([[Math.min.apply(null,lats),Math.min.apply(null,lngs)],[Math.max.apply(null,lats),Math.max.apply(null,lngs)]],{padding:[30,30]});
+}
+
+function generarFichaPDFGlobal(id){
+  var p=window._DIR_IDX&&window._DIR_IDX[id];
+  if(!p){toast("Prospecto no encontrado");return;}
+  generarFichaPDF(p);
 }
 
 function abrirMapaCalorDENUE(p){
