@@ -1867,13 +1867,22 @@ function initUI(){
     var sucInst=document.getElementById("det-suc-inst")?document.getElementById("det-suc-inst").textContent:null;
     var sucOcas=document.getElementById("det-suc-ocas")?document.getElementById("det-suc-ocas").textContent:null;
     var sucZona=document.getElementById("det-suc-zona")?document.getElementById("det-suc-zona").textContent:null;
+    var loteSec=document.getElementById("det-lote-sec");
+    var loteActivo=loteSec&&loteSec.style.display==="block";
+    var lotNombre=loteActivo?document.getElementById("det-lote-nombre").textContent:null;
+    var lotZona=loteActivo?document.getElementById("det-lote-zona").textContent:null;
+    var lotDist=loteActivo?document.getElementById("det-lote-dist").textContent:null;
+    var lotPred=loteActivo?document.getElementById("det-lote-pred").textContent:null;
+    var lotInst=loteActivo?document.getElementById("det-lote-inst").textContent:null;
     var payload=Object.assign({},p,{
       radio:typeof RADIO!=="undefined"?RADIO:1000,
       fotoUrl:fotoSrc||null,
       proyRef:proyRef||null,proyRango:proyRango||null,proyPot:proyPot||null,
       proyInst:proyInst||null,proyOcas:proyOcas||null,proyBase:proyBase||null,
       sucNombre:sucNombre||null,sucDist:sucDist||null,sucVenta:sucVenta||null,
-      sucInst:sucInst||null,sucOcas:sucOcas||null,sucZona:sucZona||null
+      sucInst:sucInst||null,sucOcas:sucOcas||null,sucZona:sucZona||null,
+      lotNombre:lotNombre||null,lotZona:lotZona||null,lotDist:lotDist||null,
+      lotPred:lotPred||null,lotInst:lotInst||null
     });
     toast("Generando PDF…");
     fetch("/api/pdf",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)})

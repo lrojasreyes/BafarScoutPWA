@@ -101,7 +101,29 @@ export default async function handler(req, res) {
     doc.setFontSize(8);doc.setFont("helvetica","bold");doc.setTextColor(55,65,81);doc.text((p.lat||0).toFixed(5)+", "+(p.lng||0).toFixed(5),c2+3,y2+10);
     doc.setFontSize(6);doc.setFont("helvetica","normal");doc.setTextColor(58,143,255);doc.text("maps.google.com/?q="+(p.lat||0).toFixed(5)+","+(p.lng||0).toFixed(5),c2+3,y2+14);
     y2+=20;
-    const yFinal=Math.max(y1,y2)+4;
+    let yFinal=Math.max(y1,y2)+4;
+    if(p.lotNombre&&p.lotNombre!=="-"&&yFinal+28<272){
+      const lzH=28;
+      doc.setFillColor(218,251,237);doc.roundedRect(M,yFinal,W-M*2,lzH,2,2,"F");
+      doc.setDrawColor(34,209,138);doc.roundedRect(M,yFinal,W-M*2,lzH,2,2,"S");
+      doc.setFontSize(7);doc.setFont("helvetica","bold");doc.setTextColor(0,100,60);
+      doc.text("ZONA POTENCIAL BAFAR",M+3,yFinal+5);
+      doc.setFontSize(5.5);doc.setFont("helvetica","normal");doc.setTextColor(34,209,138);
+      doc.text("UBICACION EN ZONA POTENCIAL IDENTIFICADA",W-M-3,yFinal+5,{align:"right"});
+      doc.setDrawColor(34,209,138);doc.line(M+3,yFinal+7,W-M-3,yFinal+7);
+      doc.setFontSize(9);doc.setFont("helvetica","bold");doc.setTextColor(...negro);
+      doc.text(p.lotNombre,M+3,yFinal+12);
+      doc.setFontSize(7);doc.setFont("helvetica","normal");doc.setTextColor(...gris);
+      doc.text(p.lotZona||"",M+3,yFinal+16.5);
+      const kW=(W-M*2-8)/3;
+      [[p.lotDist||"-",[58,143,255],"DISTANCIA"],[p.lotPred||"-",[34,209,138],"PRED. MODELO"],[p.lotInst||"-",[240,192,80],"INSTITUCIONAL"]].forEach(([v,c,l],i)=>{
+        const kx=M+2+i*(kW+2),ky=yFinal+18;
+        doc.setFillColor(...blanco);doc.roundedRect(kx,ky,kW,9,1,1,"F");
+        doc.setFontSize(5);doc.setFont("helvetica","normal");doc.setTextColor(...gris);doc.text(l,kx+kW/2,ky+3.5,{align:"center"});
+        doc.setFontSize(7);doc.setFont("helvetica","bold");doc.setTextColor(...c);doc.text(v,kx+kW/2,ky+7.5,{align:"center"});
+      });
+      yFinal+=lzH+4;
+    }
     if(p.notas&&yFinal<265){
       doc.setFillColor(248,249,250);doc.roundedRect(M,yFinal,W-M*2,12,2,2,"F");
       doc.setFontSize(8);doc.setFont("helvetica","bold");doc.setTextColor(...negro);doc.text("Notas: "+p.notas,M+3,yFinal+8,{maxWidth:W-M*2-6});
