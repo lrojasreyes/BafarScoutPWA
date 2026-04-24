@@ -23,7 +23,7 @@ async function verificarAdmin(token, serviceKey) {
 
   if (!email) { console.log("[admin-users] Sin email en JWT"); return null; }
 
-  // Buscar por email (más robusto que user_id si hay inconsistencia de UUIDs)
+  // Buscar por email — NO por user_id (puede haber inconsistencia de UUIDs entre auth.users y perfiles)
   const url = `${SURL}/rest/v1/perfiles?email=eq.${encodeURIComponent(email)}&select=rol,activo,user_id`;
   console.log("[admin-users] Consultando:", url);
 
