@@ -830,12 +830,6 @@ function initMapaGlobal(lista,em){
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
       attribution:"© OpenStreetMap",maxZoom:18
     }).addTo(_mapaGlobal);
-    _mapaGlobal.on('popupopen',function(){
-      var btn=document.querySelector('.btn-ficha-pdf-global');
-      if(btn) btn.addEventListener('click',function(){
-        window.generarFichaPDFGlobal(this.dataset.id);
-      });
-    });
   }
   setTimeout(function(){_mapaGlobal.invalidateSize();},150);
   actualizarMapaGlobal(lista,em);
@@ -2149,6 +2143,14 @@ function initUI(){
   });
 
   document.addEventListener("click",function(e){
+    var pdfBtn=e.target.closest(".btn-ficha-pdf-global");
+    if(pdfBtn){
+      var pid=pdfBtn.dataset.id;
+      if(pid&&window._DIR_IDX&&window._DIR_IDX[pid]){
+        generarFichaPDF(window._DIR_IDX[pid]);
+      }
+      return;
+    }
     var fd=e.target.closest(".foto-del");
     if(fd){
       var slot=fd.dataset.slot;
