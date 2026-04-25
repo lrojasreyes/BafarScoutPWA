@@ -985,31 +985,17 @@ var PONDERACION_GIROS={
 
 function calcularIPB(lat,lng,denueData,inegiData,cb){
   cargarSucursales(function(suc){
-    var distBafarMin=999,ventaRef=0,ventaBasadas=0,ratioInst=0.65,f1=20;
+    var distBafarMin=999;
     if(suc&&suc.length){
-      var scored=[];
       suc.forEach(function(s){
         if(!s.latitud||!s.longitud)return;
         var dk=haversineKm(lat,lng,parseFloat(s.latitud),parseFloat(s.longitud));
         if(dk<distBafarMin)distBafarMin=dk;
-        if(!s.venta_kg||dk>300)return;
-        var pg=1/(1+dk*0.1),pd=1;
-        if(inegiData.pob&&s.poblacion&&s.poblacion>0){var rp=Math.min(inegiData.pob,s.poblacion)/Math.max(inegiData.pob,s.poblacion);pd=0.5+0.5*rp;}
-        scored.push({s:s,score:pg*pd});
       });
-      scored.sort(function(a,b){return b.score-a.score;});
-      var top5=scored.slice(0,5);
-      if(top5.length){
-        var ts=top5.reduce(function(a,x){return a+x.score;},0);
-        ventaRef=top5.reduce(function(a,x){return a+x.s.venta_kg*x.score;},0)/ts;
-        ratioInst=top5.reduce(function(a,x){return a+(x.s.ratio_institucional||0.65)*x.score;},0)/ts;
-        ventaBasadas=top5.length;
-        if(ventaRef>=80000)f1=100;else if(ventaRef>=50000)f1=70;else if(ventaRef>=30000)f1=40;else f1=20;
-      }
     }
     var desglose=denueData.desglose||{};
-    var scoreGiros=Object.keys(desglose).reduce(function(a,g){return a+(desglose[g]*(PONDERACION_GIROS[g]||0));},0);
-    var f2Norm=scoreGiros>=300000?100:scoreGiros>=200000?75:scoreGiros>=100000?50:25;
+    var countGiros=Object.keys(desglose).reduce(function(a,g){return a+(PONDERACION_GIROS[g]>0?desglose[g]:0);},0);
+    var f2Norm=countGiros>=300?100:countGiros>=200?75:countGiros>=100?50:countGiros>=50?25:10;
     var gKeys=Object.keys(desglose).map(function(g){return g.toLowerCase();});
     var bonusIman=0;
     if(gKeys.some(function(g){return g.indexOf("supermercado")>=0;}))bonusIman+=15;
@@ -1020,29 +1006,21 @@ function calcularIPB(lat,lng,denueData,inegiData,cb){
     if(escKey&&desglose[escKey]>5)bonusIman+=8;
     var f2=Math.min(100,f2Norm+bonusIman);
     var pob=inegiData.pob||0;
-    var f3=pob>=120000?100:pob>=80000?75:pob>=50000?50:pob>=30000?30:10;
+    var f3=pob>=80000?100:pob>=50000?75:pob>=30000?50:pob>=15000?25:10;
     var viv=inegiData.viv||0;
     var f4=viv>=35000?100:viv>=20000?70:viv>=10000?45:20;
     var tot=denueData.tot||0;
     var f5=tot>=400?100:tot>=250?70:tot>=100?45:20;
-    var ipbBase=f1*0.30+f2*0.25+f3*0.18+f4*0.12+f5*0.08;
+    var ipbBase=f2*0.35+f3*0.35+f5*0.30;
     var factorCanib=distBafarMin<1.0?0.60:distBafarMin<1.5?0.75:distBafarMin<3.0?0.88:1;
     var ipbFinal=Math.round(ipbBase*factorCanib);
     var clasif=ipbFinal>=75?"ZONA DE ALTO POTENCIAL":ipbFinal>=55?"ZONA CON POTENCIAL":ipbFinal>=35?"POTENCIAL MODERADO":"POTENCIAL BAJO";
-    var ventaRef2=Math.round(ventaRef*(ipbFinal/100));
-    var rangoMin=Math.round(ventaRef2*0.80);
-    var rangoMax=Math.round(ventaRef2*1.40);
-    var instKg=Math.round(ventaRef2*0.65);
-    var consKg=Math.round(ventaRef2*0.35);
     cb({
       ipb:ipbFinal,clasificacion:clasif,
-      venta_referencial:ventaRef2,rango_min:rangoMin,rango_max:rangoMax,
-      institucional:instKg,consumo:consKg,
       factor_canibalizacion:factorCanib,
       distancia_bafar_cercana:Math.round(distBafarMin*100)/100,
-      detalle_factores:{f1_ventas:f1,f2_giros:f2,f3_poblacion:f3,f4_nse:f4,f5_flujo:f5},
-      nivel:clasif,modelo:ventaBasadas+" sucursales",basadas:ventaBasadas,
-      referencial:ventaRef2,ocasion:consKg
+      detalle_factores:{f2_giros:f2,f3_poblacion:f3,f4_nse:f4,f5_flujo:f5},
+      nivel:clasif
     });
   });
 }
@@ -1058,10 +1036,8 @@ function _renderIPB(r){
   var df=r.detalle_factores||{};
   var fItems=[
     {l:"Mercado giros",p:df.f2_giros||0},
-    {l:"Población",p:df.f3_poblacion||0},
-    {l:"NSE estimado",p:df.f4_nse||0},
-    {l:"Flujo comercial",p:df.f5_flujo||0},
-    {l:"Ventas referencia",p:df.f1_ventas||0}
+    {l:"Población radio",p:df.f3_poblacion||0},
+    {l:"Flujo comercial",p:df.f5_flujo||0}
   ];
   var fe=document.getElementById("det-ipb-factores");
   if(fe)fe.innerHTML=fItems.map(function(f){return "<div style='margin-bottom:6px'><div style='display:flex;justify-content:space-between;font-size:11px;color:#e8ecf4;margin-bottom:3px'><span>"+f.l+"</span><span style='font-weight:700;color:#f0c050'>"+f.p+" pts</span></div><div style='background:rgba(255,255,255,.08);border-radius:4px;height:5px'><div style='height:5px;border-radius:4px;background:#f0c050;width:"+f.p+"%'></div></div></div>";}).join("");
@@ -1069,14 +1045,12 @@ function _renderIPB(r){
   var dist=r.distancia_bafar_cercana||99;
   var fortalezas=[];var debilidades=[];
   if((df.f2_giros||0)>=75)fortalezas.push("Alta densidad de mercado objetivo");
-  if((df.f3_poblacion||0)>=75)fortalezas.push("Población amplia en la zona");
-  if((df.f4_nse||0)>=75)fortalezas.push("Buen nivel socioeconómico estimado");
+  if((df.f3_poblacion||0)>=75)fortalezas.push("Alta población en radio inmediato");
   if((df.f5_flujo||0)>=75)fortalezas.push("Zona comercialmente activa");
   if(r.bonus_iman&&r.bonus_iman>0)fortalezas.push("Generador de tráfico detectado");
   if(fc>=1)fortalezas.push("Sin competencia BAFAR cercana");
   if((df.f2_giros||0)<50)debilidades.push("Bajo mercado de giros objetivo");
-  if((df.f3_poblacion||0)<50)debilidades.push("Población limitada en la zona");
-  if((df.f4_nse||0)<50)debilidades.push("NSE estimado bajo");
+  if((df.f3_poblacion||0)<50)debilidades.push("Baja densidad poblacional en radio");
   if((df.f5_flujo||0)<50)debilidades.push("Zona con poco flujo comercial");
   if(fc<1)debilidades.push("Tienda BAFAR a "+dist.toFixed(1)+"km — riesgo de canibalización");
   var fodaEl=document.getElementById("det-ipb-foda");
