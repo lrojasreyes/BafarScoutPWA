@@ -994,32 +994,39 @@ function calcularIPB(lat,lng,denueData,inegiData,cb){
       });
     }
     var desglose=denueData.desglose||{};
-    var countGiros=Object.keys(desglose).reduce(function(a,g){return a+(PONDERACION_GIROS[g]>0?desglose[g]:0);},0);
-    var f2Norm=countGiros>=300?100:countGiros>=200?75:countGiros>=100?50:countGiros>=50?25:10;
-    var gKeys=Object.keys(desglose).map(function(g){return g.toLowerCase();});
-    var bonusIman=0;
-    if(gKeys.some(function(g){return g.indexOf("supermercado")>=0;}))bonusIman+=15;
-    if(gKeys.some(function(g){return g.indexOf("mercado")>=0&&g.indexOf("super")<0;}))bonusIman+=20;
-    if(gKeys.some(function(g){return g.indexOf("central")>=0&&g.indexOf("abasto")>=0;}))bonusIman+=20;
-    if(gKeys.some(function(g){return g.indexOf("hospital")>=0;}))bonusIman+=8;
-    var escKey=Object.keys(desglose).find(function(g){return g.toLowerCase().indexOf("escuela")>=0;});
-    if(escKey&&desglose[escKey]>5)bonusIman+=8;
-    var f2=Math.min(100,f2Norm+bonusIman);
+    // Factor 1 — Mercado giros (35%): contar establecimientos en giros objetivo
+    var GIROS_OBJETIVO=["Restaurante","Fondas o Cocinas","Carniceria","Tortas","Taqueria",
+      "Restaurante de Mariscos","Comercio","Birreria o Barbacoa","Pizzas","Hamburguesas",
+      "Cafeterias","Bares y cantinas","Minisuper","Carnitas","Comedores Industriales",
+      "Distribuidores","Menuderia","Pollerias","Tamales","Hoteles","Guarderias","Tianguis"];
+    var countGiros=GIROS_OBJETIVO.reduce(function(a,g){return a+(desglose[g]||0);},0);
+    var f1=countGiros>=300?100:countGiros>=200?75:countGiros>=100?50:countGiros>=50?25:10;
+    // Factor 2 — Población radio 1.5km (35%)
     var pob=inegiData.pob||0;
-    var f3=pob>=80000?100:pob>=50000?75:pob>=30000?50:pob>=15000?25:10;
-    var viv=inegiData.viv||0;
-    var f4=viv>=35000?100:viv>=20000?70:viv>=10000?45:20;
+    var f2=pob>=80000?100:pob>=50000?75:pob>=30000?50:pob>=15000?25:10;
+    // Factor 3 — Flujo comercial (30%)
     var tot=denueData.tot||0;
-    var f5=tot>=400?100:tot>=250?70:tot>=100?45:20;
-    var ipbBase=f2*0.35+f3*0.35+f5*0.30;
+    var f3=tot>=400?100:tot>=250?75:tot>=150?50:tot>=75?25:10;
+    var ipbBase=f1*0.35+f2*0.35+f3*0.30;
     var factorCanib=distBafarMin<1.0?0.60:distBafarMin<1.5?0.75:distBafarMin<3.0?0.88:1;
-    var ipbFinal=Math.round(ipbBase*factorCanib);
+    // Efecto imán — detectar generadores de tráfico
+    var gKeys=Object.keys(desglose).map(function(g){return g.toLowerCase();});
+    var generadores=[];var bonusIman=0;
+    if(gKeys.some(function(g){return (g.indexOf("mercado")>=0&&g.indexOf("super")<0)||g.indexOf("tianguis")>=0;})){generadores.push("Mercado/Tianguis");bonusIman+=20;}
+    if(gKeys.some(function(g){return g.indexOf("supermercado")>=0||g.indexOf("walmart")>=0||g.indexOf("soriana")>=0||g.indexOf("chedraui")>=0||g.indexOf("bodega aurrera")>=0||g.indexOf("costco")>=0||g.indexOf("sams")>=0||g.indexOf("comercial mexicana")>=0;})){generadores.push("Supermercado ancla");bonusIman+=15;}
+    if(gKeys.some(function(g){return g.indexOf("central")>=0&&g.indexOf("abasto")>=0;})){generadores.push("Central de abasto");bonusIman+=20;}
+    if(gKeys.some(function(g){return g.indexOf("plaza comercial")>=0||g.indexOf("centro comercial")>=0||g.indexOf("mall")>=0;})){generadores.push("Centro comercial");bonusIman+=12;}
+    if(gKeys.some(function(g){return g.indexOf("hospital")>=0||g.indexOf("clinica imss")>=0||g.indexOf("clinica issste")>=0;})){generadores.push("Hospital/Clínica");bonusIman+=8;}
+    if(gKeys.some(function(g){return g.indexOf("terminal")>=0||g.indexOf("central camionera")>=0||g.indexOf("paradero")>=0||g.indexOf("metro")>=0;})){generadores.push("Nodo transporte");bonusIman+=10;}
+    var ipbFinal=Math.min(100,Math.round(ipbBase*factorCanib+(generadores.length>0?bonusIman:0)));
     var clasif=ipbFinal>=75?"ZONA DE ALTO POTENCIAL":ipbFinal>=55?"ZONA CON POTENCIAL":ipbFinal>=35?"POTENCIAL MODERADO":"POTENCIAL BAJO";
     cb({
       ipb:ipbFinal,clasificacion:clasif,
       factor_canibalizacion:factorCanib,
       distancia_bafar_cercana:Math.round(distBafarMin*100)/100,
-      detalle_factores:{f2_giros:f2,f3_poblacion:f3,f4_nse:f4,f5_flujo:f5},
+      detalle_factores:{f2_giros:f1,f3_poblacion:f2,f5_flujo:f3},
+      bonus_iman:bonusIman,
+      generadores:generadores,
       nivel:clasif
     });
   });
@@ -1034,20 +1041,23 @@ function _renderIPB(r){
   var bar=document.getElementById("det-ipb-bar");if(bar){bar.style.width=ipb+"%";bar.style.background=colorIPB;}
   var ce=document.getElementById("det-ipb-clasif");if(ce){ce.textContent=clasif;ce.style.color=colorIPB;ce.style.background=bgIPB;}
   var df=r.detalle_factores||{};
+  var generadores=r.generadores||[];
+  var bonusIman=r.bonus_iman||0;
   var fItems=[
-    {l:"Mercado giros",p:df.f2_giros||0},
-    {l:"Población radio",p:df.f3_poblacion||0},
-    {l:"Flujo comercial",p:df.f5_flujo||0}
+    {l:"Mercado giros",p:df.f2_giros||0,c:"#f0c050"},
+    {l:"Población radio",p:df.f3_poblacion||0,c:"#f0c050"},
+    {l:"Flujo comercial",p:df.f5_flujo||0,c:"#f0c050"}
   ];
+  if(generadores.length>0)fItems.push({l:"🧲 Efecto imán",p:Math.min(100,bonusIman),c:"#22d18a"});
   var fe=document.getElementById("det-ipb-factores");
-  if(fe)fe.innerHTML=fItems.map(function(f){return "<div style='margin-bottom:6px'><div style='display:flex;justify-content:space-between;font-size:11px;color:#e8ecf4;margin-bottom:3px'><span>"+f.l+"</span><span style='font-weight:700;color:#f0c050'>"+f.p+" pts</span></div><div style='background:rgba(255,255,255,.08);border-radius:4px;height:5px'><div style='height:5px;border-radius:4px;background:#f0c050;width:"+f.p+"%'></div></div></div>";}).join("");
+  if(fe)fe.innerHTML=fItems.map(function(f){return "<div style='margin-bottom:6px'><div style='display:flex;justify-content:space-between;font-size:11px;color:#e8ecf4;margin-bottom:3px'><span>"+f.l+"</span><span style='font-weight:700;color:"+f.c+"'>"+f.p+" pts</span></div><div style='background:rgba(255,255,255,.08);border-radius:4px;height:5px'><div style='height:5px;border-radius:4px;background:"+f.c+";width:"+f.p+"%'></div></div></div>";}).join("");
   var fc=r.factor_canibalizacion!=null?r.factor_canibalizacion:1;
   var dist=r.distancia_bafar_cercana||99;
   var fortalezas=[];var debilidades=[];
   if((df.f2_giros||0)>=75)fortalezas.push("Alta densidad de mercado objetivo");
   if((df.f3_poblacion||0)>=75)fortalezas.push("Alta población en radio inmediato");
   if((df.f5_flujo||0)>=75)fortalezas.push("Zona comercialmente activa");
-  if(r.bonus_iman&&r.bonus_iman>0)fortalezas.push("Generador de tráfico detectado");
+  generadores.forEach(function(g){fortalezas.push("🧲 "+g);});
   if(fc>=1)fortalezas.push("Sin competencia BAFAR cercana");
   if((df.f2_giros||0)<50)debilidades.push("Bajo mercado de giros objetivo");
   if((df.f3_poblacion||0)<50)debilidades.push("Baja densidad poblacional en radio");
@@ -2433,18 +2443,18 @@ function initUI(){
       if(isIPB){
         ipbScore=pr.ipb;ipbClasif=pr.clasificacion;
         var df2=pr.detalle_factores||{};
-        ipbF1=df2.f1_ventas;ipbF2=df2.f2_giros;ipbF3=df2.f3_poblacion;ipbF4=df2.f4_nse;ipbF5=df2.f5_flujo;
+        ipbF2=df2.f2_giros;ipbF3=df2.f3_poblacion;ipbF5=df2.f5_flujo;
         ipbCanib=pr.factor_canibalizacion;ipbDistBafar=pr.distancia_bafar_cercana;
         var _fc=ipbCanib!=null?ipbCanib:1;
+        var _gens=pr.generadores||[];
         var _fF=[],_fD=[];
         if((ipbF2||0)>=75)_fF.push("Alta densidad de mercado objetivo");
-        if((ipbF3||0)>=75)_fF.push("Población amplia en la zona");
-        if((ipbF4||0)>=75)_fF.push("Buen NSE estimado");
+        if((ipbF3||0)>=75)_fF.push("Alta población en radio inmediato");
         if((ipbF5||0)>=75)_fF.push("Zona comercialmente activa");
+        _gens.forEach(function(g){_fF.push("🧲 "+g);});
         if(_fc>=1)_fF.push("Sin competencia BAFAR cercana");
         if((ipbF2||0)<50)_fD.push("Bajo mercado de giros objetivo");
-        if((ipbF3||0)<50)_fD.push("Población limitada en la zona");
-        if((ipbF4||0)<50)_fD.push("NSE estimado bajo");
+        if((ipbF3||0)<50)_fD.push("Baja densidad poblacional en radio");
         if((ipbF5||0)<50)_fD.push("Zona con poco flujo comercial");
         if(_fc<1)_fD.push("BAFAR a "+(ipbDistBafar||0).toFixed(1)+"km — canibalización");
         payload_ipbFodaF=_fF;payload_ipbFodaD=_fD;
