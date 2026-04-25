@@ -1102,17 +1102,23 @@ function mostrarSucursalDesdeCache(suc){
 }
 
 function verificarLoteCercano(lat,lng){
+  console.log('[lotes] iniciando verificación lat:',lat,'lng:',lng);
+  console.log('[lotes] window._LOTES:',(window._LOTES?window._LOTES.length:undefined),'registros');
   var sec=document.getElementById("det-lote-sec");
   if(sec)sec.style.display="none";
   function _procesarLotes(lotes){
-    if(!lotes||!lotes.length)return;
+    if(!lotes||!lotes.length){console.log('[lotes] lista vacía, abortando');return;}
+    console.log('[lotes] lotes cargados:',lotes.length);
+    console.log('[lotes] primer lote:',JSON.stringify(lotes[0]));
     var cercano=null,minDist=999;
     lotes.forEach(function(l){
-      if(!l.latitud||!l.longitud)return;
+      console.log('[lotes] comparando con lote:',l.id,l.nombre,'lat:',l.latitud,'lng:',l.longitud);
+      if(!l.latitud||!l.longitud){console.log('[lotes] sin coords, saltando');return;}
       var d=haversineKm(lat,lng,parseFloat(l.latitud),parseFloat(l.longitud));
       if(d<minDist){minDist=d;cercano=l;}
     });
-    if(!cercano||minDist>1.5)return;
+    console.log('[lotes] resultado final: cercano=',cercano?cercano.id:'ninguno','distancia=',minDist,'km');
+    if(!cercano||minDist>1.5){console.log('[lotes] fuera de rango (>1.5km) o sin lote, ocultando módulo');return;}
     var pred=parseFloat((cercano.prediction||"0").toString().replace(",",""))||0;
     var inst=parseFloat(cercano.venta_inst)||0;
     var distStr=minDist<1?(minDist*1000).toFixed(0)+"m":minDist.toFixed(2)+"km";
@@ -1124,15 +1130,20 @@ function verificarLoteCercano(lat,lng){
     document.getElementById("det-lote-inst").textContent=(inst/1000).toFixed(1)+" ton";
   }
   if(window._LOTES&&window._LOTES.length){
+    console.log('[lotes] usando cache window._LOTES');
     _procesarLotes(window._LOTES);
     return;
   }
+  console.log('[lotes] sin cache, haciendo fetch...');
   fetch("https://pjacmizmjsjwxtoldpvr.supabase.co/rest/v1/lotes_potenciales?select=id,nombre,zona,latitud,longitud,prediction,venta_inst,venta_ocasion&limit=5000",{
     headers:{"apikey":"sb_publishable_zy_iwqAnOgx0N8xElowU8A_CwpJ71_K","Authorization":"Bearer sb_publishable_zy_iwqAnOgx0N8xElowU8A_CwpJ71_K"}
-  }).then(function(r){return r.json();}).then(function(lotes){
+  }).then(function(r){
+    console.log('[lotes] fetch status:',r.status,r.ok);
+    return r.json();
+  }).then(function(lotes){
     window._LOTES=lotes||[];
     _procesarLotes(window._LOTES);
-  }).catch(function(e){console.error("lotes:",e);});
+  }).catch(function(e){console.error('[lotes] fetch error:',e);});
 }
 
 function setSyncStatus(ok){
