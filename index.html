@@ -210,25 +210,16 @@ textarea{resize:none;min-height:80px}
             <div id="det-proy-loading" style="font-size:12px;color:#6a7590;text-align:center;padding:10px">Calculando IPB...</div>
             <div id="det-proy-info" style="display:none">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-                <div style="font-size:10px;text-transform:uppercase;color:#6a7590">IPB Score</div>
+                <div style="font-size:10px;text-transform:uppercase;color:#6a7590">Potencial de la zona</div>
                 <div style="font-size:22px;font-weight:800" id="det-ipb-score">-</div>
               </div>
               <div style="background:rgba(255,255,255,.08);border-radius:6px;height:8px;margin-bottom:10px"><div id="det-ipb-bar" style="height:8px;border-radius:6px;width:0%;transition:width .4s"></div></div>
               <div style="font-size:14px;font-weight:800;padding:6px 10px;border-radius:8px;text-align:center;margin-bottom:12px" id="det-ipb-clasif">-</div>
-              <div class="r2" style="margin-bottom:8px">
-                <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">Ventas referencia</div><div style="font-size:18px;font-weight:800;color:#22d18a" id="det-proy-ref">-</div></div>
-                <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">Rango estimado</div><div style="font-size:12px;font-weight:700;color:#6a7590" id="det-proy-rango">-</div></div>
-              </div>
               <div style="margin-bottom:10px">
                 <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#6a7590;margin-bottom:8px;letter-spacing:1px">Factores del índice</div>
                 <div id="det-ipb-factores"></div>
               </div>
-              <div class="r2" style="margin-bottom:8px">
-                <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">Institucional (65%)</div><div style="font-size:15px;font-weight:700;color:#f0c050" id="det-proy-inst">-</div></div>
-                <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">Consumo (35%)</div><div style="font-size:15px;font-weight:700;color:#e8a020" id="det-proy-ocas">-</div></div>
-              </div>
-              <div id="det-ipb-canib" style="display:none;background:rgba(240,80,96,.1);border:1px solid rgba(240,80,96,.3);border-radius:8px;padding:8px 10px;font-size:12px;color:#f05060;margin-bottom:8px"></div>
-              <div style="font-size:10px;color:#6a7590;font-style:italic" id="det-proy-base"></div>
+              <div id="det-ipb-foda"></div>
             </div>
           </div>
         </div>
@@ -1061,14 +1052,9 @@ function _renderIPB(r){
   var clasif=r.clasificacion||r.nivel||"-";
   var colorIPB=ipb>=75?"#22d18a":ipb>=55?"#4ade80":ipb>=35?"#e8a020":"#f05060";
   var bgIPB=ipb>=75?"rgba(34,209,138,.12)":ipb>=55?"rgba(74,222,128,.12)":ipb>=35?"rgba(232,160,32,.12)":"rgba(240,80,96,.12)";
-  var sc=document.getElementById("det-ipb-score");if(sc){sc.textContent=ipb+" / 100";sc.style.color=colorIPB;}
+  var sc=document.getElementById("det-ipb-score");if(sc){sc.textContent=ipb+"%";sc.style.color=colorIPB;}
   var bar=document.getElementById("det-ipb-bar");if(bar){bar.style.width=ipb+"%";bar.style.background=colorIPB;}
   var ce=document.getElementById("det-ipb-clasif");if(ce){ce.textContent=clasif;ce.style.color=colorIPB;ce.style.background=bgIPB;}
-  var ref=r.venta_referencial||r.referencial||0;
-  var refEl=document.getElementById("det-proy-ref");if(refEl)refEl.textContent="~"+(ref/1000).toFixed(1)+" ton/mes";
-  var rEl=document.getElementById("det-proy-rango");if(rEl)rEl.textContent=((r.rango_min||0)/1000).toFixed(1)+" — "+((r.rango_max||0)/1000).toFixed(1)+" ton/mes";
-  var iEl=document.getElementById("det-proy-inst");if(iEl)iEl.textContent=((r.institucional||0)/1000).toFixed(1)+" ton";
-  var oEl=document.getElementById("det-proy-ocas");if(oEl)oEl.textContent=((r.consumo||r.ocasion||0)/1000).toFixed(1)+" ton";
   var df=r.detalle_factores||{};
   var fItems=[
     {l:"Mercado giros",p:df.f2_giros||0},
@@ -1079,9 +1065,28 @@ function _renderIPB(r){
   ];
   var fe=document.getElementById("det-ipb-factores");
   if(fe)fe.innerHTML=fItems.map(function(f){return "<div style='margin-bottom:6px'><div style='display:flex;justify-content:space-between;font-size:11px;color:#e8ecf4;margin-bottom:3px'><span>"+f.l+"</span><span style='font-weight:700;color:#f0c050'>"+f.p+" pts</span></div><div style='background:rgba(255,255,255,.08);border-radius:4px;height:5px'><div style='height:5px;border-radius:4px;background:#f0c050;width:"+f.p+"%'></div></div></div>";}).join("");
-  var canibEl=document.getElementById("det-ipb-canib");
-  if(canibEl){var fc=r.factor_canibalizacion||1;if(fc<1){var pct=Math.round((1-fc)*100);canibEl.style.display="block";canibEl.textContent="⚠️ Tienda BAFAR a "+(r.distancia_bafar_cercana||0).toFixed(1)+"km — Ajuste canibalización: -"+pct+"%";}else canibEl.style.display="none";}
-  var bEl=document.getElementById("det-proy-base");if(bEl)bEl.textContent=r.modelo||(r.basadas?"Basado en "+r.basadas+" sucursales":"");
+  var fc=r.factor_canibalizacion!=null?r.factor_canibalizacion:1;
+  var dist=r.distancia_bafar_cercana||99;
+  var fortalezas=[];var debilidades=[];
+  if((df.f2_giros||0)>=75)fortalezas.push("Alta densidad de mercado objetivo");
+  if((df.f3_poblacion||0)>=75)fortalezas.push("Población amplia en la zona");
+  if((df.f4_nse||0)>=75)fortalezas.push("Buen nivel socioeconómico estimado");
+  if((df.f5_flujo||0)>=75)fortalezas.push("Zona comercialmente activa");
+  if(r.bonus_iman&&r.bonus_iman>0)fortalezas.push("Generador de tráfico detectado");
+  if(fc>=1)fortalezas.push("Sin competencia BAFAR cercana");
+  if((df.f2_giros||0)<50)debilidades.push("Bajo mercado de giros objetivo");
+  if((df.f3_poblacion||0)<50)debilidades.push("Población limitada en la zona");
+  if((df.f4_nse||0)<50)debilidades.push("NSE estimado bajo");
+  if((df.f5_flujo||0)<50)debilidades.push("Zona con poco flujo comercial");
+  if(fc<1)debilidades.push("Tienda BAFAR a "+dist.toFixed(1)+"km — riesgo de canibalización");
+  var fodaEl=document.getElementById("det-ipb-foda");
+  if(fodaEl){
+    var h="";
+    if(fortalezas.length){h+="<div style='font-size:10px;font-weight:700;text-transform:uppercase;color:#22d18a;margin-bottom:5px;letter-spacing:1px'>Fortalezas</div>";h+=fortalezas.map(function(f){return "<div style='font-size:12px;color:#e8ecf4;padding:3px 0;display:flex;gap:6px;align-items:flex-start'><span>✅</span><span>"+f+"</span></div>";}).join("");}
+    if(debilidades.length){h+="<div style='font-size:10px;font-weight:700;text-transform:uppercase;color:#e8a020;margin-top:8px;margin-bottom:5px;letter-spacing:1px'>Debilidades</div>";h+=debilidades.map(function(d){return "<div style='font-size:12px;color:#e8ecf4;padding:3px 0;display:flex;gap:6px;align-items:flex-start'><span>⚠️</span><span>"+d+"</span></div>";}).join("");}
+    else h+="<div style='font-size:12px;color:#22d18a;padding:6px 0'>✅ Sin debilidades críticas</div>";
+    fodaEl.innerHTML=h;
+  }
 }
 
 function mostrarIPB(lat,lng,prospecto){
@@ -2435,6 +2440,7 @@ function initUI(){
     var fotoSrc=p.fotos&&p.fotos.frente?p.fotos.frente:p.fotos&&p.fotos.lateral?p.fotos.lateral:p.fotos&&p.fotos.entorno?p.fotos.entorno:null;
     var proyRef,proyRango,proyPot,proyInst,proyOcas,proyBase;
     var ipbScore=null,ipbClasif=null,ipbF1=null,ipbF2=null,ipbF3=null,ipbF4=null,ipbF5=null,ipbCanib=null,ipbDistBafar=null;
+    var payload_ipbFodaF=[],payload_ipbFodaD=[];
     var pvRef=null,pvRango=null,pvInst=null,pvCons=null,pvTiendas=null;
     if(p.proyeccion){
       var pr=p.proyeccion;
@@ -2455,6 +2461,19 @@ function initUI(){
         var df2=pr.detalle_factores||{};
         ipbF1=df2.f1_ventas;ipbF2=df2.f2_giros;ipbF3=df2.f3_poblacion;ipbF4=df2.f4_nse;ipbF5=df2.f5_flujo;
         ipbCanib=pr.factor_canibalizacion;ipbDistBafar=pr.distancia_bafar_cercana;
+        var _fc=ipbCanib!=null?ipbCanib:1;
+        var _fF=[],_fD=[];
+        if((ipbF2||0)>=75)_fF.push("Alta densidad de mercado objetivo");
+        if((ipbF3||0)>=75)_fF.push("Población amplia en la zona");
+        if((ipbF4||0)>=75)_fF.push("Buen NSE estimado");
+        if((ipbF5||0)>=75)_fF.push("Zona comercialmente activa");
+        if(_fc>=1)_fF.push("Sin competencia BAFAR cercana");
+        if((ipbF2||0)<50)_fD.push("Bajo mercado de giros objetivo");
+        if((ipbF3||0)<50)_fD.push("Población limitada en la zona");
+        if((ipbF4||0)<50)_fD.push("NSE estimado bajo");
+        if((ipbF5||0)<50)_fD.push("Zona con poco flujo comercial");
+        if(_fc<1)_fD.push("BAFAR a "+(ipbDistBafar||0).toFixed(1)+"km — canibalización");
+        payload_ipbFodaF=_fF;payload_ipbFodaD=_fD;
       }
       var pv=pr.venta||(DR&&DR.proyeccion_venta?DR.proyeccion_venta:null);
       if(pv){
@@ -2511,6 +2530,7 @@ function initUI(){
       ipbScore:ipbScore,ipbClasif:ipbClasif||null,
       ipbF1:ipbF1||null,ipbF2:ipbF2||null,ipbF3:ipbF3||null,ipbF4:ipbF4||null,ipbF5:ipbF5||null,
       ipbCanib:ipbCanib||null,ipbDistBafar:ipbDistBafar||null,
+      ipbFodaF:payload_ipbFodaF,ipbFodaD:payload_ipbFodaD,
       pvRef:pvRef||null,pvRango:pvRango||null,pvInst:pvInst||null,pvCons:pvCons||null,pvTiendas:pvTiendas||null,
       sucNombre:sucNombre||null,sucDist:sucDist||null,sucVenta:sucVenta||null,
       sucInst:sucInst||null,sucOcas:sucOcas||null,sucZona:sucZona||null,

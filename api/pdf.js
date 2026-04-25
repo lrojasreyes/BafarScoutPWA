@@ -110,33 +110,42 @@ export default async function handler(req, res) {
     doc.setFontSize(6);doc.setFont("helvetica","normal");doc.setTextColor(58,143,255);doc.text("maps.google.com/?q="+(p.lat||0).toFixed(5)+","+(p.lng||0).toFixed(5),c2+3,y2+14);
     y2+=20;
     let yFinal=Math.max(y1,y2)+4;
-    if(p.ipbScore!=null&&yFinal+48<272){
-      const ipbH=48;
-      const ipbClr=p.ipbScore>=75?verde:p.ipbScore>=55?[74,222,128]:p.ipbScore>=35?dorado:[239,68,68];
-      const ipbBg=p.ipbScore>=75?[218,251,237]:p.ipbScore>=55?[220,252,231]:p.ipbScore>=35?[255,248,220]:[254,226,226];
-      doc.setFillColor(...ipbBg);doc.roundedRect(M,yFinal,W-M*2,ipbH,2,2,"F");
-      doc.setDrawColor(...ipbClr);doc.roundedRect(M,yFinal,W-M*2,ipbH,2,2,"S");
-      doc.setFontSize(7);doc.setFont("helvetica","bold");doc.setTextColor(...gris);
-      doc.text("INDICE DE POTENCIAL BAFAR",M+3,yFinal+5);
-      doc.setFontSize(12);doc.setFont("helvetica","bold");doc.setTextColor(...ipbClr);
-      doc.text(String(p.ipbScore)+"/100",W-M-3,yFinal+5,{align:"right"});
-      doc.setDrawColor(...ipbClr);doc.line(M+3,yFinal+6.5,W-M-3,yFinal+6.5);
-      doc.setFontSize(9);doc.setFont("helvetica","bold");doc.setTextColor(...ipbClr);
-      doc.text(p.ipbClasif||"",M+3,yFinal+12);
-      doc.setFontSize(7);doc.setFont("helvetica","normal");doc.setTextColor(...negro);
-      doc.text("Venta ref: "+(p.proyRef||"-"),M+3,yFinal+19);
-      doc.text("Rango: "+(p.proyRango||"-"),M+3,yFinal+24);
-      const halfW=(W-M*2)/2;
-      doc.text("Institucional: "+(p.proyInst||"-"),M+3,yFinal+30);
-      doc.text("Consumo: "+(p.proyOcas||"-"),M+halfW+2,yFinal+30);
-      const fStr="Giros: "+(p.ipbF2||0)+"pts  Pob: "+(p.ipbF3||0)+"pts  NSE: "+(p.ipbF4||0)+"pts  Flujo: "+(p.ipbF5||0)+"pts";
-      doc.setFontSize(6.5);doc.setTextColor(...gris);doc.text(fStr,M+3,yFinal+37);
-      if(p.ipbCanib&&p.ipbCanib<1){
-        const pctC=Math.round((1-p.ipbCanib)*100);
-        doc.setFontSize(6.5);doc.setFont("helvetica","bold");doc.setTextColor(239,68,68);
-        doc.text("Ajuste canibalizacion: -"+pctC+"% (BAFAR a "+(p.ipbDistBafar||0).toFixed(1)+"km)",M+3,yFinal+43);
+    if(p.ipbScore!=null){
+      const fF=Array.isArray(p.ipbFodaF)?p.ipbFodaF:[];
+      const fD=Array.isArray(p.ipbFodaD)?p.ipbFodaD:[];
+      const ipbLines=3+(fF.length?fF.length+1:0)+(fD.length?fD.length+1:1);
+      const ipbH=Math.min(14+ipbLines*6,72);
+      if(yFinal+ipbH<272){
+        const ipbClr=p.ipbScore>=75?verde:p.ipbScore>=55?[74,222,128]:p.ipbScore>=35?dorado:[239,68,68];
+        const ipbBg=p.ipbScore>=75?[218,251,237]:p.ipbScore>=55?[220,252,231]:p.ipbScore>=35?[255,248,220]:[254,226,226];
+        doc.setFillColor(...ipbBg);doc.roundedRect(M,yFinal,W-M*2,ipbH,2,2,"F");
+        doc.setDrawColor(...ipbClr);doc.roundedRect(M,yFinal,W-M*2,ipbH,2,2,"S");
+        doc.setFontSize(7);doc.setFont("helvetica","bold");doc.setTextColor(...gris);
+        doc.text("INDICE DE POTENCIAL BAFAR",M+3,yFinal+5);
+        doc.setFontSize(12);doc.setFont("helvetica","bold");doc.setTextColor(...ipbClr);
+        doc.text(String(p.ipbScore)+"%",W-M-3,yFinal+5,{align:"right"});
+        doc.setDrawColor(...ipbClr);doc.line(M+3,yFinal+6.5,W-M-3,yFinal+6.5);
+        doc.setFontSize(9);doc.setFont("helvetica","bold");doc.setTextColor(...ipbClr);
+        doc.text(p.ipbClasif||"",M+3,yFinal+12);
+        const fStr="Giros: "+(p.ipbF2||0)+"pts  Pob: "+(p.ipbF3||0)+"pts  NSE: "+(p.ipbF4||0)+"pts  Flujo: "+(p.ipbF5||0)+"pts";
+        doc.setFontSize(6);doc.setFont("helvetica","normal");doc.setTextColor(...gris);
+        doc.text(fStr,M+3,yFinal+18);
+        let fy=yFinal+24;
+        if(fF.length){
+          doc.setFontSize(6);doc.setFont("helvetica","bold");doc.setTextColor(34,209,138);
+          doc.text("FORTALEZAS",M+3,fy);fy+=5;
+          fF.forEach(f=>{doc.setFont("helvetica","normal");doc.setTextColor(55,65,81);doc.text("+ "+f,M+5,fy,{maxWidth:W-M*2-10});fy+=5;});
+        }
+        if(fD.length){
+          doc.setFontSize(6);doc.setFont("helvetica","bold");doc.setTextColor(232,160,32);
+          doc.text("DEBILIDADES",M+3,fy);fy+=5;
+          fD.forEach(d=>{doc.setFont("helvetica","normal");doc.setTextColor(55,65,81);doc.text("- "+d,M+5,fy,{maxWidth:W-M*2-10});fy+=5;});
+        } else {
+          doc.setFontSize(6);doc.setFont("helvetica","normal");doc.setTextColor(34,209,138);
+          doc.text("Sin debilidades criticas",M+3,fy);
+        }
+        yFinal+=ipbH+4;
       }
-      yFinal+=ipbH+4;
     }
     if(p.lotNombre&&p.lotNombre!=="-"&&yFinal+28<272){
       const lzH=28;
