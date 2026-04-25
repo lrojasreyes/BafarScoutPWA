@@ -1104,9 +1104,7 @@ function mostrarSucursalDesdeCache(suc){
 function verificarLoteCercano(lat,lng){
   var sec=document.getElementById("det-lote-sec");
   if(sec)sec.style.display="none";
-  fetch("https://pjacmizmjsjwxtoldpvr.supabase.co/rest/v1/lotes_potenciales?select=id,nombre,zona,latitud,longitud,prediction,venta_inst,venta_ocasion&limit=500",{
-    headers:{"apikey":"sb_publishable_zy_iwqAnOgx0N8xElowU8A_CwpJ71_K","Authorization":"Bearer sb_publishable_zy_iwqAnOgx0N8xElowU8A_CwpJ71_K"}
-  }).then(function(r){return r.json();}).then(function(lotes){
+  function _procesarLotes(lotes){
     if(!lotes||!lotes.length)return;
     var cercano=null,minDist=999;
     lotes.forEach(function(l){
@@ -1124,6 +1122,16 @@ function verificarLoteCercano(lat,lng){
     document.getElementById("det-lote-dist").textContent=distStr;
     document.getElementById("det-lote-pred").textContent=(pred/1000).toFixed(1)+" ton/mes";
     document.getElementById("det-lote-inst").textContent=(inst/1000).toFixed(1)+" ton";
+  }
+  if(window._LOTES&&window._LOTES.length){
+    _procesarLotes(window._LOTES);
+    return;
+  }
+  fetch("https://pjacmizmjsjwxtoldpvr.supabase.co/rest/v1/lotes_potenciales?select=id,nombre,zona,latitud,longitud,prediction,venta_inst,venta_ocasion&limit=5000",{
+    headers:{"apikey":"sb_publishable_zy_iwqAnOgx0N8xElowU8A_CwpJ71_K","Authorization":"Bearer sb_publishable_zy_iwqAnOgx0N8xElowU8A_CwpJ71_K"}
+  }).then(function(r){return r.json();}).then(function(lotes){
+    window._LOTES=lotes||[];
+    _procesarLotes(window._LOTES);
   }).catch(function(e){console.error("lotes:",e);});
 }
 
