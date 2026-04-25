@@ -1716,7 +1716,7 @@ function rf(){
   document.getElementById("gc").textContent="Toca para obtener coordenadas";
   document.getElementById("dsec").style.display="none";
   document.getElementById("fsu").style.display="none";
-  document.getElementById("pg").innerHTML="<div class='padd' id='padd'>+</div>";
+  var pg=document.getElementById("pg");if(pg)pg.innerHTML="<div class='padd' id='padd'>+</div>";
   document.querySelectorAll(".tipo").forEach(function(c){c.classList.remove("ok");});
   document.querySelector(".tipo").classList.add("ok");
   TI="Local comercial";
