@@ -1019,7 +1019,7 @@ function mostrarProyeccion(lat,lng,pob,viv,giros){
     document.getElementById("det-proy-base").textContent="Basado en "+r.basadas+" sucursales similares en operación";
     // Guardar en DR para persistir al salvar
     if(!DR)DR={};
-    DR.proyeccion={referencial:Math.round(r.ventaRef),rango_min:Math.round(r.ventaMin),rango_max:Math.round(r.ventaMax),institucional:instKg,ocasion:ocasKg,nivel:r.potencial,modelo:r.basadas+" sucursales"};
+    DR.proyeccion={referencial:Math.round(r.ventaRef),rango_min:Math.round(r.ventaMin),rango_max:Math.round(r.ventaMax),institucional:instKg,ocasion:ocasKg,nivel:r.potencial,modelo:r.basadas+" sucursales",tiendas_referencia:r.basadas};
     // Actualizar el prospecto actual si ya existe
     if(DR._prospecto_id){var idx=PS.findIndex(function(x){return x.id===DR._prospecto_id;});if(idx>=0){PS[idx].proyeccion=DR.proyeccion;syncToSupabase(PS[idx]);}}
   });
@@ -1072,7 +1072,7 @@ function mostrarSucursalCercana(lat,lng){
 }
 
 function mostrarProyeccionDesdeCache(proy,prosp){
-  if(!proy||proy.ipb!==undefined||!proy.referencial){
+  if(!proy||proy.ipb!==undefined||!proy.referencial||!proy.tiendas_referencia){
     if(prosp&&prosp.lat&&prosp.lng){
       var _p=prosp.inegi&&prosp.inegi.pob?prosp.inegi.pob:null;
       var _v=prosp.inegi&&prosp.inegi.viv?prosp.inegi.viv:null;
