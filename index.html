@@ -1803,6 +1803,50 @@ function getRentaAsync(ciudad, tipo, operacion, estado, callback){
   .catch(function(){callback(null);});
 }
 
+function _cargarDesgloseDetalle(p,desgEl){
+  var lat=p.lat,lng=p.lng,r=RADIO,tok=localStorage.getItem("dtok")||TOK;
+  function _pd(scian){
+    return fetch("/api/denue",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({lat:lat,lng:lng,radio:r,scian:scian,token:tok})}).then(function(x){return x.json();}).catch(function(){return[];});
+  }
+  Promise.all([_pd("restaurantes"),_pd("carniceria"),_pd("minisuper")]).then(function(res){
+    var dg={},vis={};
+    var excluir=["farmacia","oxxo","papeleria","herbalife","jugos","panaderia","tortilleria","rosticeria","mcdonald","burger king","starbucks","dominos","subway","kfc","pizza hut","vips","toks","helado","nieve","raspado"];
+    function _proc(arr,esCom){
+      arr.forEach(function(est){
+        var eid=est.Id||est.id||Math.random().toString();
+        if(vis[eid])return;vis[eid]=true;
+        var nm=est.Nombre||"";var n=nm.toLowerCase();var a=(est.Clase_actividad||"").toLowerCase();
+        if(!nm||n.indexOf("sin nombre")>=0)return;
+        if(excluir.some(function(t){return n.indexOf(t)>=0||a.indexOf(t)>=0;}))return;
+        var giro=esCom?(n.indexOf("carnic")>=0?"Carniceria":n.indexOf("cremeria")>=0||n.indexOf("lacteo")>=0?"Tenderos o Cremerias":"Comercio"):"Restaurante";
+        if(!esCom){
+          if(n.indexOf("taco")>=0)giro="Taqueria";
+          else if(n.indexOf("fonda")>=0||n.indexOf("cocina")>=0)giro="Fondas o Cocinas";
+          else if(n.indexOf("birria")>=0||n.indexOf("barbacoa")>=0)giro="Birreria o Barbacoa";
+          else if(n.indexOf("mariscos")>=0||a.indexOf("mariscos")>=0)giro="Restaurante de Mariscos";
+          else if(n.indexOf("pizza")>=0)giro="Pizzas";
+          else if(n.indexOf("torta")>=0)giro="Tortas";
+          else if(n.indexOf("hambur")>=0)giro="Hamburguesas";
+          else if(n.indexOf("cafe")>=0)giro="Cafeterias";
+          else if(n.indexOf("bar")>=0||n.indexOf("cantina")>=0)giro="Bares y cantinas";
+        }
+        dg[giro]=(dg[giro]||0)+1;
+      });
+    }
+    _proc(Array.isArray(res[0])?res[0]:[],false);
+    _proc([].concat(Array.isArray(res[1])?res[1]:[]).concat(Array.isArray(res[2])?res[2]:[]),true);
+    if(Object.keys(dg).length>0){
+      desgEl.innerHTML=Object.keys(dg).sort(function(a,b){return dg[b]-dg[a];}).map(function(g){
+        return "<div style='display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04)'><span style='font-size:13px;color:#e8ecf4'>"+g+"</span><span style='font-size:14px;font-weight:700;color:#f0c050'>"+dg[g]+"</span></div>";
+      }).join("");
+      var idx=PS.findIndex(function(x){return x.id===p.id;});
+      if(idx>=0){PS[idx].denue=Object.assign({},PS[idx].denue,{desglose:dg});syncToSupabase(PS[idx]);}
+    } else {
+      desgEl.innerHTML="<div style='font-size:12px;color:#6a7590;text-align:center;padding:10px'>Sin desglose disponible</div>";
+    }
+  });
+}
+
 function openDetail(id){
   var p=PS.find(function(x){return x.id===id;});
   if(!p)return;
@@ -1847,13 +1891,19 @@ function openDetail(id){
     document.getElementById("det-viv").textContent=p.inegi&&p.inegi.viv?p.inegi.viv.toLocaleString():"-";
     document.getElementById("det-pob").textContent=p.inegi&&p.inegi.pob?(p.inegi.pob/1000).toFixed(1)+"K":"-";
     var desgEl=document.getElementById("det-desglose");
-    if(desgEl&&p.denue.desglose&&Object.keys(p.denue.desglose).length>0){
-      var dg=p.denue.desglose;
-      desgEl.innerHTML=Object.keys(dg).sort(function(a,b){return dg[b]-dg[a];}).map(function(g){
-        return "<div style='display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04)'><span style='font-size:13px;color:#e8ecf4'>"+g+"</span><span style='font-size:14px;font-weight:700;color:#f0c050'>"+dg[g]+"</span></div>";
+    var _dg=p.denue.desglose;
+    if(_dg&&typeof _dg==="string"){try{_dg=JSON.parse(_dg);}catch(e){_dg=null;}}
+    if(desgEl&&_dg&&typeof _dg==="object"&&Object.keys(_dg).length>0){
+      desgEl.innerHTML=Object.keys(_dg).sort(function(a,b){return _dg[b]-_dg[a];}).map(function(g){
+        return "<div style='display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04)'><span style='font-size:13px;color:#e8ecf4'>"+g+"</span><span style='font-size:14px;font-weight:700;color:#f0c050'>"+_dg[g]+"</span></div>";
       }).join("");
     } else if(desgEl){
-      desgEl.innerHTML="<div style='font-size:12px;color:#6a7590;text-align:center;padding:10px'>Sin desglose disponible</div>";
+      if(p.lat&&p.lng){
+        desgEl.innerHTML="<div style='font-size:12px;color:#6a7590;text-align:center;padding:10px'>Cargando desglose...</div>";
+        _cargarDesgloseDetalle(p,desgEl);
+      } else {
+        desgEl.innerHTML="<div style='font-size:12px;color:#6a7590;text-align:center;padding:10px'>Sin desglose disponible</div>";
+      }
     }
   } else {
     document.getElementById("det-denue-sec").style.display="none";
