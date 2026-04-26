@@ -994,20 +994,22 @@ function calcularIPB(lat,lng,denueData,inegiData,cb){
       });
     }
     var desglose=denueData.desglose||{};
-    // Factor 1 — Mercado giros (35%): contar establecimientos en giros objetivo
+    // Factor 1 — Mercado giros (30%)
     var GIROS_OBJETIVO=["Restaurante","Fondas o Cocinas","Carniceria","Tortas","Taqueria",
       "Restaurante de Mariscos","Comercio","Birreria o Barbacoa","Pizzas","Hamburguesas",
       "Cafeterias","Bares y cantinas","Minisuper","Carnitas","Comedores Industriales",
       "Distribuidores","Menuderia","Pollerias","Tamales","Hoteles","Guarderias","Tianguis"];
     var countGiros=GIROS_OBJETIVO.reduce(function(a,g){return a+(desglose[g]||0);},0);
-    var f1=countGiros>=300?100:countGiros>=200?75:countGiros>=100?50:countGiros>=50?25:10;
-    // Factor 2 — Población radio 1.5km (35%)
+    var f1=countGiros>=120?100:countGiros>=80?75:countGiros>=40?50:countGiros>=20?25:10;
+    // Factor 2 — Población localidad (25%): API devuelve pob dentro del radio; sin campo separado de localidad
     var pob=inegiData.pob||0;
-    var f2=pob>=80000?100:pob>=50000?75:pob>=30000?50:pob>=15000?25:10;
-    // Factor 3 — Flujo comercial (30%)
+    var f2=pob>=100000?100:pob>=60000?75:pob>=30000?50:pob>=15000?25:10;
+    // Factor 3 — Población radio 1.5km (25%): mismo campo pob (radio-específico, confirmado Edge Function)
+    var f3=pob>=50000?100:pob>=30000?75:pob>=15000?50:pob>=8000?25:10;
+    // Factor 4 — Flujo comercial (20%)
     var tot=denueData.tot||0;
-    var f3=tot>=400?100:tot>=250?75:tot>=150?50:tot>=75?25:10;
-    var ipbBase=f1*0.35+f2*0.35+f3*0.30;
+    var f4=tot>=400?100:tot>=250?75:tot>=150?50:tot>=75?25:10;
+    var ipbBase=f1*0.30+f2*0.25+f3*0.25+f4*0.20;
     var factorCanib=distBafarMin<1.0?0.60:distBafarMin<1.5?0.75:distBafarMin<3.0?0.88:1;
     // Efecto imán — detectar generadores de tráfico
     var gKeys=Object.keys(desglose).map(function(g){return g.toLowerCase();});
@@ -1024,7 +1026,7 @@ function calcularIPB(lat,lng,denueData,inegiData,cb){
       ipb:ipbFinal,clasificacion:clasif,
       factor_canibalizacion:factorCanib,
       distancia_bafar_cercana:Math.round(distBafarMin*100)/100,
-      detalle_factores:{f2_giros:f1,f3_poblacion:f2,f5_flujo:f3},
+      detalle_factores:{f1_giros:f1,f2_pob_localidad:f2,f3_pob_radio:f3,f4_flujo:f4},
       bonus_iman:bonusIman,
       generadores:generadores,
       nivel:clasif
@@ -1044,9 +1046,10 @@ function _renderIPB(r){
   var generadores=r.generadores||[];
   var bonusIman=r.bonus_iman||0;
   var fItems=[
-    {l:"Mercado giros",p:df.f2_giros||0,c:"#f0c050"},
-    {l:"Población radio",p:df.f3_poblacion||0,c:"#f0c050"},
-    {l:"Flujo comercial",p:df.f5_flujo||0,c:"#f0c050"}
+    {l:"Mercado giros (30%)",p:df.f1_giros||0,c:"#f0c050"},
+    {l:"Pob. localidad (25%)",p:df.f2_pob_localidad||0,c:"#f0c050"},
+    {l:"Pob. radio 1.5km (25%)",p:df.f3_pob_radio||0,c:"#f0c050"},
+    {l:"Flujo comercial (20%)",p:df.f4_flujo||0,c:"#f0c050"}
   ];
   if(generadores.length>0)fItems.push({l:"🧲 Efecto imán",p:Math.min(100,bonusIman),c:"#22d18a"});
   var fe=document.getElementById("det-ipb-factores");
@@ -1054,14 +1057,16 @@ function _renderIPB(r){
   var fc=r.factor_canibalizacion!=null?r.factor_canibalizacion:1;
   var dist=r.distancia_bafar_cercana||99;
   var fortalezas=[];var debilidades=[];
-  if((df.f2_giros||0)>=75)fortalezas.push("Alta densidad de mercado objetivo");
-  if((df.f3_poblacion||0)>=75)fortalezas.push("Alta población en radio inmediato");
-  if((df.f5_flujo||0)>=75)fortalezas.push("Zona comercialmente activa");
+  if((df.f1_giros||0)>=75)fortalezas.push("Alta densidad de mercado objetivo");
+  if((df.f2_pob_localidad||0)>=75)fortalezas.push("Ciudad/localidad de alto volumen");
+  if((df.f3_pob_radio||0)>=75)fortalezas.push("Alta población en radio inmediato");
+  if((df.f4_flujo||0)>=75)fortalezas.push("Zona comercialmente activa");
   generadores.forEach(function(g){fortalezas.push("🧲 "+g);});
   if(fc>=1)fortalezas.push("Sin competencia BAFAR cercana");
-  if((df.f2_giros||0)<50)debilidades.push("Bajo mercado de giros objetivo");
-  if((df.f3_poblacion||0)<50)debilidades.push("Baja densidad poblacional en radio");
-  if((df.f5_flujo||0)<50)debilidades.push("Zona con poco flujo comercial");
+  if((df.f1_giros||0)<50)debilidades.push("Bajo mercado de giros objetivo");
+  if((df.f2_pob_localidad||0)<50)debilidades.push("Localidad con poca población");
+  if((df.f3_pob_radio||0)<50)debilidades.push("Baja densidad poblacional en radio");
+  if((df.f4_flujo||0)<50)debilidades.push("Zona con poco flujo comercial");
   if(fc<1)debilidades.push("Tienda BAFAR a "+dist.toFixed(1)+"km — riesgo de canibalización");
   var fodaEl=document.getElementById("det-ipb-foda");
   if(fodaEl){
