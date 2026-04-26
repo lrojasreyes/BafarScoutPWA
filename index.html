@@ -1071,9 +1071,14 @@ function mostrarSucursalCercana(lat,lng){
   });
 }
 
-function mostrarProyeccionDesdeCache(proy){
+function mostrarProyeccionDesdeCache(proy,prosp){
   if(!proy||proy.ipb!==undefined||!proy.referencial){
-    mostrarProyeccion(GD.lat,GD.lng,GD.pob,GD.viv,GD.giros);
+    if(prosp&&prosp.lat&&prosp.lng){
+      var _p=prosp.inegi&&prosp.inegi.pob?prosp.inegi.pob:null;
+      var _v=prosp.inegi&&prosp.inegi.viv?prosp.inegi.viv:null;
+      var _g=prosp.denue&&prosp.denue.tot?prosp.denue.tot:null;
+      mostrarProyeccion(prosp.lat,prosp.lng,_p,_v,_g);
+    }
     return;
   }
   var sec=document.getElementById("det-proyeccion-sec");
@@ -1894,7 +1899,7 @@ function openDetail(id){
     var _viv=p.inegi&&p.inegi.viv?p.inegi.viv:null;
     var _giros=p.denue&&p.denue.tot?p.denue.tot:null;
     if(p.lat&&p.lng){
-      if(p.proyeccion)mostrarProyeccionDesdeCache(p.proyeccion);
+      if(p.proyeccion)mostrarProyeccionDesdeCache(p.proyeccion,p);
       else mostrarProyeccion(p.lat,p.lng,_pob,_viv,_giros);
     }
     // Exponer en DR para que generarFichaPDF pueda leer si se abre desde aquí
