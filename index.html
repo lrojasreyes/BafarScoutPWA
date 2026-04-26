@@ -946,7 +946,7 @@ var _sucursalesCache=null;
 
 function cargarSucursales(cb){
   if(_sucursalesCache){cb(_sucursalesCache);return;}
-  fetch("https://pjacmizmjsjwxtoldpvr.supabase.co/rest/v1/sucursales_bafar?select=nombre,latitud,longitud,venta_kg,venta_kg_institucional,venta_kg_consumo,ratio_institucional,zona_operaciones,tipo_tienda&limit=400",{
+  fetch("https://pjacmizmjsjwxtoldpvr.supabase.co/rest/v1/sucursales_bafar?select=nombre,latitud,longitud,venta_kg,venta_kg_institucional,venta_kg_consumo,ratio_institucional,zona_operaciones,tipo_tienda,poblacion&limit=400",{
     headers:{"apikey":"sb_publishable_zy_iwqAnOgx0N8xElowU8A_CwpJ71_K","Authorization":"Bearer sb_publishable_zy_iwqAnOgx0N8xElowU8A_CwpJ71_K"}
   }).then(function(r){return r.json();}).then(function(data){
     _sucursalesCache=Array.isArray(data)?data:[];
@@ -1064,6 +1064,10 @@ function mostrarSucursalCercana(lat,lng){
 }
 
 function mostrarProyeccionDesdeCache(proy){
+  if(!proy||proy.ipb!==undefined||!proy.referencial){
+    mostrarProyeccion(GD.lat,GD.lng,GD.pob,GD.viv,GD.giros);
+    return;
+  }
   var sec=document.getElementById("det-proyeccion-sec");
   if(sec)sec.style.display="block";
   var loading=document.getElementById("det-proy-loading");
