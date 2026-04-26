@@ -955,6 +955,7 @@ function cargarSucursales(cb){
 function calcularProyeccionBafar(lat,lng,pobProspecto,vivProspecto,girosProspecto,cb){
   cargarSucursales(function(suc){
     if(!suc||!suc.length){cb(null);return;}
+    console.log('[IPB] Inputs → giros:',girosProspecto,'pob:',pobProspecto,'viv:',vivProspecto,'lat:',lat,'lng:',lng);
     var scored=[];
     suc.forEach(function(s){
       if(!s.latitud||!s.longitud||!s.venta_kg)return;
@@ -970,13 +971,18 @@ function calcularProyeccionBafar(lat,lng,pobProspecto,vivProspecto,girosProspect
         :0.5;
       var similDistancia=1/(1+distKm*0.05);
       var score=similDenue*0.50+similPoblacion*0.30+similViviendas*0.10+similDistancia*0.10;
-      scored.push({s:s,dist:distKm,score:score});
+      scored.push({s:s,dist:distKm,score:score,similDenue:similDenue,similPoblacion:similPoblacion,similViviendas:similViviendas,similDistancia:similDistancia});
     });
     scored.sort(function(a,b){return b.score-a.score;});
     var top5=scored.slice(0,5);
     if(!top5.length){cb(null);return;}
+    console.log('[IPB] Top 5 sucursales:');
+    top5.forEach(function(x,i){
+      console.log('  '+(i+1)+'. '+x.s.nombre+' | score:'+x.score.toFixed(3)+' | denue:'+x.similDenue.toFixed(3)+'('+x.s.total_giros_bafar+') pob:'+x.similPoblacion.toFixed(3)+'('+Math.round(x.s.poblacion)+') viv:'+x.similViviendas.toFixed(3)+'('+Math.round(x.s.viviendas)+') dist:'+x.similDistancia.toFixed(3)+'('+x.dist.toFixed(1)+'km) venta_kg:'+x.s.venta_kg);
+    });
     var totalScore=top5.reduce(function(acc,x){return acc+x.score;},0);
     var ventaPonderada=top5.reduce(function(acc,x){return acc+x.s.venta_kg*x.score;},0)/totalScore;
+    console.log('[IPB] ventaPonderada:',Math.round(ventaPonderada),'kg/mes →',(ventaPonderada/1000).toFixed(1),'ton');
     var ventas=top5.map(function(x){return x.s.venta_kg;});
     var ventaMin=Math.min.apply(null,ventas);
     var ventaMax=Math.max.apply(null,ventas);
