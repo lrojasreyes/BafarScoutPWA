@@ -205,40 +205,23 @@ textarea{resize:none;min-height:80px}
           </div>
         </div>
         <div class="sec" style="margin-bottom:12px;display:none" id="det-proyeccion-sec">
-          <div class="sh"><span style="font-size:18px">📊</span><span style="font-size:14px;font-weight:700;color:#e8a020">Índice de Potencial BAFAR</span></div>
+          <div class="sh"><span style="font-size:18px">📦</span><span style="font-size:14px;font-weight:700;color:#e8a020">Proyección de ventas BAFAR</span></div>
           <div class="sb">
-            <div id="det-proy-loading" style="font-size:12px;color:#6a7590;text-align:center;padding:10px">Calculando IPB...</div>
+            <div id="det-proy-loading" style="font-size:12px;color:#6a7590;text-align:center;padding:10px">Calculando proyección...</div>
             <div id="det-proy-info" style="display:none">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-                <div style="font-size:10px;text-transform:uppercase;color:#6a7590">Potencial de la zona</div>
-                <div style="font-size:22px;font-weight:800" id="det-ipb-score">-</div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+                <div style="font-size:10px;text-transform:uppercase;color:#6a7590">Potencial de zona</div>
+                <div style="font-size:18px;font-weight:800" id="det-proy-potencial">-</div>
               </div>
-              <div style="background:rgba(255,255,255,.08);border-radius:6px;height:8px;margin-bottom:10px"><div id="det-ipb-bar" style="height:8px;border-radius:6px;width:0%;transition:width .4s"></div></div>
-              <div style="font-size:14px;font-weight:800;padding:6px 10px;border-radius:8px;text-align:center;margin-bottom:12px" id="det-ipb-clasif">-</div>
-              <div style="margin-bottom:10px">
-                <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#6a7590;margin-bottom:8px;letter-spacing:1px">Factores del índice</div>
-                <div id="det-ipb-factores"></div>
-              </div>
-              <div id="det-ipb-foda"></div>
-            </div>
-          </div>
-        </div>
-        <div class="sec" style="margin-bottom:12px;display:none" id="det-pv-sec">
-          <div class="sh"><span style="font-size:18px">📦</span><span style="font-size:14px;font-weight:700;color:#e8a020">Proyección de Ventas</span></div>
-          <div class="sb">
-            <div id="det-pv-loading" style="font-size:12px;color:#6a7590;text-align:center;padding:10px">Calculando proyección...</div>
-            <div id="det-pv-info" style="display:none">
-              <div style="font-size:11px;color:#6a7590;margin-bottom:10px">Basada en tiendas con condiciones similares</div>
               <div class="r2" style="margin-bottom:8px">
-                <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">Referencial</div><div style="font-size:20px;font-weight:800;color:#22d18a" id="det-pv-ref">-</div></div>
-                <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">Rango estimado</div><div style="font-size:12px;font-weight:700;color:#6a7590" id="det-pv-rango">-</div></div>
+                <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">Proyección referencial</div><div style="font-size:20px;font-weight:800;color:#22d18a" id="det-proy-ref">-</div></div>
+                <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">Rango estimado</div><div style="font-size:13px;font-weight:700;color:#6a7590" id="det-proy-rango">-</div></div>
               </div>
-              <div class="r2" style="margin-bottom:10px">
-                <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">Institucional (65%)</div><div style="font-size:15px;font-weight:700;color:#f0c050" id="det-pv-inst">-</div></div>
-                <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">Consumo (35%)</div><div style="font-size:15px;font-weight:700;color:#e8a020" id="det-pv-cons">-</div></div>
+              <div class="r2" style="margin-bottom:8px">
+                <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">Venta institucional</div><div style="font-size:16px;font-weight:700;color:#f0c050" id="det-proy-inst">-</div></div>
+                <div><div style="font-size:10px;text-transform:uppercase;color:#6a7590">Venta ocasión</div><div style="font-size:16px;font-weight:700;color:#e8a020" id="det-proy-ocas">-</div></div>
               </div>
-              <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#6a7590;margin-bottom:6px;letter-spacing:1px">Tiendas de referencia</div>
-              <div id="det-pv-tiendas"></div>
+              <div style="font-size:10px;color:#6a7590;font-style:italic" id="det-proy-base"></div>
             </div>
           </div>
         </div>
@@ -963,7 +946,7 @@ var _sucursalesCache=null;
 
 function cargarSucursales(cb){
   if(_sucursalesCache){cb(_sucursalesCache);return;}
-  fetch("https://pjacmizmjsjwxtoldpvr.supabase.co/rest/v1/sucursales_bafar?select=nombre,latitud,longitud,venta_kg,venta_kg_institucional,venta_kg_consumo,ratio_institucional,zona_operaciones,tipo_tienda,poblacion&limit=400",{
+  fetch("https://pjacmizmjsjwxtoldpvr.supabase.co/rest/v1/sucursales_bafar?select=nombre,latitud,longitud,venta_kg,venta_kg_institucional,venta_kg_consumo,ratio_institucional,zona_operaciones,tipo_tienda&limit=400",{
     headers:{"apikey":"sb_publishable_zy_iwqAnOgx0N8xElowU8A_CwpJ71_K","Authorization":"Bearer sb_publishable_zy_iwqAnOgx0N8xElowU8A_CwpJ71_K"}
   }).then(function(r){return r.json();}).then(function(data){
     _sucursalesCache=Array.isArray(data)?data:[];
@@ -971,124 +954,66 @@ function cargarSucursales(cb){
   }).catch(function(){cb([]);});
 }
 
-var PONDERACION_GIROS={
-  "Distribuidor":1100,"Ferias":850,"Comedores Industriales":800,"Minisuper":750,
-  "Carnitas":700,"Taqueria":700,"Cooperativas":600,"Pizzas":600,"Restaurante":600,
-  "Cafeterias":500,"Guarderias":500,"Menuderia":500,"Dependencia de Gobierno":500,
-  "Hamburguesas":500,"Tortas":500,"Birreria o Barbacoa":500,
-  "Exp. de Pescados y Mariscos":450,"Fondas o Cocinas":450,"Hospitales":450,
-  "Hoteles":450,"Tianguis":450,"Barcos":400,"Pollerias":400,"Burreros":400,
-  "Tamales":400,"Bares y cantinas":350,"Banquetes":350,"Gorditas":350,
-  "Hot dogs":350,"Carniceria":300,"Sushi":300,"Restaurante de Mariscos":200,
-  "Snack":200,"Eloteros":150,"Tendero o Cremerías":150,"Tienda Bafar":0
-};
-
-function calcularIPB(lat,lng,denueData,inegiData,cb){
+function calcularProyeccionBafar(lat,lng,pobProspecto,vivProspecto,girosProspecto,cb){
   cargarSucursales(function(suc){
-    var distBafarMin=999;
-    if(suc&&suc.length){
-      suc.forEach(function(s){
-        if(!s.latitud||!s.longitud)return;
-        var dk=haversineKm(lat,lng,parseFloat(s.latitud),parseFloat(s.longitud));
-        if(dk<distBafarMin)distBafarMin=dk;
-      });
-    }
-    var desglose=denueData.desglose||{};
-    // Factor 1 — Mercado giros (30%)
-    var GIROS_OBJETIVO=["Restaurante","Fondas o Cocinas","Carniceria","Tortas","Taqueria",
-      "Restaurante de Mariscos","Comercio","Birreria o Barbacoa","Pizzas","Hamburguesas",
-      "Cafeterias","Bares y cantinas","Minisuper","Carnitas","Comedores Industriales",
-      "Distribuidores","Menuderia","Pollerias","Tamales","Hoteles","Guarderias","Tianguis"];
-    var countGiros=GIROS_OBJETIVO.reduce(function(a,g){return a+(desglose[g]||0);},0);
-    var f1=countGiros>=120?100:countGiros>=80?75:countGiros>=40?50:countGiros>=20?25:10;
-    // Factor 2 — Población localidad (25%): API devuelve pob dentro del radio; sin campo separado de localidad
-    var pob=inegiData.pob||0;
-    var f2=pob>=100000?100:pob>=60000?75:pob>=30000?50:pob>=15000?25:10;
-    // Factor 3 — Población radio 1.5km (25%): mismo campo pob (radio-específico, confirmado Edge Function)
-    var f3=pob>=50000?100:pob>=30000?75:pob>=15000?50:pob>=8000?25:10;
-    // Factor 4 — Flujo comercial (20%)
-    var tot=denueData.tot||0;
-    var f4=tot>=400?100:tot>=250?75:tot>=150?50:tot>=75?25:10;
-    var ipbBase=f1*0.30+f2*0.25+f3*0.25+f4*0.20;
-    var factorCanib=distBafarMin<1.0?0.60:distBafarMin<1.5?0.75:distBafarMin<3.0?0.88:1;
-    // Efecto imán — detectar generadores de tráfico
-    var gKeys=Object.keys(desglose).map(function(g){return g.toLowerCase();});
-    var generadores=[];var bonusIman=0;
-    if(gKeys.some(function(g){return (g.indexOf("mercado")>=0&&g.indexOf("super")<0)||g.indexOf("tianguis")>=0;})){generadores.push("Mercado/Tianguis");bonusIman+=20;}
-    if(gKeys.some(function(g){return g.indexOf("supermercado")>=0||g.indexOf("walmart")>=0||g.indexOf("soriana")>=0||g.indexOf("chedraui")>=0||g.indexOf("bodega aurrera")>=0||g.indexOf("costco")>=0||g.indexOf("sams")>=0||g.indexOf("comercial mexicana")>=0;})){generadores.push("Supermercado ancla");bonusIman+=15;}
-    if(gKeys.some(function(g){return g.indexOf("central")>=0&&g.indexOf("abasto")>=0;})){generadores.push("Central de abasto");bonusIman+=20;}
-    if(gKeys.some(function(g){return g.indexOf("plaza comercial")>=0||g.indexOf("centro comercial")>=0||g.indexOf("mall")>=0;})){generadores.push("Centro comercial");bonusIman+=12;}
-    if(gKeys.some(function(g){return g.indexOf("hospital")>=0||g.indexOf("clinica imss")>=0||g.indexOf("clinica issste")>=0;})){generadores.push("Hospital/Clínica");bonusIman+=8;}
-    if(gKeys.some(function(g){return g.indexOf("terminal")>=0||g.indexOf("central camionera")>=0||g.indexOf("paradero")>=0||g.indexOf("metro")>=0;})){generadores.push("Nodo transporte");bonusIman+=10;}
-    var ipbFinal=Math.min(100,Math.round(ipbBase*factorCanib+(generadores.length>0?bonusIman:0)));
-    var clasif=ipbFinal>=75?"ZONA DE ALTO POTENCIAL":ipbFinal>=55?"ZONA CON POTENCIAL":ipbFinal>=35?"POTENCIAL MODERADO":"POTENCIAL BAJO";
-    cb({
-      ipb:ipbFinal,clasificacion:clasif,
-      factor_canibalizacion:factorCanib,
-      distancia_bafar_cercana:Math.round(distBafarMin*100)/100,
-      detalle_factores:{f1_giros:f1,f2_pob_localidad:f2,f3_pob_radio:f3,f4_flujo:f4},
-      bonus_iman:bonusIman,
-      generadores:generadores,
-      nivel:clasif
+    if(!suc||!suc.length){cb(null);return;}
+    var scored=[];
+    suc.forEach(function(s){
+      if(!s.latitud||!s.longitud||!s.venta_kg)return;
+      var distKm=haversineKm(lat,lng,s.latitud,s.longitud);
+      if(distKm>300)return;
+      var pesoGeo=1/(1+distKm*0.1);
+      var pesoDem=1;
+      if(pobProspecto&&s.poblacion&&s.poblacion>0){
+        var ratioPob=Math.min(pobProspecto,s.poblacion)/Math.max(pobProspecto,s.poblacion);
+        pesoDem=0.5+0.5*ratioPob;
+      }
+      scored.push({s:s,dist:distKm,score:pesoGeo*pesoDem});
     });
+    scored.sort(function(a,b){return b.score-a.score;});
+    var top5=scored.slice(0,5);
+    if(!top5.length){cb(null);return;}
+    var totalScore=top5.reduce(function(acc,x){return acc+x.score;},0);
+    var ventaPonderada=top5.reduce(function(acc,x){return acc+x.s.venta_kg*x.score;},0)/totalScore;
+    var ventas=top5.map(function(x){return x.s.venta_kg;});
+    var ventaMin=Math.min.apply(null,ventas);
+    var ventaMax=Math.max.apply(null,ventas);
+    var ratioInst=top5.reduce(function(acc,x){return acc+(x.s.ratio_institucional||0.673)*x.score;},0)/totalScore;
+    var potencial="MEDIO";
+    if(ventaPonderada>70000)potencial="ALTO";
+    else if(ventaPonderada>45000)potencial="MEDIO-ALTO";
+    else if(ventaPonderada<25000)potencial="BAJO";
+    else if(ventaPonderada<35000)potencial="MEDIO-BAJO";
+    cb({ventaRef:ventaPonderada,ventaMin:ventaMin,ventaMax:ventaMax,ratioInst:ratioInst,potencial:potencial,basadas:top5.length});
   });
 }
 
-function _renderIPB(r){
-  var ipb=r.ipb||0;
-  var clasif=r.clasificacion||r.nivel||"-";
-  var colorIPB=ipb>=75?"#22d18a":ipb>=55?"#4ade80":ipb>=35?"#e8a020":"#f05060";
-  var bgIPB=ipb>=75?"rgba(34,209,138,.12)":ipb>=55?"rgba(74,222,128,.12)":ipb>=35?"rgba(232,160,32,.12)":"rgba(240,80,96,.12)";
-  var sc=document.getElementById("det-ipb-score");if(sc){sc.textContent=ipb+"%";sc.style.color=colorIPB;}
-  var bar=document.getElementById("det-ipb-bar");if(bar){bar.style.width=ipb+"%";bar.style.background=colorIPB;}
-  var ce=document.getElementById("det-ipb-clasif");if(ce){ce.textContent=clasif;ce.style.color=colorIPB;ce.style.background=bgIPB;}
-  var df=r.detalle_factores||{};
-  var generadores=r.generadores||[];
-  var bonusIman=r.bonus_iman||0;
-  var fItems=[
-    {l:"Mercado giros (30%)",p:df.f1_giros||0,c:"#f0c050"},
-    {l:"Pob. localidad (25%)",p:df.f2_pob_localidad||0,c:"#f0c050"},
-    {l:"Pob. radio 1.5km (25%)",p:df.f3_pob_radio||0,c:"#f0c050"},
-    {l:"Flujo comercial (20%)",p:df.f4_flujo||0,c:"#f0c050"}
-  ];
-  if(generadores.length>0)fItems.push({l:"🧲 Efecto imán",p:Math.min(100,bonusIman),c:"#22d18a"});
-  var fe=document.getElementById("det-ipb-factores");
-  if(fe)fe.innerHTML=fItems.map(function(f){return "<div style='margin-bottom:6px'><div style='display:flex;justify-content:space-between;font-size:11px;color:#e8ecf4;margin-bottom:3px'><span>"+f.l+"</span><span style='font-weight:700;color:"+f.c+"'>"+f.p+" pts</span></div><div style='background:rgba(255,255,255,.08);border-radius:4px;height:5px'><div style='height:5px;border-radius:4px;background:"+f.c+";width:"+f.p+"%'></div></div></div>";}).join("");
-  var fc=r.factor_canibalizacion!=null?r.factor_canibalizacion:1;
-  var dist=r.distancia_bafar_cercana||99;
-  var fortalezas=[];var debilidades=[];
-  if((df.f1_giros||0)>=75)fortalezas.push("Alta densidad de mercado objetivo");
-  if((df.f2_pob_localidad||0)>=75)fortalezas.push("Ciudad/localidad de alto volumen");
-  if((df.f3_pob_radio||0)>=75)fortalezas.push("Alta población en radio inmediato");
-  if((df.f4_flujo||0)>=75)fortalezas.push("Zona comercialmente activa");
-  generadores.forEach(function(g){fortalezas.push("🧲 "+g);});
-  if(fc>=1)fortalezas.push("Sin competencia BAFAR cercana");
-  if((df.f1_giros||0)<50)debilidades.push("Bajo mercado de giros objetivo");
-  if((df.f2_pob_localidad||0)<50)debilidades.push("Localidad con poca población");
-  if((df.f3_pob_radio||0)<50)debilidades.push("Baja densidad poblacional en radio");
-  if((df.f4_flujo||0)<50)debilidades.push("Zona con poco flujo comercial");
-  if(fc<1)debilidades.push("Tienda BAFAR a "+dist.toFixed(1)+"km — riesgo de canibalización");
-  var fodaEl=document.getElementById("det-ipb-foda");
-  if(fodaEl){
-    var h="";
-    if(fortalezas.length){h+="<div style='font-size:10px;font-weight:700;text-transform:uppercase;color:#22d18a;margin-bottom:5px;letter-spacing:1px'>Fortalezas</div>";h+=fortalezas.map(function(f){return "<div style='font-size:12px;color:#e8ecf4;padding:3px 0;display:flex;gap:6px;align-items:flex-start'><span>✅</span><span>"+f+"</span></div>";}).join("");}
-    if(debilidades.length){h+="<div style='font-size:10px;font-weight:700;text-transform:uppercase;color:#e8a020;margin-top:8px;margin-bottom:5px;letter-spacing:1px'>Debilidades</div>";h+=debilidades.map(function(d){return "<div style='font-size:12px;color:#e8ecf4;padding:3px 0;display:flex;gap:6px;align-items:flex-start'><span>⚠️</span><span>"+d+"</span></div>";}).join("");}
-    else h+="<div style='font-size:12px;color:#22d18a;padding:6px 0'>✅ Sin debilidades críticas</div>";
-    fodaEl.innerHTML=h;
-  }
-}
-
-function mostrarIPB(lat,lng,prospecto){
-  var sec=document.getElementById("det-proyeccion-sec");if(sec)sec.style.display="block";
-  var loading=document.getElementById("det-proy-loading");var info=document.getElementById("det-proy-info");
-  if(loading)loading.style.display="block";if(info)info.style.display="none";
-  var dd={desglose:(prospecto&&prospecto.denue&&prospecto.denue.desglose)?prospecto.denue.desglose:(DR&&DR.desglose?DR.desglose:{}),tot:(prospecto&&prospecto.denue&&prospecto.denue.tot)?prospecto.denue.tot:(DR?DR.tot||0:0)};
-  var id={pob:(prospecto&&prospecto.inegi&&prospecto.inegi.pob)?prospecto.inegi.pob:(DR?DR.pob||0:0),viv:(prospecto&&prospecto.inegi&&prospecto.inegi.viv)?prospecto.inegi.viv:(DR?DR.viv||0:0)};
-  calcularIPB(lat,lng,dd,id,function(r){
-    if(loading)loading.style.display="none";if(!r)return;if(info)info.style.display="block";
-    _renderIPB(r);
-    if(!DR)DR={};DR.proyeccion=r;
-    if(DR._prospecto_id){var idx=PS.findIndex(function(x){return x.id===DR._prospecto_id;});if(idx>=0){PS[idx].proyeccion=r;syncToSupabase(PS[idx]);}}
+function mostrarProyeccion(lat,lng,pob,viv,giros){
+  var sec=document.getElementById("det-proyeccion-sec");
+  if(sec)sec.style.display="block";
+  var loading=document.getElementById("det-proy-loading");
+  var info=document.getElementById("det-proy-info");
+  if(loading)loading.style.display="block";
+  if(info)info.style.display="none";
+  calcularProyeccionBafar(lat,lng,pob,viv,giros,function(r){
+    if(loading)loading.style.display="none";
+    if(!r)return;
+    if(info)info.style.display="block";
+    var instKg=Math.round(r.ventaRef*r.ratioInst);
+    var ocasKg=Math.round(r.ventaRef*(1-r.ratioInst));
+    var colorPot=r.potencial.indexOf("ALTO")>=0?"#22d18a":r.potencial.indexOf("BAJO")>=0?"#f05060":"#e8a020";
+    document.getElementById("det-proy-potencial").textContent=r.potencial;
+    document.getElementById("det-proy-potencial").style.color=colorPot;
+    document.getElementById("det-proy-ref").textContent="~"+(r.ventaRef/1000).toFixed(1)+" ton/mes";
+    document.getElementById("det-proy-rango").textContent=(r.ventaMin/1000).toFixed(1)+" — "+(r.ventaMax/1000).toFixed(1)+" ton/mes";
+    document.getElementById("det-proy-inst").textContent=(instKg/1000).toFixed(1)+" ton ("+(r.ratioInst*100).toFixed(0)+"%)"
+    document.getElementById("det-proy-ocas").textContent=(ocasKg/1000).toFixed(1)+" ton ("+((1-r.ratioInst)*100).toFixed(0)+"%)"
+    document.getElementById("det-proy-base").textContent="Basado en "+r.basadas+" sucursales similares en operación";
+    // Guardar en DR para persistir al salvar
+    if(!DR)DR={};
+    DR.proyeccion={referencial:Math.round(r.ventaRef),rango_min:Math.round(r.ventaMin),rango_max:Math.round(r.ventaMax),institucional:instKg,ocasion:ocasKg,nivel:r.potencial,modelo:r.basadas+" sucursales"};
+    // Actualizar el prospecto actual si ya existe
+    if(DR._prospecto_id){var idx=PS.findIndex(function(x){return x.id===DR._prospecto_id;});if(idx>=0){PS[idx].proyeccion=DR.proyeccion;syncToSupabase(PS[idx]);}}
   });
 }
 
@@ -1138,76 +1063,23 @@ function mostrarSucursalCercana(lat,lng){
   });
 }
 
-function mostrarIPBDesdeCache(proy){
-  var sec=document.getElementById("det-proyeccion-sec");if(sec)sec.style.display="block";
-  var loading=document.getElementById("det-proy-loading");var info=document.getElementById("det-proy-info");
-  if(loading)loading.style.display="none";if(info)info.style.display="block";
-  _renderIPB(proy);
-}
-
-function calcularProyeccionSimilitud(lat,lng,denueData,inegiData,cb){
-  cargarSucursales(function(suc){
-    if(!suc||!suc.length){cb(null);return;}
-    var pSitio=inegiData.pob||0,dSitio=denueData.tot||0,vSitio=inegiData.viv||0;
-    var candidatos=[];
-    suc.forEach(function(s){
-      if(!s.latitud||!s.longitud||!s.venta_kg||parseFloat(s.venta_kg)<=0)return;
-      var dk=haversineKm(lat,lng,parseFloat(s.latitud),parseFloat(s.longitud));
-      var vkg=parseFloat(s.venta_kg);
-      var pT=parseFloat(s.poblacion)||0;
-      var sPob=pSitio>0&&pT>0?Math.max(0,1-Math.abs(pSitio-pT)/pSitio):0.5;
-      var sDenue=0.5; // campo total_giros no disponible en cache actual
-      var sViv=0.5;   // campo viviendas no disponible en cache actual
-      var sGeo=Math.max(0,1-Math.min(dk,500)/500);
-      var score=sPob*0.30+sDenue*0.30+sViv*0.20+sGeo*0.20;
-      candidatos.push({s:s,vkg:vkg,dist:dk,sim:score});
-    });
-    candidatos.sort(function(a,b){return b.sim-a.sim;});
-    var top5=candidatos.slice(0,5);
-    if(!top5.length){cb(null);return;}
-    var ventaRef=top5.reduce(function(a,x){return a+x.vkg;},0)/top5.length;
-    cb({
-      referencial:Math.round(ventaRef),
-      rango_min:Math.round(ventaRef*0.80),
-      rango_max:Math.round(ventaRef*1.40),
-      institucional:Math.round(ventaRef*0.65),
-      consumo:Math.round(ventaRef*0.35),
-      tiendas_referencia:top5.map(function(x){return{nombre:x.s.nombre||"-",venta_kg:Math.round(x.vkg),similitud:Math.round(x.sim*100)};})
-    });
-  });
-}
-
-function _renderProyeccionVenta(r){
-  var e=document.getElementById("det-pv-ref");if(e)e.textContent="~"+(r.referencial/1000).toFixed(1)+" ton/mes";
-  var e2=document.getElementById("det-pv-rango");if(e2)e2.textContent=(r.rango_min/1000).toFixed(1)+" — "+(r.rango_max/1000).toFixed(1)+" ton/mes";
-  var e3=document.getElementById("det-pv-inst");if(e3)e3.textContent=(r.institucional/1000).toFixed(1)+" ton";
-  var e4=document.getElementById("det-pv-cons");if(e4)e4.textContent=(r.consumo/1000).toFixed(1)+" ton";
-  var te=document.getElementById("det-pv-tiendas");
-  if(te&&r.tiendas_referencia){
-    te.innerHTML=r.tiendas_referencia.map(function(t){
-      return "<div style='display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04)'><span style='font-size:12px;color:#e8ecf4'>• "+t.nombre+"</span><span style='font-size:11px;color:#6a7590;white-space:nowrap'>"+((t.venta_kg||0)/1000).toFixed(1)+" ton <span style='color:#22d18a'>("+t.similitud+"%)</span></span></div>";
-    }).join("");
-  }
-}
-
-function mostrarProyeccionVenta(lat,lng,prospecto){
-  var sec=document.getElementById("det-pv-sec");if(sec)sec.style.display="block";
-  var loading=document.getElementById("det-pv-loading");var info=document.getElementById("det-pv-info");
-  if(loading)loading.style.display="block";if(info)info.style.display="none";
-  var dd={desglose:(prospecto&&prospecto.denue&&prospecto.denue.desglose)?prospecto.denue.desglose:(DR&&DR.desglose?DR.desglose:{}),tot:(prospecto&&prospecto.denue&&prospecto.denue.tot)?prospecto.denue.tot:(DR?DR.tot||0:0)};
-  var id={pob:(prospecto&&prospecto.inegi&&prospecto.inegi.pob)?prospecto.inegi.pob:(DR?DR.pob||0:0),viv:(prospecto&&prospecto.inegi&&prospecto.inegi.viv)?prospecto.inegi.viv:(DR?DR.viv||0:0)};
-  calcularProyeccionSimilitud(lat,lng,dd,id,function(r){
-    if(loading)loading.style.display="none";if(!r)return;if(info)info.style.display="block";
-    _renderProyeccionVenta(r);
-    if(!DR)DR={};DR.proyeccion_venta=r;
-  });
-}
-
-function mostrarProyeccionVentaDesdeCache(venta){
-  var sec=document.getElementById("det-pv-sec");if(sec)sec.style.display="block";
-  var loading=document.getElementById("det-pv-loading");var info=document.getElementById("det-pv-info");
-  if(loading)loading.style.display="none";if(info)info.style.display="block";
-  _renderProyeccionVenta(venta);
+function mostrarProyeccionDesdeCache(proy){
+  var sec=document.getElementById("det-proyeccion-sec");
+  if(sec)sec.style.display="block";
+  var loading=document.getElementById("det-proy-loading");
+  var info=document.getElementById("det-proy-info");
+  if(loading)loading.style.display="none";
+  if(info)info.style.display="block";
+  var colorPot=proy.nivel&&proy.nivel.indexOf("ALTO")>=0?"#22d18a":proy.nivel&&proy.nivel.indexOf("BAJO")>=0?"#f05060":"#e8a020";
+  document.getElementById("det-proy-potencial").textContent=proy.nivel||"-";
+  document.getElementById("det-proy-potencial").style.color=colorPot;
+  document.getElementById("det-proy-ref").textContent="~"+(proy.referencial/1000).toFixed(1)+" ton/mes";
+  document.getElementById("det-proy-rango").textContent=(proy.rango_min/1000).toFixed(1)+" — "+(proy.rango_max/1000).toFixed(1)+" ton/mes";
+  var tot=(proy.institucional||0)+(proy.ocasion||0);
+  var ri=tot>0?(proy.institucional||0)/tot:0.673;
+  document.getElementById("det-proy-inst").textContent=((proy.institucional||0)/1000).toFixed(1)+" ton ("+(ri*100).toFixed(0)+"%)";
+  document.getElementById("det-proy-ocas").textContent=((proy.ocasion||0)/1000).toFixed(1)+" ton ("+((1-ri)*100).toFixed(0)+"%)";
+  document.getElementById("det-proy-base").textContent=proy.modelo||"";
 }
 
 function mostrarSucursalDesdeCache(suc){
@@ -1230,23 +1102,19 @@ function mostrarSucursalDesdeCache(suc){
 }
 
 function verificarLoteCercano(lat,lng){
-  console.log('[lotes] iniciando verificación lat:',lat,'lng:',lng);
-  console.log('[lotes] window._LOTES:',(window._LOTES?window._LOTES.length:undefined),'registros');
   var sec=document.getElementById("det-lote-sec");
   if(sec)sec.style.display="none";
-  function _procesarLotes(lotes){
-    if(!lotes||!lotes.length){console.log('[lotes] lista vacía, abortando');return;}
-    console.log('[lotes] lotes cargados:',lotes.length);
-    console.log('[lotes] primer lote:',JSON.stringify(lotes[0]));
+  fetch("https://pjacmizmjsjwxtoldpvr.supabase.co/rest/v1/lotes_potenciales?select=id,nombre,zona,latitud,longitud,prediction,venta_inst,venta_ocasion&limit=500",{
+    headers:{"apikey":"sb_publishable_zy_iwqAnOgx0N8xElowU8A_CwpJ71_K","Authorization":"Bearer sb_publishable_zy_iwqAnOgx0N8xElowU8A_CwpJ71_K"}
+  }).then(function(r){return r.json();}).then(function(lotes){
+    if(!lotes||!lotes.length)return;
     var cercano=null,minDist=999;
     lotes.forEach(function(l){
-      console.log('[lotes] comparando con lote:',l.id,l.nombre,'lat:',l.latitud,'lng:',l.longitud);
-      if(!l.latitud||!l.longitud){console.log('[lotes] sin coords, saltando');return;}
+      if(!l.latitud||!l.longitud)return;
       var d=haversineKm(lat,lng,parseFloat(l.latitud),parseFloat(l.longitud));
       if(d<minDist){minDist=d;cercano=l;}
     });
-    console.log('[lotes] resultado final: cercano=',cercano?cercano.id:'ninguno','distancia=',minDist,'km');
-    if(!cercano||minDist>1.5){console.log('[lotes] fuera de rango (>1.5km) o sin lote, ocultando módulo');return;}
+    if(!cercano||minDist>1.5)return;
     var pred=parseFloat((cercano.prediction||"0").toString().replace(",",""))||0;
     var inst=parseFloat(cercano.venta_inst)||0;
     var distStr=minDist<1?(minDist*1000).toFixed(0)+"m":minDist.toFixed(2)+"km";
@@ -1256,22 +1124,7 @@ function verificarLoteCercano(lat,lng){
     document.getElementById("det-lote-dist").textContent=distStr;
     document.getElementById("det-lote-pred").textContent=(pred/1000).toFixed(1)+" ton/mes";
     document.getElementById("det-lote-inst").textContent=(inst/1000).toFixed(1)+" ton";
-  }
-  if(window._LOTES&&window._LOTES.length){
-    console.log('[lotes] usando cache window._LOTES');
-    _procesarLotes(window._LOTES);
-    return;
-  }
-  console.log('[lotes] sin cache, haciendo fetch...');
-  fetch("https://pjacmizmjsjwxtoldpvr.supabase.co/rest/v1/lotes_potenciales?select=id,nombre,zona,latitud,longitud,prediction,venta_inst,venta_ocasion&limit=5000",{
-    headers:{"apikey":"sb_publishable_zy_iwqAnOgx0N8xElowU8A_CwpJ71_K","Authorization":"Bearer sb_publishable_zy_iwqAnOgx0N8xElowU8A_CwpJ71_K"}
-  }).then(function(r){
-    console.log('[lotes] fetch status:',r.status,r.ok);
-    return r.json();
-  }).then(function(lotes){
-    window._LOTES=lotes||[];
-    _procesarLotes(window._LOTES);
-  }).catch(function(e){console.error('[lotes] fetch error:',e);});
+  }).catch(function(e){console.error("lotes:",e);});
 }
 
 function setSyncStatus(ok){
@@ -1787,8 +1640,6 @@ function showD(){
           }).then(function(x){return x.json();}).then(function(d){
             if(d&&d.pob){
               DR.pob=d.pob;DR.viv=d.viv;
-              calcularIPB(lat,lng,{desglose:DR.desglose||{},tot:DR.tot||0},{pob:d.pob,viv:d.viv},function(r){if(!DR)DR={};DR.proyeccion=r;});
-              calcularProyeccionSimilitud(lat,lng,{desglose:DR.desglose||{},tot:DR.tot||0},{pob:d.pob,viv:d.viv},function(r){if(!DR||!r)return;DR.proyeccion_venta=r;});
               var vEl=document.getElementById("det-viv");
               var pEl=document.getElementById("det-pob");
               if(vEl)vEl.textContent=d.viv.toLocaleString();
@@ -1857,7 +1708,7 @@ function rf(){
   document.getElementById("gc").textContent="Toca para obtener coordenadas";
   document.getElementById("dsec").style.display="none";
   document.getElementById("fsu").style.display="none";
-  var pg=document.getElementById("pg");if(pg)pg.innerHTML="<div class='padd' id='padd'>+</div>";
+  document.getElementById("pg").innerHTML="<div class='padd' id='padd'>+</div>";
   document.querySelectorAll(".tipo").forEach(function(c){c.classList.remove("ok");});
   document.querySelector(".tipo").classList.add("ok");
   TI="Local comercial";
@@ -1892,7 +1743,7 @@ function saveP(){
       denue:editId?(existing?existing.denue:null):(DR&&DR.real?{rest:DR.rest,com:DR.com,tot:DR.tot,desglose:DR.desglose||{}}:null),
       inegi:editId?(existing?existing.inegi:null):(DR&&DR.real?{viv:DR.viv,pob:DR.pob}:null),
       competencia:editId?(existing?existing.competencia||[]:[]): (DR&&DR.competencia?DR.competencia:[]),
-      proyeccion:(function(){var ip=DR&&DR.proyeccion?DR.proyeccion:(existing?existing.proyeccion||null:null);var pv=DR&&DR.proyeccion_venta?DR.proyeccion_venta:(ip&&ip.venta?ip.venta:null);return ip?Object.assign({},ip,pv?{venta:pv}:{}):(pv?{venta:pv}:null);})(),
+      proyeccion:DR&&DR.proyeccion?DR.proyeccion:(existing?existing.proyeccion||null:null),
       sucursal_cercana:DR&&DR.sucursal_cercana?DR.sucursal_cercana:(existing?existing.sucursal_cercana||null:null),
       documentos:docState
     };
@@ -1982,10 +1833,8 @@ function openDetail(id){
     var _viv=p.inegi&&p.inegi.viv?p.inegi.viv:null;
     var _giros=p.denue&&p.denue.tot?p.denue.tot:null;
     if(p.lat&&p.lng){
-      if(p.proyeccion&&p.proyeccion.ipb!==undefined)mostrarIPBDesdeCache(p.proyeccion);
-      else mostrarIPB(p.lat,p.lng,p);
-      if(p.proyeccion&&p.proyeccion.venta)mostrarProyeccionVentaDesdeCache(p.proyeccion.venta);
-      else mostrarProyeccionVenta(p.lat,p.lng,p);
+      if(p.proyeccion)mostrarProyeccionDesdeCache(p.proyeccion);
+      else mostrarProyeccion(p.lat,p.lng,_pob,_viv,_giros);
     }
     // Exponer en DR para que generarFichaPDF pueda leer si se abre desde aquí
     DR=DR||{};DR._prospecto_id=p.id;
@@ -2427,62 +2276,25 @@ function initUI(){
 
   function generarFichaPDF(p){
     var fotoSrc=p.fotos&&p.fotos.frente?p.fotos.frente:p.fotos&&p.fotos.lateral?p.fotos.lateral:p.fotos&&p.fotos.entorno?p.fotos.entorno:null;
+    // Usar datos guardados en el objeto prospecto; fallback al DOM solo si se abre desde vista detalle
     var proyRef,proyRango,proyPot,proyInst,proyOcas,proyBase;
-    var ipbScore=null,ipbClasif=null,ipbF1=null,ipbF2=null,ipbF3=null,ipbF4=null,ipbF5=null,ipbCanib=null,ipbDistBafar=null;
-    var payload_ipbFodaF=[],payload_ipbFodaD=[];
-    var pvRef=null,pvRango=null,pvInst=null,pvCons=null,pvTiendas=null;
     if(p.proyeccion){
       var pr=p.proyeccion;
-      var isIPB=pr.ipb!==undefined;
-      var ref2=pr.venta_referencial||pr.referencial||0;
-      var instKg2=pr.institucional||0;
-      var consKg2=pr.consumo||pr.ocasion||0;
-      var tot2=instKg2+consKg2;
-      var ri2=tot2>0?instKg2/tot2:0.65;
-      proyRef="~"+(ref2/1000).toFixed(1)+" ton/mes";
-      proyRango=((pr.rango_min||0)/1000).toFixed(1)+" — "+((pr.rango_max||0)/1000).toFixed(1)+" ton/mes";
-      proyPot=pr.clasificacion||pr.nivel||null;
-      proyInst=(instKg2/1000).toFixed(1)+" ton ("+(ri2*100).toFixed(0)+"%)";
-      proyOcas=(consKg2/1000).toFixed(1)+" ton ("+((1-ri2)*100).toFixed(0)+"%)";
-      proyBase=isIPB?("IPB "+pr.ipb+"/100 · "+(pr.basadas||pr.modelo||"")):(pr.modelo||null);
-      if(isIPB){
-        ipbScore=pr.ipb;ipbClasif=pr.clasificacion;
-        var df2=pr.detalle_factores||{};
-        ipbF2=df2.f2_giros;ipbF3=df2.f3_poblacion;ipbF5=df2.f5_flujo;
-        ipbCanib=pr.factor_canibalizacion;ipbDistBafar=pr.distancia_bafar_cercana;
-        var _fc=ipbCanib!=null?ipbCanib:1;
-        var _gens=pr.generadores||[];
-        var _fF=[],_fD=[];
-        if((ipbF2||0)>=75)_fF.push("Alta densidad de mercado objetivo");
-        if((ipbF3||0)>=75)_fF.push("Alta población en radio inmediato");
-        if((ipbF5||0)>=75)_fF.push("Zona comercialmente activa");
-        _gens.forEach(function(g){_fF.push("🧲 "+g);});
-        if(_fc>=1)_fF.push("Sin competencia BAFAR cercana");
-        if((ipbF2||0)<50)_fD.push("Bajo mercado de giros objetivo");
-        if((ipbF3||0)<50)_fD.push("Baja densidad poblacional en radio");
-        if((ipbF5||0)<50)_fD.push("Zona con poco flujo comercial");
-        if(_fc<1)_fD.push("BAFAR a "+(ipbDistBafar||0).toFixed(1)+"km — canibalización");
-        payload_ipbFodaF=_fF;payload_ipbFodaD=_fD;
-      }
-      var pv=pr.venta||(DR&&DR.proyeccion_venta?DR.proyeccion_venta:null);
-      if(pv){
-        pvRef="~"+(pv.referencial/1000).toFixed(1)+" ton/mes";
-        pvRango=(pv.rango_min/1000).toFixed(1)+" — "+(pv.rango_max/1000).toFixed(1)+" ton/mes";
-        pvInst=(pv.institucional/1000).toFixed(1)+" ton (65%)";
-        pvCons=(pv.consumo/1000).toFixed(1)+" ton (35%)";
-        pvTiendas=pv.tiendas_referencia||null;
-      }
+      var tot=(pr.institucional||0)+(pr.ocasion||0);
+      var ri=tot>0?(pr.institucional||0)/tot:0.673;
+      proyRef="~"+(pr.referencial/1000).toFixed(1)+" ton/mes";
+      proyRango=(pr.rango_min/1000).toFixed(1)+" — "+(pr.rango_max/1000).toFixed(1)+" ton/mes";
+      proyPot=pr.nivel||null;
+      proyInst=((pr.institucional||0)/1000).toFixed(1)+" ton ("+(ri*100).toFixed(0)+"%)";
+      proyOcas=((pr.ocasion||0)/1000).toFixed(1)+" ton ("+((1-ri)*100).toFixed(0)+"%)";
+      proyBase=pr.modelo||null;
     } else {
       proyRef=document.getElementById("det-proy-ref")?document.getElementById("det-proy-ref").textContent:null;
       proyRango=document.getElementById("det-proy-rango")?document.getElementById("det-proy-rango").textContent:null;
-      proyPot=document.getElementById("det-ipb-clasif")?document.getElementById("det-ipb-clasif").textContent:null;
+      proyPot=document.getElementById("det-proy-potencial")?document.getElementById("det-proy-potencial").textContent:null;
       proyInst=document.getElementById("det-proy-inst")?document.getElementById("det-proy-inst").textContent:null;
       proyOcas=document.getElementById("det-proy-ocas")?document.getElementById("det-proy-ocas").textContent:null;
       proyBase=document.getElementById("det-proy-base")?document.getElementById("det-proy-base").textContent:null;
-      pvRef=document.getElementById("det-pv-ref")?document.getElementById("det-pv-ref").textContent:null;
-      pvRango=document.getElementById("det-pv-rango")?document.getElementById("det-pv-rango").textContent:null;
-      pvInst=document.getElementById("det-pv-inst")?document.getElementById("det-pv-inst").textContent:null;
-      pvCons=document.getElementById("det-pv-cons")?document.getElementById("det-pv-cons").textContent:null;
     }
     var sucNombre,sucDist,sucVenta,sucInst,sucOcas,sucZona;
     if(p.sucursal_cercana){
@@ -2516,11 +2328,6 @@ function initUI(){
       fotoUrl:fotoSrc||null,
       proyRef:proyRef||null,proyRango:proyRango||null,proyPot:proyPot||null,
       proyInst:proyInst||null,proyOcas:proyOcas||null,proyBase:proyBase||null,
-      ipbScore:ipbScore,ipbClasif:ipbClasif||null,
-      ipbF1:ipbF1||null,ipbF2:ipbF2||null,ipbF3:ipbF3||null,ipbF4:ipbF4||null,ipbF5:ipbF5||null,
-      ipbCanib:ipbCanib||null,ipbDistBafar:ipbDistBafar||null,
-      ipbFodaF:payload_ipbFodaF,ipbFodaD:payload_ipbFodaD,
-      pvRef:pvRef||null,pvRango:pvRango||null,pvInst:pvInst||null,pvCons:pvCons||null,pvTiendas:pvTiendas||null,
       sucNombre:sucNombre||null,sucDist:sucDist||null,sucVenta:sucVenta||null,
       sucInst:sucInst||null,sucOcas:sucOcas||null,sucZona:sucZona||null,
       lotNombre:lotNombre||null,lotZona:lotZona||null,lotDist:lotDist||null,
