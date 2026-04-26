@@ -1065,7 +1065,7 @@ function mostrarSucursalCercana(lat,lng){
       document.getElementById("det-suc-zona").textContent=zona;
       // Guardar en DR para persistir al salvar
       if(!DR)DR={};
-      DR.sucursal_cercana={nombre:usar.s.nombre||"",distancia:distStr,venta_real:vkg,venta_inst:ikg,venta_ocas:okg,region:zona};
+      DR.sucursal_cercana={nombre:usar.s.nombre||"",distancia:distStr,venta_real:vkg,venta_inst:ikg,venta_ocas:okg,region:zona,coords_lat:lat,coords_lng:lng};
       if(DR._prospecto_id){var idx=PS.findIndex(function(x){return x.id===DR._prospecto_id;});if(idx>=0){PS[idx].sucursal_cercana=DR.sucursal_cercana;syncToSupabase(PS[idx]);}}
     }).catch(function(){if(loading)loading.style.display="none";if(err)err.style.display="block";});
   });
@@ -1891,7 +1891,8 @@ function openDetail(id){
     document.getElementById("det-rest").textContent=p.denue.rest||0;
     document.getElementById("det-com").textContent=p.denue.tot||0;
     if(p.lat&&p.lng){
-      if(p.sucursal_cercana)mostrarSucursalDesdeCache(p.sucursal_cercana);
+      var _scCacheValida=p.sucursal_cercana&&p.sucursal_cercana.coords_lat===p.lat&&p.sucursal_cercana.coords_lng===p.lng;
+      if(_scCacheValida)mostrarSucursalDesdeCache(p.sucursal_cercana);
       else mostrarSucursalCercana(p.lat,p.lng);
     }
     verificarLoteCercano(p.lat,p.lng);
