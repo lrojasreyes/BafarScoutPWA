@@ -944,7 +944,7 @@ var _sucursalesCache=null;
 
 function cargarSucursales(cb){
   if(_sucursalesCache){cb(_sucursalesCache);return;}
-  fetch("https://pjacmizmjsjwxtoldpvr.supabase.co/rest/v1/sucursales_bafar?select=nombre,latitud,longitud,venta_kg,venta_kg_institucional,venta_kg_consumo,ratio_institucional,zona_operaciones,tipo_tienda,poblacion&limit=400",{
+  fetch("https://pjacmizmjsjwxtoldpvr.supabase.co/rest/v1/sucursales_bafar?select=nombre,latitud,longitud,venta_kg,venta_kg_institucional,venta_kg_consumo,ratio_institucional,zona_operaciones,tipo_tienda,poblacion,viviendas,total_giros_bafar&limit=400",{
     headers:{"apikey":"sb_publishable_zy_iwqAnOgx0N8xElowU8A_CwpJ71_K","Authorization":"Bearer sb_publishable_zy_iwqAnOgx0N8xElowU8A_CwpJ71_K"}
   }).then(function(r){return r.json();}).then(function(data){
     _sucursalesCache=Array.isArray(data)?data:[];
@@ -959,14 +959,18 @@ function calcularProyeccionBafar(lat,lng,pobProspecto,vivProspecto,girosProspect
     suc.forEach(function(s){
       if(!s.latitud||!s.longitud||!s.venta_kg)return;
       var distKm=haversineKm(lat,lng,s.latitud,s.longitud);
-      if(distKm>300)return;
-      var pesoGeo=1/(1+distKm*0.1);
-      var pesoDem=1;
-      if(pobProspecto&&s.poblacion&&s.poblacion>0){
-        var ratioPob=Math.min(pobProspecto,s.poblacion)/Math.max(pobProspecto,s.poblacion);
-        pesoDem=0.5+0.5*ratioPob;
-      }
-      scored.push({s:s,dist:distKm,score:pesoGeo*pesoDem});
+      var similDenue=s.total_giros_bafar!=null&&girosProspecto
+        ?1-Math.min(1,Math.abs(girosProspecto-s.total_giros_bafar)/Math.max(girosProspecto,s.total_giros_bafar,1))
+        :0.5;
+      var similPoblacion=s.poblacion!=null&&pobProspecto
+        ?1-Math.min(1,Math.abs(pobProspecto-s.poblacion)/Math.max(pobProspecto,s.poblacion,1))
+        :0.5;
+      var similViviendas=s.viviendas!=null&&vivProspecto
+        ?1-Math.min(1,Math.abs(vivProspecto-s.viviendas)/Math.max(vivProspecto,s.viviendas,1))
+        :0.5;
+      var similDistancia=1/(1+distKm*0.05);
+      var score=similDenue*0.50+similPoblacion*0.30+similViviendas*0.10+similDistancia*0.10;
+      scored.push({s:s,dist:distKm,score:score});
     });
     scored.sort(function(a,b){return b.score-a.score;});
     var top5=scored.slice(0,5);
