@@ -1902,6 +1902,11 @@ function openDetail(id){
       desgEl.innerHTML=Object.keys(_dg).sort(function(a,b){return _dg[b]-_dg[a];}).map(function(g){
         return "<div style='display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04)'><span style='font-size:13px;color:#e8ecf4'>"+g+"</span><span style='font-size:14px;font-weight:700;color:#f0c050'>"+_dg[g]+"</span></div>";
       }).join("");
+      var _comGiros=["Carniceria","Tenderos o Cremerias","Comercio"];
+      var _dgRest=Object.keys(_dg).filter(function(g){return _comGiros.indexOf(g)<0;}).reduce(function(a,g){return a+_dg[g];},0);
+      var _dgTot=Object.keys(_dg).reduce(function(a,g){return a+_dg[g];},0);
+      document.getElementById("det-rest").textContent=_dgRest;
+      document.getElementById("det-com").textContent=_dgTot;
     } else if(desgEl){
       if(p.lat&&p.lng){
         desgEl.innerHTML="<div style='font-size:12px;color:#6a7590;text-align:center;padding:10px'>Cargando desglose...</div>";
