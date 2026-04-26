@@ -1839,8 +1839,13 @@ function _cargarDesgloseDetalle(p,desgEl){
       desgEl.innerHTML=Object.keys(dg).sort(function(a,b){return dg[b]-dg[a];}).map(function(g){
         return "<div style='display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04)'><span style='font-size:13px;color:#e8ecf4'>"+g+"</span><span style='font-size:14px;font-weight:700;color:#f0c050'>"+dg[g]+"</span></div>";
       }).join("");
+      var comGiros=["Carniceria","Tenderos o Cremerias","Comercio"];
+      var nuevoRest=Object.keys(dg).filter(function(g){return comGiros.indexOf(g)<0;}).reduce(function(a,g){return a+dg[g];},0);
+      var nuevoTot=Object.keys(dg).reduce(function(a,g){return a+dg[g];},0);
+      var elRest=document.getElementById("det-rest");if(elRest)elRest.textContent=nuevoRest;
+      var elCom=document.getElementById("det-com");if(elCom)elCom.textContent=nuevoTot;
       var idx=PS.findIndex(function(x){return x.id===p.id;});
-      if(idx>=0){PS[idx].denue=Object.assign({},PS[idx].denue,{desglose:dg});syncToSupabase(PS[idx]);}
+      if(idx>=0){PS[idx].denue=Object.assign({},PS[idx].denue,{desglose:dg,rest:nuevoRest,tot:nuevoTot});syncToSupabase(PS[idx]);}
     } else {
       desgEl.innerHTML="<div style='font-size:12px;color:#6a7590;text-align:center;padding:10px'>Sin desglose disponible</div>";
     }
