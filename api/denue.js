@@ -25,6 +25,7 @@ export default async function handler(req) {
 
     // Accept array of SCIAN codes or legacy single string
     const codes = Array.isArray(scian) ? scian : [scian === 'restaurantes' ? 'restaurante' : scian];
+    console.log('[DENUE API] recibido: scian tipo='+typeof scian+' isArray='+Array.isArray(scian)+' codes_count='+codes.length+' primero='+codes[0]);
 
     const results = await Promise.all(codes.map(async (code) => {
       const url = `https://www.inegi.org.mx/app/api/denue/v1/consulta/buscar/${encodeURIComponent(code)}/${lat},${lng}/${radio}/${token}`;

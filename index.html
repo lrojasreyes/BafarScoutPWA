@@ -1595,7 +1595,9 @@ function showD(){
       new Promise(function(res){setTimeout(function(){res([]);},ms);})
     ]);
   }
+  console.log('[DENUE] enviando a /api/denue:', JSON.stringify({lat:lat,lng:lng,radio:r,scian:SCIAN_TODOS}));
   proxyDENUE(SCIAN_TODOS,18000).then(function(res){
+    console.log('[DENUE] respuesta recibida:', Array.isArray(res)?res.length+' items, primer _scian='+(res[0]&&res[0]._scian||'undefined'):'NO es array → '+JSON.stringify(res).slice(0,120));
     var desglose={},totalRest=0,totalCom=0,vistos={};
     var todos=Array.isArray(res)?res:[];
     todos.forEach(function(est){
