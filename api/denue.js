@@ -8,16 +8,21 @@ const FETCH_HEADERS = {
   "Origin": "https://www.inegi.org.mx"
 };
 
-// Text terms that collectively cover all 16 target SCIAN codes
-const SEARCH_TERMS = ['restaurante', 'carniceria', 'minisuper', 'cantina'];
-
-// Whitelist of SCIAN codes relevant to BAFAR
-const SCIAN_BAFAR = new Set([
-  '461150','461121','461123',
-  '722514','722515','722330','722517','722518',
-  '722511','722512','722519','722516','722513',
-  '722310','722320','722412'
-]);
+// Each term targets specific SCIAN codes; results filtered to only those codes
+const BUSQUEDAS = [
+  { termino: "restaurante", scian: new Set(["722511","722512","722513","722516","722519"]) },
+  { termino: "tacos",       scian: new Set(["722514"]) },
+  { termino: "cafeteria",   scian: new Set(["722515"]) },
+  { termino: "comedor",     scian: new Set(["722310"]) },
+  { termino: "banquetes",   scian: new Set(["722320"]) },
+  { termino: "antojitos",   scian: new Set(["722330"]) },
+  { termino: "bar",         scian: new Set(["722412"]) },
+  { termino: "pizza",       scian: new Set(["722517"]) },
+  { termino: "carnitas",    scian: new Set(["722518"]) },
+  { termino: "carniceria",  scian: new Set(["461121"]) },
+  { termino: "pescado",     scian: new Set(["461123"]) },
+  { termino: "abarrotes",   scian: new Set(["461150"]) }
+];
 
 export default async function handler(req) {
   if(req.method === 'OPTIONS') {
@@ -34,21 +39,21 @@ export default async function handler(req) {
     const { lat, lng, radio, token: clientToken } = await req.json();
     const token = clientToken || "0e4c4af9-a631-4f6d-8c35-2d2eb7314785";
 
-    const results = await Promise.all(SEARCH_TERMS.map(async (term) => {
-      const url = `https://www.inegi.org.mx/app/api/denue/v1/consulta/buscar/${term}/${lat},${lng}/${radio}/${token}`;
+    const results = await Promise.all(BUSQUEDAS.map(async ({ termino, scian }) => {
+      const url = `https://www.inegi.org.mx/app/api/denue/v1/consulta/buscar/${termino}/${lat},${lng}/${radio}/${token}`;
       const resp = await fetch(url, { headers: FETCH_HEADERS });
       const data = await resp.json().catch(() => []);
       if(!Array.isArray(data)) return [];
       return data
         .map(function(d) {
           const clee = d.CLEE || '';
-          const scian = clee.length >= 11 ? clee.substring(5, 11) : '';
-          return Object.assign({}, d, { _scian: scian });
+          const code = clee.length >= 11 ? clee.substring(5, 11) : '';
+          return Object.assign({}, d, { _scian: code });
         })
-        .filter(function(d) { return SCIAN_BAFAR.has(d._scian); });
+        .filter(function(d) { return scian.has(d._scian); });
     }));
 
-    // Deduplicate by Id across all search terms
+    // Deduplicate across all search terms by Id
     const seen = new Set();
     const flat = results.flat().filter(function(d) {
       const id = d.Id || d.id;
@@ -57,7 +62,7 @@ export default async function handler(req) {
       return true;
     });
 
-    console.log('[DENUE API] terms:', SEARCH_TERMS.join(','), '| per term:', results.map(r=>r.length).join('/'), '| final:', flat.length);
+    console.log('[DENUE API] per term:', results.map((r,i)=>BUSQUEDAS[i].termino+':'+r.length).join(' | '), '| total:', flat.length);
 
     return new Response(JSON.stringify(flat), {
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
