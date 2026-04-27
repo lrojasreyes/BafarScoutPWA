@@ -875,6 +875,8 @@ function actualizarMapaGlobal(lista,em){
 window.generarFichaPDFGlobal=function(id){
   var p=window._DIR_IDX&&window._DIR_IDX[id];
   if(!p){toast("Prospecto no encontrado");return;}
+  console.log('[PDF Global] sucursal_cercana:',p.sucursal_cercana);
+  console.log('[PDF Global] calculando desde lat:',p.lat,p.lng);
   if(!p.sucursal_cercana&&p.lat&&p.lng){
     toast("Calculando sucursal cercana…");
     cargarSucursales(function(suc){
@@ -1999,6 +2001,12 @@ function dp(id){
   if(!confirm("Eliminar?"))return;
   PS=PS.filter(function(p){return p.id!==id;});
   deleteFromSupabase(id);
+  if(window._DIR_DATA){
+    window._DIR_DATA.todos=window._DIR_DATA.todos.filter(function(p){return p.id!==id;});
+    if(window._DIR_IDX)delete window._DIR_IDX[id];
+    var mc=document.getElementById("dir-mapa-container");
+    if(_mapaGlobal&&mc&&mc.style.display!=="none")actualizarMapaGlobal(window._DIR_DATA.todos,window._DIR_DATA.emailMap);
+  }
   ud();rl();
   toast("Eliminado");
 }
@@ -2257,7 +2265,9 @@ function initUI(){
   document.getElementById("bdel").addEventListener("click",function(){
     if(!confirm("Eliminar TODO?"))return;
     PS.forEach(function(p){deleteFromSupabase(p.id);});
-    PS=[];ud();
+    PS=[];
+    if(window._DIR_DATA){window._DIR_DATA.todos=[];if(window._DIR_IDX)window._DIR_IDX={};}
+    ud();
     toast("Eliminado todo");
   });
 
