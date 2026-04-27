@@ -8,22 +8,16 @@ const FETCH_HEADERS = {
   "Origin": "https://www.inegi.org.mx"
 };
 
-// All terms together maximize coverage of all 16 SCIAN codes.
-// Every term uses the global SCIAN_BAFAR whitelist — no per-term filtering —
-// so an establishment is never discarded just because it surfaced via a
-// different search term than expected.
-const SEARCH_TERMS = [
-  'restaurante', 'tacos', 'cafeteria', 'comedor',
-  'banquetes', 'antojitos', 'bar', 'pizza',
-  'carnitas', 'carniceria', 'pescado', 'abarrotes'
+// 6 grouped searches to stay within Vercel Free 10s timeout.
+// Each group targets specific SCIAN codes extracted from CLEE field.
+const BUSQUEDAS = [
+  { termino: "restaurante tacos",   scian: new Set(["722511","722512","722513","722514","722516","722519"]) },
+  { termino: "cafeteria comedor",   scian: new Set(["722515","722310","722320"]) },
+  { termino: "bar cantina",         scian: new Set(["722412","722330"]) },
+  { termino: "pizza carnitas",      scian: new Set(["722517","722518"]) },
+  { termino: "carniceria pescado",  scian: new Set(["461121","461123"]) },
+  { termino: "abarrotes minisuper", scian: new Set(["461150"]) }
 ];
-
-const SCIAN_BAFAR = new Set([
-  '461150','461121','461123',
-  '722310','722320','722330','722412',
-  '722511','722512','722513','722514',
-  '722515','722516','722517','722518','722519'
-]);
 
 export default async function handler(req) {
   if(req.method === 'OPTIONS') {
@@ -40,21 +34,21 @@ export default async function handler(req) {
     const { lat, lng, radio, token: clientToken } = await req.json();
     const token = clientToken || "0e4c4af9-a631-4f6d-8c35-2d2eb7314785";
 
-    const results = await Promise.all(SEARCH_TERMS.map(async (term) => {
-      const url = `https://www.inegi.org.mx/app/api/denue/v1/consulta/buscar/${term}/${lat},${lng}/${radio}/${token}`;
+    const results = await Promise.all(BUSQUEDAS.map(async ({ termino, scian }) => {
+      const url = `https://www.inegi.org.mx/app/api/denue/v1/consulta/buscar/${encodeURIComponent(termino)}/${lat},${lng}/${radio}/${token}`;
       const resp = await fetch(url, { headers: FETCH_HEADERS });
       const data = await resp.json().catch(() => []);
       if(!Array.isArray(data)) return [];
       return data
         .map(function(d) {
           const clee = d.CLEE || '';
-          const scian = clee.length >= 11 ? clee.substring(5, 11) : '';
-          return Object.assign({}, d, { _scian: scian });
+          const code = clee.length >= 11 ? clee.substring(5, 11) : '';
+          return Object.assign({}, d, { _scian: code });
         })
-        .filter(function(d) { return SCIAN_BAFAR.has(d._scian); });
+        .filter(function(d) { return scian.has(d._scian); });
     }));
 
-    // Deduplicate across all terms by Id
+    // Deduplicate across all groups by Id
     const seen = new Set();
     const flat = results.flat().filter(function(d) {
       const id = d.Id || d.id;
@@ -63,7 +57,7 @@ export default async function handler(req) {
       return true;
     });
 
-    console.log('[DENUE API] per term:', results.map((r,i)=>SEARCH_TERMS[i]+':'+r.length).join(' '), '| total dedup:', flat.length);
+    console.log('[DENUE API] per group:', results.map((r,i)=>BUSQUEDAS[i].termino+':'+r.length).join(' | '), '| total:', flat.length);
 
     return new Response(JSON.stringify(flat), {
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
