@@ -1589,15 +1589,15 @@ function showD(){
   var EXCL_DENUE=["starbucks","mcdonalds","mc donald","dominos","domino","burger king","kfc","pizza hut","subway","vips","toks","liconsa","herbalife","sukarne","norson","kowi","tsk","pollo rostizado","pollos rostizado","rosticeria","panaderia","pasteleria","heladeria","nieveria","neveria","paleteria","jugos","jugueria","gelatina","raspados","nutricion","club nutri","fruteria","lecheria","cafenio","krispy","churros","pulque","vinateria","estanquillo","kiosko","botanas","ensalada","postre","nieve","agua purificada","refresqueria"];
   var SCIAN_TODOS=Object.keys(SCIAN_BAFAR);
   var SCIAN_COM_CODES=["461150","461121","461123"];
-  function proxyDENUE(scian,ms){
+  function proxyDENUE(ms){
     return Promise.race([
-      fetch("/api/denue",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({lat:lat,lng:lng,radio:r,scian:scian,token:tok})}).then(function(x){return x.json();}).catch(function(){return[];}),
+      fetch("/api/denue",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({lat:lat,lng:lng,radio:r,token:tok})}).then(function(x){return x.json();}).catch(function(){return[];}),
       new Promise(function(res){setTimeout(function(){res([]);},ms);})
     ]);
   }
-  console.log('[DENUE] enviando a /api/denue:', JSON.stringify({lat:lat,lng:lng,radio:r,scian:SCIAN_TODOS}));
-  proxyDENUE(SCIAN_TODOS,18000).then(function(res){
-    console.log('[DENUE] respuesta recibida:', Array.isArray(res)?res.length+' items, primer _scian='+(res[0]&&res[0]._scian||'undefined'):'NO es array → '+JSON.stringify(res).slice(0,120));
+  console.log('[DENUE] llamando lat:'+lat+' lng:'+lng+' radio:'+r);
+  proxyDENUE(18000).then(function(res){
+    console.log('[DENUE] respuesta:', Array.isArray(res)?res.length+' items, primer _scian='+(res[0]&&res[0]._scian||'undefined'):'NO array → '+JSON.stringify(res).slice(0,120));
     var desglose={},totalRest=0,totalCom=0,vistos={};
     var todos=Array.isArray(res)?res:[];
     todos.forEach(function(est){
@@ -1797,7 +1797,7 @@ function _cargarDesgloseDetalle(p,desgEl){
   var _SCIAN_BAFAR={"461150":"Minisuper","461121":"Carniceria","461123":"Exp. de Pescados y Mariscos","722514":"Taqueria","722515":"Cafeterias","722330":"Fondas o Cocinas","722517":"Pizzas","722518":"Carnitas","722511":"Restaurante","722512":"Restaurante de Mariscos","722519":"Snack","722516":"Restaurante","722513":"Gorditas","722310":"Comedores Industriales","722320":"Banquetes","722412":"Bares y cantinas"};
   var _EXCL_DENUE=["starbucks","mcdonalds","mc donald","dominos","domino","burger king","kfc","pizza hut","subway","vips","toks","liconsa","herbalife","sukarne","norson","kowi","tsk","pollo rostizado","pollos rostizado","rosticeria","panaderia","pasteleria","heladeria","nieveria","neveria","paleteria","jugos","jugueria","gelatina","raspados","nutricion","club nutri","fruteria","lecheria","cafenio","krispy","churros","pulque","vinateria","estanquillo","kiosko","botanas","ensalada","postre","nieve","agua purificada","refresqueria"];
   var _SCIAN_COM_CODES=["461150","461121","461123"];
-  fetch("/api/denue",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({lat:lat,lng:lng,radio:r,scian:Object.keys(_SCIAN_BAFAR),token:tok})}).then(function(x){return x.json();}).catch(function(){return[];}).then(function(res){
+  fetch("/api/denue",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({lat:lat,lng:lng,radio:r,token:tok})}).then(function(x){return x.json();}).catch(function(){return[];}).then(function(res){
     var dg={},vis={};
     var todos=Array.isArray(res)?res:[];
     todos.forEach(function(est){
