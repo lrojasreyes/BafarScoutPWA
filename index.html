@@ -875,7 +875,28 @@ function actualizarMapaGlobal(lista,em){
 window.generarFichaPDFGlobal=function(id){
   var p=window._DIR_IDX&&window._DIR_IDX[id];
   if(!p){toast("Prospecto no encontrado");return;}
-  generarFichaPDF(p);
+  if(!p.sucursal_cercana&&p.lat&&p.lng){
+    toast("Calculando sucursal cercana…");
+    cargarSucursales(function(suc){
+      if(suc&&suc.length){
+        var conVenta=suc.filter(function(s){return s.latitud&&s.longitud&&s.venta_kg&&parseFloat(s.venta_kg)>0;});
+        var ordenadas=conVenta.map(function(s){
+          return {s:s,dist:haversineKm(p.lat,p.lng,parseFloat(s.latitud),parseFloat(s.longitud))};
+        }).sort(function(a,b){return a.dist-b.dist;});
+        if(ordenadas.length){
+          var usar=ordenadas[0];
+          var distStr=usar.dist<1?(usar.dist*1000).toFixed(0)+"m":usar.dist.toFixed(1)+"km";
+          var vkg=parseFloat(usar.s.venta_kg)||0;
+          var ikg=parseFloat(usar.s.venta_kg_institucional)||0;
+          var okg=parseFloat(usar.s.venta_kg_consumo)||0;
+          p.sucursal_cercana={nombre:usar.s.nombre||"",distancia:distStr,venta_real:vkg,venta_inst:ikg,venta_ocas:okg,region:usar.s.zona_operaciones||"",coords_lat:p.lat,coords_lng:p.lng};
+        }
+      }
+      generarFichaPDF(p);
+    });
+  } else {
+    generarFichaPDF(p);
+  }
 };
 
 function abrirMapaCalorDENUE(p){
