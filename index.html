@@ -1585,56 +1585,30 @@ function showD(){
   document.getElementById("dc").innerHTML="<div style='padding:20px;display:flex;align-items:center;gap:12px'><div class='spin'></div><span style='color:#6a7590;font-size:13px'>Consultando DENUE "+RADIO+"m...</span></div>";
   var tok=localStorage.getItem("dtok")||TOK;
   var lat=GD.lat,lng=GD.lng,r=RADIO;
-  var SCIAN_REST=["722511","722514","722518","722513","722516","722512","722519","722310","722330","722515","722517","722320","722412"];
-  var SCIAN_COM=["461121","461150","461123"];
-  function fetchTimeout(url,ms){
-    return Promise.race([
-      fetch(url).then(function(x){return x.json();}).catch(function(){return [];}),
-      new Promise(function(res){setTimeout(function(){res([]);},ms);})
-    ]);
-  }
+  var SCIAN_BAFAR={"461150":"Minisuper","461121":"Carniceria","461123":"Exp. de Pescados y Mariscos","722514":"Taqueria","722515":"Cafeterias","722330":"Fondas o Cocinas","722517":"Pizzas","722518":"Carnitas","722511":"Restaurante","722512":"Restaurante de Mariscos","722519":"Snack","722516":"Restaurante","722513":"Gorditas","722310":"Comedores Industriales","722320":"Banquetes","722412":"Bares y cantinas"};
+  var EXCL_DENUE=["starbucks","mcdonalds","mc donald","dominos","domino","burger king","kfc","pizza hut","subway","vips","toks","liconsa","herbalife","sukarne","norson","kowi","tsk","pollo rostizado","pollos rostizado","rosticeria","panaderia","pasteleria","heladeria","nieveria","neveria","paleteria","jugos","jugueria","gelatina","raspados","nutricion","club nutri","fruteria","lecheria","cafenio","krispy","churros","pulque","vinateria","estanquillo","kiosko","botanas","ensalada","postre","nieve","agua purificada","refresqueria"];
+  var SCIAN_TODOS=Object.keys(SCIAN_BAFAR);
+  var SCIAN_COM_CODES=["461150","461121","461123"];
   function proxyDENUE(scian,ms){
     return Promise.race([
       fetch("/api/denue",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({lat:lat,lng:lng,radio:r,scian:scian,token:tok})}).then(function(x){return x.json();}).catch(function(){return[];}),
       new Promise(function(res){setTimeout(function(){res([]);},ms);})
     ]);
   }
-  Promise.all([
-    proxyDENUE("restaurantes",8000),
-    
-    proxyDENUE("carniceria",5000),
-    proxyDENUE("minisuper",5000)
-  ]).then(function(res){
+  proxyDENUE(SCIAN_TODOS,18000).then(function(res){
     var desglose={},totalRest=0,totalCom=0,vistos={};
-    var arrRest=Array.isArray(res[0])?res[0]:[];
-    var arrCom=[].concat(Array.isArray(res[1])?res[1]:[]).concat(Array.isArray(res[2])?res[2]:[]).concat(Array.isArray(res[3])?res[3]:[]);
-    function procesar(arr,esCom){
-      arr.forEach(function(est){
-        var id=est.Id||est.id||Math.random().toString();
-        if(vistos[id]) return; vistos[id]=true;
-        var nombre=est.Nombre||""; var act=est.Clase_actividad||"";
-        var n=nombre.toLowerCase(); var a=act.toLowerCase();
-        var excluir=["farmacia","oxxo","papeleria","herbalife","jugos","panaderia","tortilleria","rosticeria","mcdonald","burger king","starbucks","dominos","subway","kfc","pizza hut","vips","toks","helado","nieve","raspado"];
-        if(!nombre||n.indexOf("sin nombre")>=0) return;
-        if(excluir.some(function(t){return n.indexOf(t)>=0||a.indexOf(t)>=0;})) return;
-        var giro=esCom?(n.indexOf("carnic")>=0?"Carniceria":n.indexOf("cremeria")>=0||n.indexOf("lacteo")>=0?"Tenderos o Cremerias":"Comercio"):"Restaurante";
-        if(!esCom){
-          if(n.indexOf("taco")>=0) giro="Taqueria";
-          else if(n.indexOf("fonda")>=0||n.indexOf("cocina")>=0) giro="Fondas o Cocinas";
-          else if(n.indexOf("birria")>=0||n.indexOf("barbacoa")>=0) giro="Birreria o Barbacoa";
-          else if(n.indexOf("mariscos")>=0||a.indexOf("mariscos")>=0) giro="Restaurante de Mariscos";
-          else if(n.indexOf("pizza")>=0) giro="Pizzas";
-          else if(n.indexOf("torta")>=0) giro="Tortas";
-          else if(n.indexOf("hambur")>=0) giro="Hamburguesas";
-          else if(n.indexOf("cafe")>=0) giro="Cafeterias";
-          else if(n.indexOf("bar")>=0||n.indexOf("cantina")>=0) giro="Bares y cantinas";
-        }
-        desglose[giro]=(desglose[giro]||0)+1;
-        if(esCom) totalCom++; else totalRest++;
-      });
-    }
-    procesar(arrRest,false);
-    procesar(arrCom,true);
+    var todos=Array.isArray(res)?res:[];
+    todos.forEach(function(est){
+      var id=est.Id||est.id||Math.random().toString();
+      if(vistos[id])return;vistos[id]=true;
+      var nm=(est.Nombre||"").trim();var n=nm.toLowerCase();
+      if(!nm||n.indexOf("sin nombre")>=0)return;
+      if(EXCL_DENUE.some(function(t){return n.indexOf(t)>=0;}))return;
+      var giro=SCIAN_BAFAR[est._scian];
+      if(!giro)return;
+      desglose[giro]=(desglose[giro]||0)+1;
+      if(SCIAN_COM_CODES.indexOf(est._scian)>=0)totalCom++;else totalRest++;
+    });
     var totalEncontrados=totalRest+totalCom;
     var r1={real:totalEncontrados>0,restaurantes:totalRest,comercios:totalCom,total:totalEncontrados,desglose:desglose};
     var R=null;
@@ -1818,41 +1792,27 @@ function getRentaAsync(ciudad, tipo, operacion, estado, callback){
 
 function _cargarDesgloseDetalle(p,desgEl){
   var lat=p.lat,lng=p.lng,r=RADIO,tok=localStorage.getItem("dtok")||TOK;
-  function _pd(scian){
-    return fetch("/api/denue",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({lat:lat,lng:lng,radio:r,scian:scian,token:tok})}).then(function(x){return x.json();}).catch(function(){return[];});
-  }
-  Promise.all([_pd("restaurantes"),_pd("carniceria"),_pd("minisuper")]).then(function(res){
+  var _SCIAN_BAFAR={"461150":"Minisuper","461121":"Carniceria","461123":"Exp. de Pescados y Mariscos","722514":"Taqueria","722515":"Cafeterias","722330":"Fondas o Cocinas","722517":"Pizzas","722518":"Carnitas","722511":"Restaurante","722512":"Restaurante de Mariscos","722519":"Snack","722516":"Restaurante","722513":"Gorditas","722310":"Comedores Industriales","722320":"Banquetes","722412":"Bares y cantinas"};
+  var _EXCL_DENUE=["starbucks","mcdonalds","mc donald","dominos","domino","burger king","kfc","pizza hut","subway","vips","toks","liconsa","herbalife","sukarne","norson","kowi","tsk","pollo rostizado","pollos rostizado","rosticeria","panaderia","pasteleria","heladeria","nieveria","neveria","paleteria","jugos","jugueria","gelatina","raspados","nutricion","club nutri","fruteria","lecheria","cafenio","krispy","churros","pulque","vinateria","estanquillo","kiosko","botanas","ensalada","postre","nieve","agua purificada","refresqueria"];
+  var _SCIAN_COM_CODES=["461150","461121","461123"];
+  fetch("/api/denue",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({lat:lat,lng:lng,radio:r,scian:Object.keys(_SCIAN_BAFAR),token:tok})}).then(function(x){return x.json();}).catch(function(){return[];}).then(function(res){
     var dg={},vis={};
-    var excluir=["farmacia","oxxo","papeleria","herbalife","jugos","panaderia","tortilleria","rosticeria","mcdonald","burger king","starbucks","dominos","subway","kfc","pizza hut","vips","toks","helado","nieve","raspado"];
-    function _proc(arr,esCom){
-      arr.forEach(function(est){
-        var eid=est.Id||est.id||Math.random().toString();
-        if(vis[eid])return;vis[eid]=true;
-        var nm=est.Nombre||"";var n=nm.toLowerCase();var a=(est.Clase_actividad||"").toLowerCase();
-        if(!nm||n.indexOf("sin nombre")>=0)return;
-        if(excluir.some(function(t){return n.indexOf(t)>=0||a.indexOf(t)>=0;}))return;
-        var giro=esCom?(n.indexOf("carnic")>=0?"Carniceria":n.indexOf("cremeria")>=0||n.indexOf("lacteo")>=0?"Tenderos o Cremerias":"Comercio"):"Restaurante";
-        if(!esCom){
-          if(n.indexOf("taco")>=0)giro="Taqueria";
-          else if(n.indexOf("fonda")>=0||n.indexOf("cocina")>=0)giro="Fondas o Cocinas";
-          else if(n.indexOf("birria")>=0||n.indexOf("barbacoa")>=0)giro="Birreria o Barbacoa";
-          else if(n.indexOf("mariscos")>=0||a.indexOf("mariscos")>=0)giro="Restaurante de Mariscos";
-          else if(n.indexOf("pizza")>=0)giro="Pizzas";
-          else if(n.indexOf("torta")>=0)giro="Tortas";
-          else if(n.indexOf("hambur")>=0)giro="Hamburguesas";
-          else if(n.indexOf("cafe")>=0)giro="Cafeterias";
-          else if(n.indexOf("bar")>=0||n.indexOf("cantina")>=0)giro="Bares y cantinas";
-        }
-        dg[giro]=(dg[giro]||0)+1;
-      });
-    }
-    _proc(Array.isArray(res[0])?res[0]:[],false);
-    _proc([].concat(Array.isArray(res[1])?res[1]:[]).concat(Array.isArray(res[2])?res[2]:[]),true);
+    var todos=Array.isArray(res)?res:[];
+    todos.forEach(function(est){
+      var eid=est.Id||est.id||Math.random().toString();
+      if(vis[eid])return;vis[eid]=true;
+      var nm=(est.Nombre||"").trim();var n=nm.toLowerCase();
+      if(!nm||n.indexOf("sin nombre")>=0)return;
+      if(_EXCL_DENUE.some(function(t){return n.indexOf(t)>=0;}))return;
+      var giro=_SCIAN_BAFAR[est._scian];
+      if(!giro)return;
+      dg[giro]=(dg[giro]||0)+1;
+    });
     if(Object.keys(dg).length>0){
       desgEl.innerHTML=Object.keys(dg).sort(function(a,b){return dg[b]-dg[a];}).map(function(g){
         return "<div style='display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04)'><span style='font-size:13px;color:#e8ecf4'>"+g+"</span><span style='font-size:14px;font-weight:700;color:#f0c050'>"+dg[g]+"</span></div>";
       }).join("");
-      var comGiros=["Carniceria","Tenderos o Cremerias","Comercio"];
+      var comGiros=["Minisuper","Carniceria","Exp. de Pescados y Mariscos"];
       var nuevoRest=Object.keys(dg).filter(function(g){return comGiros.indexOf(g)<0;}).reduce(function(a,g){return a+dg[g];},0);
       var nuevoTot=Object.keys(dg).reduce(function(a,g){return a+dg[g];},0);
       var elRest=document.getElementById("det-rest");if(elRest)elRest.textContent=nuevoRest;
@@ -1916,7 +1876,7 @@ function openDetail(id){
       desgEl.innerHTML=Object.keys(_dg).sort(function(a,b){return _dg[b]-_dg[a];}).map(function(g){
         return "<div style='display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04)'><span style='font-size:13px;color:#e8ecf4'>"+g+"</span><span style='font-size:14px;font-weight:700;color:#f0c050'>"+_dg[g]+"</span></div>";
       }).join("");
-      var _comGiros=["Carniceria","Tenderos o Cremerias","Comercio"];
+      var _comGiros=["Carniceria","Minisuper","Exp. de Pescados y Mariscos","Tenderos o Cremerias","Comercio"];
       var _dgRest=Object.keys(_dg).filter(function(g){return _comGiros.indexOf(g)<0;}).reduce(function(a,g){return a+_dg[g];},0);
       var _dgTot=Object.keys(_dg).reduce(function(a,g){return a+_dg[g];},0);
       document.getElementById("det-rest").textContent=_dgRest;
