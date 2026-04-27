@@ -8,16 +8,27 @@ const FETCH_HEADERS = {
   "Origin": "https://www.inegi.org.mx"
 };
 
-// 6 grouped searches to stay within Vercel Free 10s timeout.
-// Each group targets specific SCIAN codes extracted from CLEE field.
 const BUSQUEDAS = [
-  { termino: "restaurante tacos",   scian: new Set(["722511","722512","722513","722514","722516","722519"]) },
-  { termino: "cafeteria comedor",   scian: new Set(["722515","722310","722320"]) },
-  { termino: "bar cantina",         scian: new Set(["722412","722330"]) },
-  { termino: "pizza carnitas",      scian: new Set(["722517","722518"]) },
-  { termino: "carniceria pescado",  scian: new Set(["461121","461123"]) },
-  { termino: "abarrotes minisuper", scian: new Set(["461150"]) }
+  {
+    termino: "restaurante",
+    scian: new Set(["722511","722512","722513","722514","722515",
+                    "722516","722517","722518","722519","722310",
+                    "722320","722330","722412"])
+  },
+  {
+    termino: "carniceria",
+    scian: new Set(["461121","461123"])
+  },
+  {
+    termino: "abarrotes",
+    scian: new Set(["461150"])
+  }
 ];
+
+const withTimeout = (promise, ms) => Promise.race([
+  promise,
+  new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms))
+]);
 
 export default async function handler(req) {
   if(req.method === 'OPTIONS') {
@@ -35,20 +46,26 @@ export default async function handler(req) {
     const token = clientToken || "0e4c4af9-a631-4f6d-8c35-2d2eb7314785";
 
     const results = await Promise.all(BUSQUEDAS.map(async ({ termino, scian }) => {
-      const url = `https://www.inegi.org.mx/app/api/denue/v1/consulta/buscar/${encodeURIComponent(termino)}/${lat},${lng}/${radio}/${token}`;
-      const resp = await fetch(url, { headers: FETCH_HEADERS });
-      const data = await resp.json().catch(() => []);
-      if(!Array.isArray(data)) return [];
-      return data
-        .map(function(d) {
-          const clee = d.CLEE || '';
-          const code = clee.length >= 11 ? clee.substring(5, 11) : '';
-          return Object.assign({}, d, { _scian: code });
-        })
-        .filter(function(d) { return scian.has(d._scian); });
+      try {
+        const url = `https://www.inegi.org.mx/app/api/denue/v1/consulta/buscar/${termino}/${lat},${lng}/${radio}/${token}`;
+        const data = await withTimeout(
+          fetch(url, { headers: FETCH_HEADERS }).then(r => r.json()),
+          8000
+        );
+        if(!Array.isArray(data)) return [];
+        return data
+          .map(function(d) {
+            const clee = d.CLEE || '';
+            const code = clee.length >= 11 ? clee.substring(5, 11) : '';
+            return Object.assign({}, d, { _scian: code });
+          })
+          .filter(function(d) { return scian.has(d._scian); });
+      } catch(e) {
+        console.log('[DENUE API] '+termino+' failed:', e.message);
+        return [];
+      }
     }));
 
-    // Deduplicate across all groups by Id
     const seen = new Set();
     const flat = results.flat().filter(function(d) {
       const id = d.Id || d.id;
@@ -57,7 +74,7 @@ export default async function handler(req) {
       return true;
     });
 
-    console.log('[DENUE API] per group:', results.map((r,i)=>BUSQUEDAS[i].termino+':'+r.length).join(' | '), '| total:', flat.length);
+    console.log('[DENUE API]', results.map((r,i)=>BUSQUEDAS[i].termino+':'+r.length).join(' | '), '| total:', flat.length);
 
     return new Response(JSON.stringify(flat), {
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
