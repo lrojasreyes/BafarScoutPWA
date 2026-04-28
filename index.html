@@ -857,7 +857,7 @@ function actualizarMapaGlobal(lista,em){
     var vivVal=p.inegi&&p.inegi.viv!=null?p.inegi.viv:(p.viviendas!=null?p.viviendas:"—");
     var vivStr=typeof vivVal==="number"&&vivVal>=1000?(vivVal/1000).toFixed(1)+"K":(vivVal!=null&&vivVal!=="—"?vivVal:"—");
     var denueVal=(p.denue&&(p.denue.tot!=null?p.denue.tot:p.denue.total!=null?p.denue.total:null))!=null?(p.denue.tot!=null?p.denue.tot:p.denue.total):"—";
-    var rentaStr=p.precio?"$"+Number(p.precio).toLocaleString("es-MX")+"/mes":"";
+    var rentaStr=(p.precio&&!isNaN(Number(p.precio))&&Number(p.precio)>0)?"$"+Number(p.precio).toLocaleString("es-MX")+"/mes":"";
     var m2Str=p.m2_terreno?p.m2_terreno+"m²":"";
     var extraStr=[rentaStr,m2Str].filter(Boolean).join(" · ");
     var statusColor=p.status==="viable"?"#22d18a":p.status==="descartado"?"#f05060":"#e8a020";
@@ -1768,7 +1768,7 @@ function saveP(){
       denue:editId?(existing?existing.denue:null):(DR&&DR.real?{rest:DR.rest,com:DR.com,tot:DR.tot,desglose:DR.desglose||{}}:null),
       inegi:editId?(existing?existing.inegi:null):(DR&&DR.real?{viv:DR.viv,pob:DR.pob}:null),
       competencia:editId?(existing?existing.competencia||[]:[]): (DR&&DR.competencia?DR.competencia:[]),
-      proyeccion:DR&&DR.proyeccion?DR.proyeccion:(existing?existing.proyeccion||null:null),
+      proyeccion:DR&&(DR.proyeccion||DR.proyeccion_venta)?(DR.proyeccion||DR.proyeccion_venta):(existing?existing.proyeccion||null:null),
       sucursal_cercana:DR&&DR.sucursal_cercana?DR.sucursal_cercana:(existing?existing.sucursal_cercana||null:null),
       documentos:docState
     };

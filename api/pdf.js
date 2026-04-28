@@ -36,20 +36,20 @@ export default async function handler(req, res) {
       doc.setFont("helvetica","bold");doc.setTextColor(...dorado);doc.text(String(dg[g]),c1+cW-3,gy,{align:"right"});gy+=5;
     });
     y1+=dgH+4;
-    if(p.pvRef){
-      const tiendas=Array.isArray(p.pvTiendas)?p.pvTiendas:[];
+    if(p.proyRef){
+      const tiendas=p.proyeccion&&Array.isArray(p.proyeccion.tiendas_referencia)?p.proyeccion.tiendas_referencia:[];
       const pvH=34+tiendas.length*5;
       doc.setFillColor(248,249,250);doc.roundedRect(c1,y1,cW,pvH,2,2,"F");doc.setDrawColor(229,231,235);doc.roundedRect(c1,y1,cW,pvH,2,2,"S");
       doc.setFontSize(7);doc.setFont("helvetica","bold");doc.setTextColor(...gris);doc.text("PROYECCION DE VENTAS",c1+3,y1+5);
       doc.setDrawColor(...dorado);doc.line(c1+3,y1+6.5,c1+cW-3,y1+6.5);
       doc.setFillColor(...blanco);doc.roundedRect(c1+2,y1+8,42,13,1,1,"F");doc.roundedRect(c1+48,y1+8,42,13,1,1,"F");
       doc.setFontSize(6);doc.setTextColor(...gris);doc.text("REFERENCIAL",c1+23,y1+11,{align:"center"});doc.text("RANGO",c1+69,y1+11,{align:"center"});
-      doc.setFontSize(10);doc.setFont("helvetica","bold");doc.setTextColor(...verde);doc.text(p.pvRef,c1+23,y1+19,{align:"center"});
-      doc.setFontSize(7);doc.setFont("helvetica","normal");doc.setTextColor(...gris);doc.text(p.pvRango||"-",c1+69,y1+16,{align:"center",maxWidth:40});
+      doc.setFontSize(10);doc.setFont("helvetica","bold");doc.setTextColor(...verde);doc.text(p.proyRef,c1+23,y1+19,{align:"center"});
+      doc.setFontSize(7);doc.setFont("helvetica","normal");doc.setTextColor(...gris);doc.text(p.proyRango||"-",c1+69,y1+16,{align:"center",maxWidth:40});
       doc.setFillColor(...blanco);doc.roundedRect(c1+2,y1+23,42,10,1,1,"F");doc.roundedRect(c1+48,y1+23,42,10,1,1,"F");
       doc.setFontSize(6);doc.setTextColor(...gris);doc.text("INSTITUCIONAL",c1+23,y1+26,{align:"center"});doc.text("CONSUMO",c1+69,y1+26,{align:"center"});
-      doc.setFontSize(8);doc.setFont("helvetica","bold");doc.setTextColor(240,192,80);doc.text(p.pvInst||"-",c1+23,y1+31,{align:"center"});
-      doc.setTextColor(...dorado);doc.text(p.pvCons||"-",c1+69,y1+31,{align:"center"});
+      doc.setFontSize(8);doc.setFont("helvetica","bold");doc.setTextColor(240,192,80);doc.text(p.proyInst||"-",c1+23,y1+31,{align:"center"});
+      doc.setTextColor(...dorado);doc.text(p.proyOcas||"-",c1+69,y1+31,{align:"center"});
       if(tiendas.length){
         let ty=y1+36;
         doc.setFontSize(5.5);doc.setFont("helvetica","bold");doc.setTextColor(...gris);doc.text("TIENDAS DE REFERENCIA",c1+3,ty);ty+=3;
